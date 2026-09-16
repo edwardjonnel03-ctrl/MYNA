@@ -5,6 +5,7 @@ const cors = require("cors");
 const session = require("express-session");
 const path = require("path");
 const { Resend } = require("resend");
+const connectDatabase = require("./config/database");
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
@@ -245,31 +246,35 @@ app.get(
 // START SERVER
 // =========================================
 
-app.listen(
-PORT,
-() => {
+async function startServer() {
 
+    try {
 
-    console.log("");
+        await connectDatabase();
 
-    console.log(
-        "=============================="
-    );
+        app.listen(
+            PORT,
+            () => {
 
-    console.log(
-        "       MAYNA IS RUNNING"
-    );
+                console.log("");
+                console.log("==============================");
+                console.log("       MAYNA IS RUNNING");
+                console.log("==============================");
+                console.log("http://localhost:" + PORT);
+                console.log("");
 
-    console.log(
-        "=============================="
-    );
+            }
+        );
 
-    console.log(
-        "http://localhost:" + PORT
-    );
+    } catch (error) {
 
-    console.log("");
+        console.error(
+            "SERVER START ERROR:",
+            error
+        );
 
+        process.exit(1);
+    }
 }
 
-);
+startServer();

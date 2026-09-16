@@ -1,79 +1,14 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
 const crypto = require("crypto");
 const { Resend } = require("resend");
+
+const Business = require("../models/Business");
 
 const router = express.Router();
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
 );
-
-const dataFile = path.join(
-    __dirname,
-    "..",
-    "..",
-    "data",
-    "businesses.json"
-);
-
-
-// ========================================
-// LOAD BUSINESSES
-// ========================================
-
-function loadBusinesses() {
-
-    try {
-
-        if (!fs.existsSync(dataFile)) {
-
-            fs.writeFileSync(
-                dataFile,
-                "[]"
-            );
-        }
-
-        const data =
-            fs.readFileSync(
-                dataFile,
-                "utf8"
-            );
-
-        if (!data.trim()) {
-            return [];
-        }
-
-        return JSON.parse(data);
-
-    } catch (error) {
-
-        console.error(
-            "ERROR LOADING BUSINESSES:",
-            error
-        );
-
-        return [];
-    }
-}
-
-
-// ========================================
-// SAVE BUSINESSES
-// ========================================
-
-function saveBusinesses(data) {
-
-    fs.writeFileSync(
-        dataFile,
-        JSON.stringify(
-            data,
-            null,
-            4
-        )
-    );
-}
 
 
 // ========================================
@@ -82,15 +17,16 @@ function saveBusinesses(data) {
 
 function publicBusiness(business) {
 
-    const safeBusiness = {
-        ...business
-    };
+    const safeBusiness =
+        business.toObject
+            ? business.toObject()
+            : { ...business };
 
-    delete safeBusiness.ownerPasswordHash;
-    delete safeBusiness.ownerPasswordSalt;
-
-    delete safeBusiness.resetTokenHash;
-    delete safeBusiness.resetTokenExpires;
+    delete safeBusiness.ownerEmail;
+delete safeBusiness.ownerPasswordHash;
+delete safeBusiness.ownerPasswordSalt;
+delete safeBusiness.resetTokenHash;
+delete safeBusiness.resetTokenExpires;
 
     return safeBusiness;
 }
@@ -150,15 +86,28 @@ function verifyPassword(
                 storedSalt
             );
 
-        return crypto.timingSafeEqual(
+        const calculatedHash =
             Buffer.from(
                 result.passwordHash,
                 "hex"
-            ),
+            );
+
+        const savedHash =
             Buffer.from(
                 storedHash,
                 "hex"
-            )
+            );
+
+        if (
+            calculatedHash.length !==
+            savedHash.length
+        ) {
+            return false;
+        }
+
+        return crypto.timingSafeEqual(
+            calculatedHash,
+            savedHash
         );
 
     } catch (error) {
@@ -181,34 +130,50 @@ function hashResetToken(token) {
 }
 
 
-let businesses =
-    loadBusinesses();
-
-
 // ========================================
 // GET ALL BUSINESSES
 // ========================================
 
 router.get(
     "/",
-    (req, res) => {
+    async (req, res) => {
 
-        businesses =
-            loadBusinesses();
+        try {
 
-        const safeBusinesses =
-            businesses.map(
-                publicBusiness
+            const businesses =
+                await Business
+                    .find()
+                    .sort({
+                        createdAt: -1
+                    });
+
+            return res.json({
+
+                success: true,
+
+                businesses:
+                    businesses.map(
+                        publicBusiness
+                    )
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "GET BUSINESSES ERROR:",
+                error
             );
 
-        return res.json({
+            return res.status(500).json({
 
-            success: true,
+                success: false,
 
-            businesses:
-                safeBusinesses
+                message:
+                    "Server error while loading businesses."
 
-        });
+            });
+        }
     }
 );
 
@@ -230,10 +195,8 @@ router.post(
                 .trim()
                 .toLowerCase();
 
-
             const genericMessage =
                 "If an account exists for that email, a password reset link has been generated.";
-
 
             if (!email) {
 
@@ -247,22 +210,10 @@ router.post(
                 });
             }
 
-
-            businesses =
-                loadBusinesses();
-
-
             const business =
-                businesses.find(
-                    item =>
-                        String(
-                            item.ownerEmail || ""
-                        )
-                        .trim()
-                        .toLowerCase() ===
-                        email
-                );
-
+                await Business.findOne({
+                    ownerEmail: email
+                });
 
             if (!business) {
 
@@ -276,55 +227,26 @@ router.post(
                 });
             }
 
-
-            // =====================================
-            // CREATE RESET TOKEN
-            // =====================================
-
             const resetToken =
                 crypto
                     .randomBytes(32)
                     .toString("hex");
 
-
-            const resetTokenHash =
+            business.resetTokenHash =
                 hashResetToken(
                     resetToken
                 );
 
-
-            const resetTokenExpires =
-                Date.now() +
-                (
-                    60 *
-                    60 *
-                    1000
+            business.resetTokenExpires =
+                new Date(
+                    Date.now() +
+                    (60 * 60 * 1000)
                 );
 
-
-            business.resetTokenHash =
-                resetTokenHash;
-
-
-            business.resetTokenExpires =
-                resetTokenExpires;
-
-
-            saveBusinesses(
-                businesses
-            );
-
-
-            // =====================================
-            // RESET LINK
-            // =====================================
+            await business.save();
 
             const resetLink =
-    `https://myna-web-i92o.onrender.com/reset-password.html?token=${resetToken}`;
-
-            // =====================================
-            // SEND EMAIL
-            // =====================================
+                `https://myna-web-i92o.onrender.com/reset-password.html?token=${resetToken}`;
 
             const {
                 data,
@@ -342,28 +264,22 @@ router.post(
                         "MAYNA — Reset your password",
 
                     html: `
+                        <div style="
+                            font-family: Arial, sans-serif;
+                            max-width: 600px;
+                            margin: auto;
+                            padding: 30px;
+                            color: #222;
+                        ">
 
-                        <div
-                            style="
-                                font-family: Arial, sans-serif;
-                                max-width: 600px;
-                                margin: auto;
-                                padding: 30px;
-                                color: #222;
-                            "
-                        >
-
-                            <h1>
-                                MAYNA
-                            </h1>
+                            <h1>MAYNA</h1>
 
                             <h2>
                                 Reset your password
                             </h2>
 
                             <p>
-                                Hello
-                                ${business.businessName || "Business Owner"},
+                                Hello ${business.businessName || "Business Owner"},
                             </p>
 
                             <p>
@@ -377,11 +293,7 @@ router.post(
                                 create a new password.
                             </p>
 
-                            <p
-                                style="
-                                    margin: 30px 0;
-                                "
-                            >
+                            <p style="margin: 30px 0;">
 
                                 <a
                                     href="${resetLink}"
@@ -413,20 +325,16 @@ router.post(
 
                             <hr>
 
-                            <p
-                                style="
-                                    color: #777;
-                                    font-size: 13px;
-                                "
-                            >
+                            <p style="
+                                color: #777;
+                                font-size: 13px;
+                            ">
                                 MAYNA — Discover. Connect. Grow.
                             </p>
 
                         </div>
-
                     `
                 });
-
 
             if (error) {
 
@@ -434,7 +342,6 @@ router.post(
                     "RESEND EMAIL ERROR:",
                     error
                 );
-
 
                 return res.status(500).json({
 
@@ -446,42 +353,10 @@ router.post(
                 });
             }
 
-
-            console.log("");
-
             console.log(
-                "========================================"
-            );
-
-            console.log(
-                "       PASSWORD RESET EMAIL SENT"
-            );
-
-            console.log(
-                "========================================"
-            );
-
-            console.log(
-                "Business:",
-                business.businessName
-            );
-
-            console.log(
-                "Email:",
-                email
-            );
-
-            console.log(
-                "Resend ID:",
+                "PASSWORD RESET EMAIL SENT:",
                 data?.id || "No ID"
             );
-
-            console.log(
-                "========================================"
-            );
-
-            console.log("");
-
 
             return res.json({
 
@@ -492,14 +367,12 @@ router.post(
 
             });
 
-
         } catch (error) {
 
             console.error(
                 "FORGOT PASSWORD ERROR:",
                 error
             );
-
 
             return res.status(500).json({
 
@@ -520,7 +393,7 @@ router.post(
 
 router.post(
     "/reset-password",
-    (req, res) => {
+    async (req, res) => {
 
         try {
 
@@ -529,12 +402,10 @@ router.post(
                     req.body.token || ""
                 ).trim();
 
-
             const newPassword =
                 String(
                     req.body.password || ""
                 );
-
 
             if (!token) {
 
@@ -547,7 +418,6 @@ router.post(
 
                 });
             }
-
 
             if (
                 !newPassword ||
@@ -564,29 +434,22 @@ router.post(
                 });
             }
 
-
-            businesses =
-                loadBusinesses();
-
-
             const tokenHash =
                 hashResetToken(
                     token
                 );
 
-
             const business =
-                businesses.find(
-                    item =>
-                        item.resetTokenHash ===
-                            tokenHash
-                        &&
-                        Number(
-                            item.resetTokenExpires
-                        ) >
-                            Date.now()
-                );
+                await Business.findOne({
 
+                    resetTokenHash:
+                        tokenHash,
+
+                    resetTokenExpires: {
+                        $gt: new Date()
+                    }
+
+                });
 
             if (!business) {
 
@@ -600,35 +463,24 @@ router.post(
                 });
             }
 
-
-            // CREATE NEW PASSWORD HASH
-
             const passwordData =
                 hashPassword(
                     newPassword
                 );
 
-
             business.ownerPasswordHash =
                 passwordData.passwordHash;
-
 
             business.ownerPasswordSalt =
                 passwordData.passwordSalt;
 
+            business.resetTokenHash =
+                null;
 
-            // DELETE RESET TOKEN
-            // MAKES THE LINK SINGLE-USE
+            business.resetTokenExpires =
+                null;
 
-            delete business.resetTokenHash;
-
-            delete business.resetTokenExpires;
-
-
-            saveBusinesses(
-                businesses
-            );
-
+            await business.save();
 
             return res.json({
 
@@ -646,7 +498,6 @@ router.post(
                 error
             );
 
-
             return res.status(500).json({
 
                 success: false,
@@ -661,282 +512,12 @@ router.post(
 
 
 // ========================================
-// GET ONE BUSINESS
-// ========================================
-
-router.get(
-    "/:id",
-    (req, res) => {
-
-        businesses =
-            loadBusinesses();
-
-
-        const id =
-            String(
-                req.params.id
-            );
-
-
-        const business =
-            businesses.find(
-                item =>
-                    String(item.id) ===
-                    id
-            );
-
-
-        if (!business) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Business not found."
-
-            });
-        }
-
-
-        return res.json({
-
-            success: true,
-
-            business:
-                publicBusiness(
-                    business
-                )
-
-        });
-    }
-);
-
-
-// ========================================
-// REGISTER BUSINESS
-// ========================================
-
-router.post(
-    "/",
-    (req, res) => {
-
-        try {
-
-            const ownerEmail =
-                String(
-                    req.body.ownerEmail || ""
-                )
-                .trim()
-                .toLowerCase();
-
-
-            const ownerPassword =
-                String(
-                    req.body.ownerPassword || ""
-                );
-
-
-            if (!ownerEmail) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Owner email is required."
-
-                });
-            }
-
-
-            if (!ownerPassword) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Owner password is required."
-
-                });
-            }
-
-
-            if (
-                ownerPassword.length < 6
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Password must be at least 6 characters."
-
-                });
-            }
-
-
-            businesses =
-                loadBusinesses();
-
-
-            const existingOwner =
-                businesses.find(
-                    item =>
-                        String(
-                            item.ownerEmail || ""
-                        )
-                        .trim()
-                        .toLowerCase() ===
-                        ownerEmail
-                );
-
-
-            if (existingOwner) {
-
-                return res.status(409).json({
-
-                    success: false,
-
-                    message:
-                        "An owner account with this email already exists."
-
-                });
-            }
-
-
-            const passwordData =
-                hashPassword(
-                    ownerPassword
-                );
-
-
-            const newBusiness = {
-
-                id:
-                    Date.now(),
-
-                businessName:
-                    req.body.businessName || "",
-
-                image:
-                    req.body.image || "",
-
-                country:
-                    "Namibia",
-
-                town:
-                    req.body.location || "",
-
-                category:
-                    req.body.category || "",
-
-                phone:
-                    req.body.phone || "",
-
-                whatsapp:
-                    req.body.whatsapp || "",
-
-                email:
-                    req.body.email || "",
-
-                description:
-                    req.body.description || "",
-
-                services:
-                    req.body.services || "",
-
-                ownerEmail:
-                    ownerEmail,
-
-                ownerPasswordHash:
-                    passwordData.passwordHash,
-
-                ownerPasswordSalt:
-                    passwordData.passwordSalt,
-
-                verified:
-                    false,
-
-                hours: {
-
-                    monday: "",
-                    tuesday: "",
-                    wednesday: "",
-                    thursday: "",
-                    friday: "",
-                    saturday: "",
-                    sunday: ""
-
-                }
-
-            };
-
-
-            businesses.push(
-                newBusiness
-            );
-
-
-            saveBusinesses(
-                businesses
-            );
-
-
-            req.session.ownerBusinessId =
-                newBusiness.id;
-
-
-            console.log(
-                "New business registered:",
-                newBusiness.businessName
-            );
-
-
-            return res.status(201).json({
-
-                success: true,
-
-                message:
-                    "Business registered successfully.",
-
-                business:
-                    publicBusiness(
-                        newBusiness
-                    )
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "REGISTER BUSINESS ERROR:",
-                error
-            );
-
-
-            return res.status(500).json({
-
-                success: false,
-
-                message:
-                    "Server error while registering business."
-
-            });
-        }
-    }
-);
-
-
-// ========================================
 // OWNER LOGIN
 // ========================================
 
 router.post(
     "/owner/login",
-    (req, res) => {
+    async (req, res) => {
 
         try {
 
@@ -947,12 +528,10 @@ router.post(
                 .trim()
                 .toLowerCase();
 
-
             const password =
                 String(
                     req.body.password || ""
                 );
-
 
             if (
                 !email ||
@@ -969,22 +548,10 @@ router.post(
                 });
             }
 
-
-            businesses =
-                loadBusinesses();
-
-
             const business =
-                businesses.find(
-                    item =>
-                        String(
-                            item.ownerEmail || ""
-                        )
-                        .trim()
-                        .toLowerCase() ===
-                        email
-                );
-
+                await Business.findOne({
+                    ownerEmail: email
+                });
 
             if (!business) {
 
@@ -998,14 +565,12 @@ router.post(
                 });
             }
 
-
             const passwordCorrect =
                 verifyPassword(
                     password,
                     business.ownerPasswordHash,
                     business.ownerPasswordSalt
                 );
-
 
             if (!passwordCorrect) {
 
@@ -1019,10 +584,8 @@ router.post(
                 });
             }
 
-
             req.session.ownerBusinessId =
                 business.id;
-
 
             return res.json({
 
@@ -1045,7 +608,6 @@ router.post(
                 error
             );
 
-
             return res.status(500).json({
 
                 success: false,
@@ -1065,41 +627,70 @@ router.post(
 
 router.get(
     "/owner/session",
-    (req, res) => {
+    async (req, res) => {
 
-        if (
-            !req.session ||
-            !req.session.ownerBusinessId
-        ) {
+        try {
 
-            return res.status(401).json({
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
 
-                success: false,
+                return res.status(401).json({
+
+                    success: false,
+
+                    authenticated:
+                        false
+
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id:
+                        Number(
+                            req.session.ownerBusinessId
+                        )
+                });
+
+            if (!business) {
+
+                req.session.ownerBusinessId =
+                    null;
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    authenticated:
+                        false
+
+                });
+            }
+
+            return res.json({
+
+                success: true,
 
                 authenticated:
-                    false
+                    true,
+
+                business:
+                    publicBusiness(
+                        business
+                    )
 
             });
-        }
 
+        } catch (error) {
 
-        businesses =
-            loadBusinesses();
-
-
-        const business =
-            businesses.find(
-                item =>
-                    String(item.id) ===
-                    String(
-                        req.session.ownerBusinessId
-                    )
+            console.error(
+                "OWNER SESSION ERROR:",
+                error
             );
 
-
-        if (!business) {
-
-            return res.status(401).json({
+            return res.status(500).json({
 
                 success: false,
 
@@ -1108,21 +699,6 @@ router.get(
 
             });
         }
-
-
-        return res.json({
-
-            success: true,
-
-            authenticated:
-                true,
-
-            business:
-                publicBusiness(
-                    business
-                )
-
-        });
     }
 );
 
@@ -1138,16 +714,12 @@ router.post(
         if (!req.session) {
 
             return res.json({
-
                 success: true
-
             });
         }
 
-
         req.session.ownerBusinessId =
             null;
-
 
         return res.json({
 
@@ -1162,12 +734,207 @@ router.post(
 
 
 // ========================================
+// REGISTER BUSINESS
+// ========================================
+
+router.post(
+    "/",
+    async (req, res) => {
+
+        try {
+
+            const ownerEmail =
+                String(
+                    req.body.ownerEmail || ""
+                )
+                .trim()
+                .toLowerCase();
+
+            const ownerPassword =
+                String(
+                    req.body.ownerPassword || ""
+                );
+
+            if (!ownerEmail) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Owner email is required."
+
+                });
+            }
+
+            if (
+                !ownerPassword ||
+                ownerPassword.length < 6
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Password must be at least 6 characters."
+
+                });
+            }
+
+            const existingOwner =
+                await Business.findOne({
+                    ownerEmail:
+                        ownerEmail
+                });
+
+            if (existingOwner) {
+
+                return res.status(409).json({
+
+                    success: false,
+
+                    message:
+                        "An owner account with this email already exists."
+
+                });
+            }
+
+            const passwordData =
+                hashPassword(
+                    ownerPassword
+                );
+
+            const newBusiness =
+                await Business.create({
+
+                    id:
+                        Date.now(),
+
+                    businessName:
+                        req.body.businessName || "",
+
+                    image:
+                        req.body.image || "",
+
+                    country:
+                        "Namibia",
+
+                    town:
+                        req.body.location || "",
+
+                    category:
+                        req.body.category || "Other",
+
+                    phone:
+                        req.body.phone || "",
+
+                    whatsapp:
+                        req.body.whatsapp || "",
+
+                    email:
+                        req.body.email || "",
+
+                    description:
+                        req.body.description || "",
+
+                    services:
+                        req.body.services || "",
+
+                    ownerEmail:
+                        ownerEmail,
+
+                    ownerPasswordHash:
+                        passwordData.passwordHash,
+
+                    ownerPasswordSalt:
+                        passwordData.passwordSalt,
+
+                    claimed:
+                        true,
+
+                    verified:
+                        false,
+
+                    hours: {
+
+                        monday: "",
+                        tuesday: "",
+                        wednesday: "",
+                        thursday: "",
+                        friday: "",
+                        saturday: "",
+                        sunday: ""
+
+                    }
+
+                });
+
+            req.session.ownerBusinessId =
+                newBusiness.id;
+
+            console.log(
+                "New MongoDB business registered:",
+                newBusiness.businessName
+            );
+
+            return res.status(201).json({
+
+                success: true,
+
+                message:
+                    "Business registered successfully.",
+
+                business:
+                    publicBusiness(
+                        newBusiness
+                    )
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "REGISTER BUSINESS ERROR:",
+                error
+            );
+
+            if (
+                error &&
+                error.code === 11000
+            ) {
+
+                return res.status(409).json({
+
+                    success: false,
+
+                    message:
+                        "This business account already exists."
+
+                });
+            }
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while registering business."
+
+            });
+        }
+    }
+);
+
+
+// ========================================
 // VERIFY / UNVERIFY BUSINESS
 // ADMIN ONLY
 // ========================================
 
 router.put(
     "/:id/verification",
+
     (req, res, next) => {
 
         if (
@@ -1176,10 +943,8 @@ router.put(
         ) {
 
             next();
-
             return;
         }
-
 
         return res.status(401).json({
 
@@ -1191,31 +956,40 @@ router.put(
         });
     },
 
-    (req, res) => {
+    async (req, res) => {
 
         try {
 
             const id =
-                String(
+                Number(
                     req.params.id
                 );
 
+            const verified =
+                req.body.verified === true;
 
-            businesses =
-                loadBusinesses();
+            const business =
+                await Business.findOneAndUpdate(
 
+                    {
+                        id: id
+                    },
 
-            const businessIndex =
-                businesses.findIndex(
-                    item =>
-                        String(item.id) ===
-                        id
+                    {
+                        $set: {
+                            verified:
+                                verified
+                        }
+                    },
+
+                    {
+                        new: true,
+                        runValidators: true
+                    }
+
                 );
 
-
-            if (
-                businessIndex === -1
-            ) {
+            if (!business) {
 
                 return res.status(404).json({
 
@@ -1226,22 +1000,6 @@ router.put(
 
                 });
             }
-
-
-            const verified =
-                req.body.verified === true;
-
-
-            businesses[
-                businessIndex
-            ].verified =
-                verified;
-
-
-            saveBusinesses(
-                businesses
-            );
-
 
             return res.json({
 
@@ -1254,9 +1012,7 @@ router.put(
 
                 business:
                     publicBusiness(
-                        businesses[
-                            businessIndex
-                        ]
+                        business
                     )
 
             });
@@ -1267,7 +1023,6 @@ router.put(
                 "VERIFICATION ERROR:",
                 error
             );
-
 
             return res.status(500).json({
 
@@ -1289,7 +1044,7 @@ router.put(
 
 router.put(
     "/:id",
-    (req, res) => {
+    async (req, res) => {
 
         try {
 
@@ -1308,17 +1063,16 @@ router.put(
                 });
             }
 
-
             const id =
-                String(
+                Number(
                     req.params.id
                 );
-
 
             if (
                 String(
                     req.session.ownerBusinessId
-                ) !== id
+                ) !==
+                String(id)
             ) {
 
                 return res.status(403).json({
@@ -1331,22 +1085,12 @@ router.put(
                 });
             }
 
+            const business =
+                await Business.findOne({
+                    id: id
+                });
 
-            businesses =
-                loadBusinesses();
-
-
-            const businessIndex =
-                businesses.findIndex(
-                    item =>
-                        String(item.id) ===
-                        id
-                );
-
-
-            if (
-                businessIndex === -1
-            ) {
+            if (!business) {
 
                 return res.status(404).json({
 
@@ -1358,77 +1102,87 @@ router.put(
                 });
             }
 
+            if (
+                req.body.businessName !==
+                undefined
+            ) {
+                business.businessName =
+                    req.body.businessName;
+            }
 
-            const currentBusiness =
-                businesses[
-                    businessIndex
-                ];
+            if (
+                req.body.image !==
+                undefined
+            ) {
+                business.image =
+                    req.body.image;
+            }
 
+            if (
+                req.body.category !==
+                undefined
+            ) {
+                business.category =
+                    req.body.category;
+            }
 
-            const updatedBusiness = {
+            if (
+                req.body.location !==
+                undefined
+            ) {
+                business.town =
+                    req.body.location;
+            }
 
-                ...currentBusiness,
+            if (
+                req.body.phone !==
+                undefined
+            ) {
+                business.phone =
+                    req.body.phone;
+            }
 
-                businessName:
-                    req.body.businessName ??
-                    currentBusiness.businessName,
+            if (
+                req.body.whatsapp !==
+                undefined
+            ) {
+                business.whatsapp =
+                    req.body.whatsapp;
+            }
 
-                image:
-                    req.body.image ??
-                    currentBusiness.image ??
-                    "",
+            if (
+                req.body.email !==
+                undefined
+            ) {
+                business.email =
+                    req.body.email;
+            }
 
-                category:
-                    req.body.category ??
-                    currentBusiness.category,
+            if (
+                req.body.description !==
+                undefined
+            ) {
+                business.description =
+                    req.body.description;
+            }
 
-                town:
-                    req.body.location ??
-                    currentBusiness.town,
+            if (
+                req.body.services !==
+                undefined
+            ) {
+                business.services =
+                    req.body.services;
+            }
 
-                phone:
-                    req.body.phone ??
-                    currentBusiness.phone ??
-                    "",
+            if (
+                req.body.hours !==
+                undefined
+            ) {
+                business.hours =
+                    req.body.hours;
+            }
 
-                whatsapp:
-                    req.body.whatsapp ??
-                    currentBusiness.whatsapp ??
-                    "",
-
-                email:
-                    req.body.email ??
-                    currentBusiness.email ??
-                    "",
-
-                description:
-                    req.body.description ??
-                    currentBusiness.description ??
-                    "",
-
-                services:
-                    req.body.services ??
-                    currentBusiness.services ??
-                    "",
-
-                hours:
-                    req.body.hours ??
-                    currentBusiness.hours ??
-                    {}
-
-            };
-
-
-            businesses[
-                businessIndex
-            ] =
-                updatedBusiness;
-
-
-            saveBusinesses(
-                businesses
-            );
-
+            await business.save();
 
             return res.json({
 
@@ -1439,7 +1193,7 @@ router.put(
 
                 business:
                     publicBusiness(
-                        updatedBusiness
+                        business
                     )
 
             });
@@ -1451,13 +1205,91 @@ router.put(
                 error
             );
 
-
             return res.status(500).json({
 
                 success: false,
 
                 message:
                     "Server error while updating business."
+
+            });
+        }
+    }
+);
+
+
+// ========================================
+// GET ONE BUSINESS
+// Keep this near the bottom because /:id
+// is a dynamic route.
+// ========================================
+
+router.get(
+    "/:id",
+    async (req, res) => {
+
+        try {
+
+            const id =
+                Number(
+                    req.params.id
+                );
+
+            if (
+                !Number.isFinite(id)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid business ID."
+
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: id
+                });
+
+            if (!business) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Business not found."
+
+                });
+            }
+
+            return res.json({
+
+                success: true,
+
+                business:
+                    publicBusiness(
+                        business
+                    )
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "GET BUSINESS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while loading business."
 
             });
         }
