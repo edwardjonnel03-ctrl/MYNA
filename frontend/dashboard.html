@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MAYNA Business Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px;
+        }
+
+        header .top {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            color: #d1d5db;
+        }
+
+        #logoutButton {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .photo-area {
+            text-align: center;
+        }
+
+        #photoPreview {
+            max-width: 250px;
+            max-height: 200px;
+            border-radius: 10px;
+            display: none;
+            margin: 15px auto;
+            object-fit: cover;
+        }
+
+        #photoPlaceholder {
+            width: 250px;
+            height: 160px;
+            margin: 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 10px;
+            color: #6b7280;
+        }
+
+        #saveButton {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #saveButton:disabled,
+        #logoutButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 7px;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        @media (max-width: 700px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            header .top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="top">
+
+        <div>
+
+            <h1>MAYNA Business Dashboard</h1>
+
+            <p id="ownerBusinessName">
+                Loading your business...
+            </p>
+
+        </div>
+
+        <button id="logoutButton">
+            Logout
+        </button>
+
+    </div>
+
+</header>
+
+
+<main>
+
+
+    <div class="card">
+
+        <h2>Business Information</h2>
+
+        <div class="grid">
+
+
+            <div>
+
+                <label for="businessName">
+                    Business Name
+                </label>
+
+                <input
+                    type="text"
+                    id="businessName"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select id="category">
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Automotive">
+                        Automotive
+                    </option>
+
+                    <option value="Beauty">
+                        Beauty
+                    </option>
+
+                    <option value="Construction">
+                        Construction
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Health">
+                        Health
+                    </option>
+
+                    <option value="IT & Technology">
+                        IT & Technology
+                    </option>
+
+                    <option value="Retail">
+                        Retail
+                    </option>
+
+                    <option value="Services">
+                        Services
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label for="location">
+                    Town / Location
+                </label>
+
+                <input
+                    type="text"
+                    id="location"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="phone">
+                    Phone
+                </label>
+
+                <input
+                    type="text"
+                    id="phone"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="whatsapp">
+                    WhatsApp
+                </label>
+
+                <input
+                    type="text"
+                    id="whatsapp"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="email">
+                    Business Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                >
+
+            </div>
+
+
+            <div class="full">
+
+                <label for="description">
+                    Business Description
+                </label>
+
+                <textarea
+                    id="description"
+                    placeholder="Tell customers about your business..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="full">
+
+                <label for="services">
+                    Services
+                </label>
+
+                <textarea
+                    id="services"
+                    placeholder="List the services you provide..."
+                ></textarea>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <div class="card photo-area">
+
+        <h2>Business Photo</h2>
+
+        <div id="photoPlaceholder">
+            No business photo
+        </div>
+
+        <img
+            id="photoPreview"
+            alt="Business photo"
+        >
+
+        <input
+            type="file"
+            id="photoInput"
+            accept="image/*"
+        >
+
+        <p>
+            Maximum image size: 5 MB
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Opening Hours</h2>
+
+        <div class="grid">
+
+
+            <div>
+                <label for="monday">
+                    Monday
+                </label>
+
+                <input
+                    type="text"
+                    id="monday"
+                    placeholder="08:00 - 17:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="tuesday">
+                    Tuesday
+                </label>
+
+                <input
+                    type="text"
+                    id="tuesday"
+                    placeholder="08:00 - 17:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="wednesday">
+                    Wednesday
+                </label>
+
+                <input
+                    type="text"
+                    id="wednesday"
+                    placeholder="08:00 - 17:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="thursday">
+                    Thursday
+                </label>
+
+                <input
+                    type="text"
+                    id="thursday"
+                    placeholder="08:00 - 17:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="friday">
+                    Friday
+                </label>
+
+                <input
+                    type="text"
+                    id="friday"
+                    placeholder="08:00 - 17:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="saturday">
+                    Saturday
+                </label>
+
+                <input
+                    type="text"
+                    id="saturday"
+                    placeholder="08:00 - 13:00"
+                >
+            </div>
+
+
+            <div>
+                <label for="sunday">
+                    Sunday
+                </label>
+
+                <input
+                    type="text"
+                    id="sunday"
+                    placeholder="Closed"
+                >
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <button id="saveButton">
+            Save changes →
+        </button>
+
+        <div id="message"></div>
+
+    </div>
+
+
+</main>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        let businessId = null;
+
+
+        const photoInput =
+            document.getElementById(
+                "photoInput"
+            );
+
+        const photoPreview =
+            document.getElementById(
+                "photoPreview"
+            );
+
+        const photoPlaceholder =
+            document.getElementById(
+                "photoPlaceholder"
+            );
+
+        const message =
+            document.getElementById(
+                "message"
+            );
+
+        const saveButton =
+            document.getElementById(
+                "saveButton"
+            );
+
+        const logoutButton =
+            document.getElementById(
+                "logoutButton"
+            );
+
+        const ownerBusinessName =
+            document.getElementById(
+                "ownerBusinessName"
+            );
+
+
+        function showPhoto(imageSource) {
+
+            if (!imageSource) {
+
+                photoPreview.style.display =
+                    "none";
+
+                photoPlaceholder.style.display =
+                    "flex";
+
+                return;
+            }
+
+            photoPreview.src =
+                imageSource;
+
+            photoPreview.style.display =
+                "block";
+
+            photoPlaceholder.style.display =
+                "none";
+        }
+
+
+        photoInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    photoInput.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                if (
+                    !file.type.startsWith(
+                        "image/"
+                    )
+                ) {
+
+                    alert(
+                        "Please select an image file."
+                    );
+
+                    photoInput.value = "";
+
+                    return;
+                }
+
+                if (
+                    file.size >
+                    5 * 1024 * 1024
+                ) {
+
+                    alert(
+                        "Please choose an image smaller than 5 MB."
+                    );
+
+                    photoInput.value = "";
+
+                    return;
+                }
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    function (event) {
+
+                        showPhoto(
+                            event.target.result
+                        );
+
+                    };
+
+                reader.readAsDataURL(file);
+
+            }
+        );
+
+
+        async function loadOwnerSession() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/businesses/owner/session",
+                        {
+                            credentials:
+                                "include"
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    window.location.href =
+                        "owner-login.html";
+
+                    return;
+                }
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    !result.success ||
+                    !result.authenticated ||
+                    !result.business
+                ) {
+
+                    window.location.href =
+                        "owner-login.html";
+
+                    return;
+                }
+
+
+                const business =
+                    result.business;
+
+
+                businessId =
+                    business.id;
+
+
+                ownerBusinessName.textContent =
+                    "Managing: " +
+                    (
+                        business.businessName ||
+                        "Your business"
+                    );
+
+
+                document.getElementById(
+                    "businessName"
+                ).value =
+                    business.businessName || "";
+
+
+                document.getElementById(
+                    "category"
+                ).value =
+                    business.category || "";
+
+
+                document.getElementById(
+                    "location"
+                ).value =
+                    business.town || "";
+
+
+                document.getElementById(
+                    "phone"
+                ).value =
+                    business.phone || "";
+
+
+                document.getElementById(
+                    "whatsapp"
+                ).value =
+                    business.whatsapp || "";
+
+
+                document.getElementById(
+                    "email"
+                ).value =
+                    business.email || "";
+
+
+                document.getElementById(
+                    "description"
+                ).value =
+                    business.description || "";
+
+
+                document.getElementById(
+                    "services"
+                ).value =
+                    business.services || "";
+
+
+                showPhoto(
+                    business.image || ""
+                );
+
+
+                const hours =
+                    business.hours || {};
+
+
+                document.getElementById(
+                    "monday"
+                ).value =
+                    hours.monday || "";
+
+
+                document.getElementById(
+                    "tuesday"
+                ).value =
+                    hours.tuesday || "";
+
+
+                document.getElementById(
+                    "wednesday"
+                ).value =
+                    hours.wednesday || "";
+
+
+                document.getElementById(
+                    "thursday"
+                ).value =
+                    hours.thursday || "";
+
+
+                document.getElementById(
+                    "friday"
+                ).value =
+                    hours.friday || "";
+
+
+                document.getElementById(
+                    "saturday"
+                ).value =
+                    hours.saturday || "";
+
+
+                document.getElementById(
+                    "sunday"
+                ).value =
+                    hours.sunday || "";
+
+
+            } catch (error) {
+
+                console.error(
+                    "OWNER SESSION ERROR:",
+                    error
+                );
+
+                window.location.href =
+                    "owner-login.html";
+            }
+        }
+
+
+        saveButton.addEventListener(
+            "click",
+            async function () {
+
+
+                if (!businessId) {
+
+                    alert(
+                        "Your business has not loaded yet."
+                    );
+
+                    return;
+                }
+
+
+                saveButton.disabled =
+                    true;
+
+                saveButton.textContent =
+                    "Saving...";
+
+
+                let image = "";
+
+
+                if (
+                    photoPreview.style.display !==
+                        "none" &&
+                    photoPreview.src
+                ) {
+
+                    image =
+                        photoPreview.src;
+                }
+
+
+                const updatedBusiness = {
+
+                    businessName:
+                        document.getElementById(
+                            "businessName"
+                        ).value.trim(),
+
+                    category:
+                        document.getElementById(
+                            "category"
+                        ).value,
+
+                    location:
+                        document.getElementById(
+                            "location"
+                        ).value.trim(),
+
+                    phone:
+                        document.getElementById(
+                            "phone"
+                        ).value.trim(),
+
+                    whatsapp:
+                        document.getElementById(
+                            "whatsapp"
+                        ).value.trim(),
+
+                    email:
+                        document.getElementById(
+                            "email"
+                        ).value.trim(),
+
+                    image:
+                        image,
+
+                    description:
+                        document.getElementById(
+                            "description"
+                        ).value.trim(),
+
+                    services:
+                        document.getElementById(
+                            "services"
+                        ).value.trim(),
+
+                    hours: {
+
+                        monday:
+                            document.getElementById(
+                                "monday"
+                            ).value.trim(),
+
+                        tuesday:
+                            document.getElementById(
+                                "tuesday"
+                            ).value.trim(),
+
+                        wednesday:
+                            document.getElementById(
+                                "wednesday"
+                            ).value.trim(),
+
+                        thursday:
+                            document.getElementById(
+                                "thursday"
+                            ).value.trim(),
+
+                        friday:
+                            document.getElementById(
+                                "friday"
+                            ).value.trim(),
+
+                        saturday:
+                            document.getElementById(
+                                "saturday"
+                            ).value.trim(),
+
+                        sunday:
+                            document.getElementById(
+                                "sunday"
+                            ).value.trim()
+                    }
+                };
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            `/api/businesses/${businessId}`,
+                            {
+
+                                method:
+                                    "PUT",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                credentials:
+                                    "include",
+
+                                body:
+                                    JSON.stringify(
+                                        updatedBusiness
+                                    )
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            result.message ||
+                            "Could not save changes."
+                        );
+                    }
+
+
+                    ownerBusinessName.textContent =
+                        "Managing: " +
+                        (
+                            result.business.businessName ||
+                            "Your business"
+                        );
+
+
+                    message.textContent =
+                        "Business updated successfully.";
+
+                    message.style.display =
+                        "block";
+
+
+                    showPhoto(
+                        result.business.image || ""
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "SAVE ERROR:",
+                        error
+                    );
+
+
+                    message.textContent =
+                        "Could not save changes: " +
+                        error.message;
+
+                    message.style.display =
+                        "block";
+
+
+                } finally {
+
+                    saveButton.disabled =
+                        false;
+
+                    saveButton.textContent =
+                        "Save changes →";
+                }
+
+            }
+        );
+
+
+        logoutButton.addEventListener(
+            "click",
+            async function () {
+
+                logoutButton.disabled =
+                    true;
+
+                logoutButton.textContent =
+                    "Logging out...";
+
+
+                try {
+
+                    await fetch(
+                        "/api/businesses/owner/logout",
+                        {
+                            method: "POST",
+                            credentials: "include"
+                        }
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "LOGOUT ERROR:",
+                        error
+                    );
+                }
+
+
+                window.location.href =
+                    "owner-login.html";
+
+            }
+        );
+
+
+        loadOwnerSession();
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Explore Businesses — MAYNA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .explore-page {
+            padding: 110px 6% 80px;
+            min-height: 100vh;
+        }
+
+        .explore-header {
+            max-width: 850px;
+            margin-bottom: 45px;
+        }
+
+        .explore-label {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+        }
+
+        .explore-header h1 {
+            font-size: clamp(38px, 6vw, 68px);
+            line-height: 1;
+            margin-bottom: 18px;
+        }
+
+        .explore-header p {
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .explore-tools {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .explore-search {
+            flex: 1;
+            min-width: 250px;
+            padding: 17px 20px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .explore-search:focus {
+            border-color: var(--accent);
+        }
+
+        .category-filter {
+            padding: 17px 20px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .business-card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 25px;
+            transition: 0.25s ease;
+            cursor: pointer;
+        }
+
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+        }
+
+        .business-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            background: var(--soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+
+        .business-card h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .business-category {
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .business-location {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .business-description {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .view-business {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .verified-badge {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #16803c;
+        }
+
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 70px 20px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 900px) {
+            .business-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .explore-page {
+                padding: 90px 5% 60px;
+            }
+
+            .business-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .explore-header h1 {
+                font-size: 42px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <nav class="navbar">
+
+        <a href="index.html" class="logo">
+            MAYNA<span>.</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="businesses.html" class="active">
+                Explore
+            </a>
+            <a href="index.html#categories">
+                Categories
+            </a>
+            <a href="register.html">
+                List your business
+            </a>
+        </div>
+
+        <a
+            href="register.html"
+            class="nav-button"
+        >
+            List your business
+        </a>
+
+    </nav>
+
+
+    <!-- EXPLORE -->
+
+    <main class="explore-page">
+
+        <div class="explore-header">
+
+            <div class="explore-label">
+                DISCOVER NAMIBIA
+            </div>
+
+            <h1>
+                Find businesses<br>
+                worth knowing.
+            </h1>
+
+            <p>
+                Discover local businesses, services and products
+                across Namibia.
+            </p>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="explore-tools">
+
+            <input
+                type="text"
+                id="businessSearch"
+                class="explore-search"
+                placeholder="Search businesses, services or products..."
+            >
+
+            <select
+                id="categoryFilter"
+                class="category-filter"
+            >
+                <option value="">
+                    All categories
+                </option>
+
+                <option value="Electronics">
+                    Electronics
+                </option>
+
+                <option value="Repairs">
+                    Repairs
+                </option>
+
+                <option value="Computers">
+                    Computers
+                </option>
+
+                <option value="Automotive">
+                    Automotive
+                </option>
+
+                <option value="Food">
+                    Food
+                </option>
+
+                <option value="Beauty">
+                    Beauty
+                </option>
+
+                <option value="Home">
+                    Home
+                </option>
+
+                <option value="Shopping">
+                    Shopping
+                </option>
+            </select>
+
+        </div>
+
+
+        <!-- REAL BUSINESSES LOAD HERE -->
+
+        <div
+            class="business-grid"
+            id="businessGrid"
+        ></div>
+
+
+        <!-- EMPTY -->
+
+        <div
+            class="empty-state"
+            id="emptyState"
+        >
+            <h2>
+                No businesses found
+            </h2>
+
+            <p>
+                Try another search or category.
+            </p>
+        </div>
+
+    </main>
+
+
+    <script>
+
+        const searchInput =
+            document.getElementById(
+                "businessSearch"
+            );
+
+        const categoryFilter =
+            document.getElementById(
+                "categoryFilter"
+            );
+
+        const businessGrid =
+            document.getElementById(
+                "businessGrid"
+            );
+
+        const emptyState =
+            document.getElementById(
+                "emptyState"
+            );
+
+
+        let businesses = [];
+
+
+        /*
+        ========================================
+        LOAD REAL BUSINESSES
+        ========================================
+        */
+
+        async function loadBusinesses() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/businesses"
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not load businesses."
+                    );
+
+                }
+
+
+                const result =
+                    await response.json();
+
+
+                if (!result.success) {
+
+                    throw new Error(
+                        "Could not load businesses."
+                    );
+
+                }
+
+
+                /*
+                Only show verified businesses
+                */
+
+                businesses =
+                    result.businesses.filter(
+                        business =>
+                            business.verified === true
+                    );
+
+
+                renderBusinesses();
+
+
+            } catch (error) {
+
+                console.error(
+                    "LOAD BUSINESSES ERROR:",
+                    error
+                );
+
+
+                businessGrid.innerHTML = "";
+
+                emptyState.style.display =
+                    "block";
+
+                emptyState.querySelector("h2")
+                    .textContent =
+                    "Unable to load businesses";
+
+                emptyState.querySelector("p")
+                    .textContent =
+                    "Please try again later.";
+
+            }
+
+        }
+
+
+        /*
+        ========================================
+        RENDER BUSINESSES
+        ========================================
+        */
+
+        function renderBusinesses() {
+
+            const search =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+
+            const category =
+                categoryFilter.value;
+
+
+            const filteredBusinesses =
+                businesses.filter(
+                    function(business) {
+
+                        const name =
+                            (
+                                business.businessName ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const businessCategory =
+                            (
+                                business.category ||
+                                ""
+                            );
+
+
+                        const town =
+                            (
+                                business.town ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const description =
+                            (
+                                business.description ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const services =
+                            (
+                                business.services ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const matchesSearch =
+                            !search ||
+                            name.includes(search) ||
+                            businessCategory
+                                .toLowerCase()
+                                .includes(search) ||
+                            town.includes(search) ||
+                            description.includes(search) ||
+                            services.includes(search);
+
+
+                        const matchesCategory =
+                            !category ||
+                            businessCategory === category;
+
+
+                        return (
+                            matchesSearch &&
+                            matchesCategory
+                        );
+
+                    }
+                );
+
+
+            /*
+            Clear existing cards
+            */
+
+            businessGrid.innerHTML = "";
+
+
+            /*
+            No businesses
+            */
+
+            if (
+                filteredBusinesses.length === 0
+            ) {
+
+                emptyState.style.display =
+                    "block";
+
+                return;
+
+            }
+
+
+            emptyState.style.display =
+                "none";
+
+
+            /*
+            Create real business cards
+            */
+
+            filteredBusinesses.forEach(
+                function(business) {
+
+                    const card =
+                        document.createElement(
+                            "article"
+                        );
+
+
+                    card.className =
+                        "business-card";
+
+
+                    const name =
+                        business.businessName ||
+                        "Unnamed Business";
+
+
+                    const category =
+                        business.category ||
+                        "Business";
+
+
+                    const town =
+                        business.town ||
+                        "Namibia";
+
+
+                    const description =
+                        business.description ||
+                        "Local business and services.";
+
+
+                    const initials =
+                        name
+                            .split(" ")
+                            .map(
+                                word =>
+                                    word.charAt(0)
+                            )
+                            .join("")
+                            .substring(0, 2)
+                            .toUpperCase();
+
+
+                    card.innerHTML = `
+
+                        <div class="business-icon">
+                            ${initials}
+                        </div>
+
+                        <div class="business-category">
+                            ${category}
+                        </div>
+
+                        <h3>
+                            ${name}
+                        </h3>
+
+                        <div class="business-location">
+                            📍 ${town}
+                        </div>
+
+                        <p class="business-description">
+                            ${description}
+                        </p>
+
+                        <div class="verified-badge">
+                            ✓ Verified business
+                        </div>
+
+                        <div class="view-business">
+                            View business →
+                        </div>
+
+                    `;
+
+
+                    card.addEventListener(
+                        "click",
+                        function() {
+
+                            window.location.href =
+                                "business.html?id=" +
+                                encodeURIComponent(
+                                    business.id
+                                );
+
+                        }
+                    );
+
+
+                    businessGrid.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+        ========================================
+        SEARCH
+        ========================================
+        */
+
+        searchInput.addEventListener(
+            "input",
+            renderBusinesses
+        );
+
+
+        /*
+        ========================================
+        CATEGORY FILTER
+        ========================================
+        */
+
+        categoryFilter.addEventListener(
+            "change",
+            renderBusinesses
+        );
+
+
+        /*
+        ========================================
+        HOMEPAGE SEARCH
+        ========================================
+        */
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const homepageSearch =
+            params.get("search");
+
+
+        if (homepageSearch) {
+
+            searchInput.value =
+                homepageSearch;
+
+        }
+
+
+        /*
+        ========================================
+        START
+        ========================================
+        */
+
+        loadBusinesses();
+
+    </script>
+
+</body>
+</html>

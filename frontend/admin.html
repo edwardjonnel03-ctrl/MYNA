@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Admin Dashboard — MAYNA</title>
+
+<link
+    rel="stylesheet"
+    href="css/style.css"
+>
+
+<style>
+
+    .admin-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 50px 20px;
+    }
+
+    .admin-header {
+        margin-bottom: 35px;
+    }
+
+    .admin-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .admin-header h1 {
+        margin-bottom: 8px;
+    }
+
+    .admin-header p {
+        color: var(--muted);
+    }
+
+    .logout-button {
+        border: none;
+        background: #222;
+        color: white;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        opacity: 0.85;
+    }
+
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 25px;
+        box-shadow: var(--shadow);
+    }
+
+    .stat-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card strong {
+        font-size: 30px;
+    }
+
+    .business-list {
+        display: grid;
+        gap: 15px;
+    }
+
+    .business-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .business-info h3 {
+        margin: 0 0 6px;
+    }
+
+    .business-info p {
+        margin: 4px 0;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .verified-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #eaf8ef;
+        color: #18864b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .unverified-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #f3f3f3;
+        color: #777;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .admin-button {
+        border: none;
+        background: var(--orange);
+        color: white;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .admin-button:hover {
+        background: var(--orange-dark);
+    }
+
+    @media (max-width: 700px) {
+
+        .admin-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .business-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .admin-header-top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<main class="admin-page">
+
+    <div class="admin-header">
+
+        <div class="admin-header-top">
+
+            <div>
+
+                <h1>
+                    MAYNA Admin Dashboard
+                </h1>
+
+                <p>
+                    Manage registered businesses and verification status.
+                </p>
+
+            </div>
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <section class="admin-stats">
+
+        <div class="stat-card">
+
+            <span>
+                Total Businesses
+            </span>
+
+            <strong id="totalBusinesses">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Verified Businesses
+            </span>
+
+            <strong id="verifiedBusinesses">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Unverified Businesses
+            </span>
+
+            <strong id="unverifiedBusinesses">
+                0
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <section>
+
+        <h2>
+            Registered Businesses
+        </h2>
+
+        <div
+            id="businessList"
+            class="business-list"
+        >
+            Checking admin access...
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    // =========================================
+    // CHECK BACKEND ADMIN SESSION
+    // =========================================
+
+    async function checkAdminSession() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/admin/check",
+                    {
+                        method: "GET",
+                        credentials: "include"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                window.location.href =
+                    "admin-login.html";
+
+                return false;
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                !result.success ||
+                result.authenticated !== true
+            ) {
+
+                window.location.href =
+                    "admin-login.html";
+
+                return false;
+            }
+
+
+            return true;
+
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN SESSION CHECK ERROR:",
+                error
+            );
+
+            window.location.href =
+                "admin-login.html";
+
+            return false;
+        }
+
+    }
+
+
+    // =========================================
+    // LOGOUT
+    // =========================================
+
+    async function logout() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/admin/logout",
+                    {
+                        method: "POST",
+                        credentials: "include"
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result.message ||
+                    "Logout failed."
+                );
+            }
+
+
+            sessionStorage.removeItem(
+                "maynaAdmin"
+            );
+
+
+            window.location.href =
+                "admin-login.html";
+
+
+        } catch (error) {
+
+            console.error(
+                "LOGOUT ERROR:",
+                error
+            );
+
+            alert(
+                "Could not log out. Please try again."
+            );
+
+        }
+
+    }
+
+
+    document
+        .getElementById("logoutButton")
+        .addEventListener(
+            "click",
+            logout
+        );
+
+
+    // =========================================
+    // VERIFY / UNVERIFY BUSINESS
+    // =========================================
+
+    async function toggleVerification(
+        id,
+        currentStatus
+    ) {
+
+        const newStatus =
+            !currentStatus;
+
+
+        const action =
+            newStatus
+                ? "verify"
+                : "unverify";
+
+
+        const confirmed =
+            confirm(
+                `Are you sure you want to ${action} this business?`
+            );
+
+
+        if (!confirmed) {
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/businesses/${id}/verification`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        credentials:
+                            "include",
+
+                        body:
+                            JSON.stringify({
+                                verified:
+                                    newStatus
+                            })
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                if (
+                    response.status === 401
+                ) {
+
+                    window.location.href =
+                        "admin-login.html";
+
+                    return;
+                }
+
+
+                throw new Error(
+                    result.message ||
+                    "Verification update failed."
+                );
+            }
+
+
+            alert(
+                result.message
+            );
+
+
+            loadBusinesses();
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            alert(
+                error.message ||
+                "Could not update verification status."
+            );
+
+        }
+
+    }
+
+
+    // =========================================
+    // LOAD BUSINESSES
+    // =========================================
+
+    async function loadBusinesses() {
+
+        const businessList =
+            document.getElementById(
+                "businessList"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/businesses",
+                    {
+                        credentials:
+                            "include"
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Could not load businesses."
+                );
+            }
+
+
+            if (!result.success) {
+
+                throw new Error(
+                    "Could not load businesses."
+                );
+            }
+
+
+            const businesses =
+                result.businesses;
+
+
+            const verified =
+                businesses.filter(
+                    business =>
+                        business.verified === true
+                );
+
+
+            const unverified =
+                businesses.filter(
+                    business =>
+                        business.verified !== true
+                );
+
+
+            document.getElementById(
+                "totalBusinesses"
+            ).textContent =
+                businesses.length;
+
+
+            document.getElementById(
+                "verifiedBusinesses"
+            ).textContent =
+                verified.length;
+
+
+            document.getElementById(
+                "unverifiedBusinesses"
+            ).textContent =
+                unverified.length;
+
+
+            if (
+                businesses.length === 0
+            ) {
+
+                businessList.innerHTML = `
+
+                    <div class="business-card">
+
+                        No businesses registered yet.
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            businessList.innerHTML =
+                businesses.map(
+                    business => {
+
+                        const status =
+                            business.verified
+
+                            ? `
+
+                                <div class="verified-status">
+
+                                    ✓ Verified
+
+                                </div>
+
+                            `
+
+                            : `
+
+                                <div class="unverified-status">
+
+                                    ○ Not Verified
+
+                                </div>
+
+                            `;
+
+
+                        return `
+
+                            <div class="business-card">
+
+                                <div class="business-info">
+
+                                    <h3>
+
+                                        ${
+                                            business.businessName ||
+                                            "Unnamed Business"
+                                        }
+
+                                    </h3>
+
+
+                                    <p>
+
+                                        Category:
+                                        ${
+                                            business.category ||
+                                            "Not specified"
+                                        }
+
+                                    </p>
+
+
+                                    <p>
+
+                                        Location:
+                                        ${
+                                            business.town ||
+                                            "Not specified"
+                                        }
+
+                                    </p>
+
+
+                                    ${status}
+
+                                </div>
+
+
+                                <button
+
+                                    class="admin-button"
+
+                                    onclick="
+                                        toggleVerification(
+                                            ${business.id},
+                                            ${business.verified}
+                                        )
+                                    "
+
+                                >
+
+                                    ${
+                                        business.verified
+                                            ? "Unverify"
+                                            : "Verify"
+                                    }
+
+                                </button>
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join("");
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            businessList.innerHTML = `
+
+                <div class="business-card">
+
+                    Unable to load businesses.
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    // =========================================
+    // START ADMIN DASHBOARD
+    // =========================================
+
+    async function startAdminDashboard() {
+
+        const authenticated =
+            await checkAdminSession();
+
+
+        if (!authenticated) {
+
+            return;
+        }
+
+
+        await loadBusinesses();
+
+    }
+
+
+    startAdminDashboard();
+
+</script>
+```
+
+</body>
+
+</html>

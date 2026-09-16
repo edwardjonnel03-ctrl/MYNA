@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Register Your Business — MAYNA</title>
+
+<link
+    rel="stylesheet"
+    href="css/style.css"
+>
+```
+
+</head>
+
+<body>
+
+```
+<nav class="navbar">
+
+    <a
+        href="index.html"
+        class="logo"
+    >
+        MAYNA<span>.</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="businesses.html">
+            Explore
+        </a>
+
+        <a href="index.html#categories">
+            Categories
+        </a>
+
+        <a
+            href="register.html"
+            class="active"
+        >
+            Register
+        </a>
+
+    </div>
+
+    <a
+        href="register.html"
+        class="nav-button"
+    >
+        List your business
+    </a>
+
+</nav>
+
+
+<main class="register-page">
+
+    <section class="register-hero">
+
+        <div class="register-label">
+            JOIN MAYNA
+        </div>
+
+        <h1>
+            Put your business
+            <br>
+            on the map.
+        </h1>
+
+        <p>
+            Create your MAYNA business listing
+            and help customers discover what
+            you offer.
+        </p>
+
+    </section>
+
+
+    <section class="register-container">
+
+        <form
+            id="businessForm"
+            class="register-form"
+        >
+
+            <!-- SECTION 01 -->
+
+            <div class="form-section">
+
+                <div class="form-heading">
+
+                    <span class="form-number">
+                        01
+                    </span>
+
+                    <h2>
+                        Business information
+                    </h2>
+
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="businessName">
+                            Business name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="businessName"
+                            placeholder="e.g. Dario Gadgets"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="category">
+                            Category
+                        </label>
+
+                        <select
+                            id="category"
+                            required
+                        >
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            <option value="Electronics">
+                                Electronics
+                            </option>
+
+                            <option value="Repairs">
+                                Repairs
+                            </option>
+
+                            <option value="Computers">
+                                Computers
+                            </option>
+
+                            <option value="Automotive">
+                                Automotive
+                            </option>
+
+                            <option value="Food">
+                                Food
+                            </option>
+
+                            <option value="Beauty">
+                                Beauty
+                            </option>
+
+                            <option value="Home">
+                                Home
+                            </option>
+
+                            <option value="Shopping">
+                                Shopping
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="e.g. Windhoek"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group form-full">
+
+                        <label for="description">
+                            Business description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            rows="5"
+                            placeholder="Tell customers what your business does..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SECTION 02 -->
+
+            <div class="form-section">
+
+                <div class="form-heading">
+
+                    <span class="form-number">
+                        02
+                    </span>
+
+                    <h2>
+                        Owner account & contact details
+                    </h2>
+
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="ownerEmail">
+                            Owner login email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="ownerEmail"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="ownerPassword">
+                            Create password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="ownerPassword"
+                            placeholder="Create a password"
+                            minlength="6"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Business phone number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="+264 ..."
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="whatsapp">
+                            WhatsApp number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="whatsapp"
+                            placeholder="+264 ..."
+                        >
+
+                    </div>
+
+
+                    <div class="form-group form-full">
+
+                        <label for="email">
+                            Business email address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="business@example.com"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SECTION 03 -->
+
+            <div class="form-section">
+
+                <div class="form-heading">
+
+                    <span class="form-number">
+                        03
+                    </span>
+
+                    <h2>
+                        Services & products
+                    </h2>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="services">
+                        What do you offer?
+                    </label>
+
+                    <textarea
+                        id="services"
+                        rows="6"
+                        placeholder="e.g. Phone repairs, laptops, accessories, software installation..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <div class="submit-area">
+
+                <button
+                    type="submit"
+                    class="submit-button"
+                    id="submitButton"
+                >
+                    Create my business listing →
+                </button>
+
+                <p>
+                    Your listing will be reviewed
+                    before appearing publicly on MAYNA.
+                </p>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    const form =
+        document.getElementById(
+            "businessForm"
+        );
+
+    const submitButton =
+        document.getElementById(
+            "submitButton"
+        );
+
+
+    form.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const business = {
+
+                ownerEmail:
+                    document.getElementById(
+                        "ownerEmail"
+                    ).value.trim(),
+
+                ownerPassword:
+                    document.getElementById(
+                        "ownerPassword"
+                    ).value,
+
+                businessName:
+                    document.getElementById(
+                        "businessName"
+                    ).value.trim(),
+
+                category:
+                    document.getElementById(
+                        "category"
+                    ).value,
+
+                location:
+                    document.getElementById(
+                        "location"
+                    ).value.trim(),
+
+                description:
+                    document.getElementById(
+                        "description"
+                    ).value.trim(),
+
+                phone:
+                    document.getElementById(
+                        "phone"
+                    ).value.trim(),
+
+                whatsapp:
+                    document.getElementById(
+                        "whatsapp"
+                    ).value.trim(),
+
+                email:
+                    document.getElementById(
+                        "email"
+                    ).value.trim(),
+
+                services:
+                    document.getElementById(
+                        "services"
+                    ).value.trim()
+
+            };
+
+
+            try {
+
+                submitButton.disabled =
+                    true;
+
+                submitButton.textContent =
+                    "Registering...";
+
+
+                const response =
+                    await fetch(
+                        "/api/businesses",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            credentials:
+                                "include",
+
+                            body:
+                                JSON.stringify(
+                                    business
+                                )
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Registration failed."
+                    );
+
+                }
+
+
+                alert(
+                    "🎉 " +
+                    business.businessName +
+                    " has been registered on MAYNA!"
+                );
+
+
+                window.location.href =
+                    "dashboard.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+                alert(
+                    "MAYNA could not register the business.\n\n" +
+                    error.message
+                );
+
+
+            } finally {
+
+                submitButton.disabled =
+                    false;
+
+                submitButton.textContent =
+                    "Create my business listing →";
+
+            }
+
+        }
+    );
+
+</script>
+```
+
+</body>
+
+</html>
