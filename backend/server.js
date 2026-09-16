@@ -79,10 +79,10 @@ app.post(
 
 
     const correctUsername =
-        "admin";
+    process.env.ADMIN_USERNAME;
 
-    const correctPassword =
-        "MAYNA123";
+const correctPassword =
+    process.env.ADMIN_PASSWORD;
 
 
     if (
