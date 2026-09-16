@@ -320,8 +320,7 @@ router.post(
             // =====================================
 
             const resetLink =
-                `http://localhost:5000/reset-password.html?token=${resetToken}`;
-
+    `https://myna-web-i92o.onrender.com/reset-password.html?token=${resetToken}`;
 
             // =====================================
             // SEND EMAIL
