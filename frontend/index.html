@@ -69,6 +69,7 @@
         <a href="register.html">
             List your business
         </a>
+        <a href="owner-login.html">Business Login</a>
 
     </nav>
 
@@ -880,3 +881,107 @@
 </body>
 
 </html>
+/* =========================
+   NAVIGATION LINKS
+========================= */
+
+.navbar {
+    width: 100%;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.logo {
+    text-decoration: none;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.nav-links a {
+    display: inline-block;
+    text-decoration: none;
+    color: #4b5563;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 0;
+    border: none;
+    background: transparent;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+    color: #111827;
+}
+
+.nav-links a.active {
+    color: #111827;
+}
+
+.nav-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+    background: #111827;
+    color: #ffffff;
+
+    padding: 11px 18px;
+    border-radius: 8px;
+
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.nav-button:hover {
+    background: #374151;
+}
+
+/* =========================
+   MOBILE NAVIGATION
+========================= */
+
+@media (max-width: 768px) {
+
+    .nav-container {
+        flex-wrap: wrap;
+        padding: 16px;
+    }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .nav-button {
+        font-size: 13px;
+        padding: 9px 14px;
+    }
+
+}
