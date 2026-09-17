@@ -1,4 +1,6 @@
 require("dotenv").config();
+const cloudinary =
+    require("./config/cloudinary");
 
 const express = require("express");
 const cors = require("cors");
@@ -21,7 +23,57 @@ const PORT = 5000;
 
 app.use(cors());
 
-app.use(express.json());
+app.use(
+    express.json({
+        limit: "30mb"
+    })
+);
+app.post(
+    "/api/upload",
+    async (req, res) => {
+
+        try {
+
+            const image =
+                req.body.image;
+
+            if (!image) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "No image provided."
+                });
+            }
+
+            const result =
+                await cloudinary.uploader.upload(
+                    image,
+                    {
+                        folder: "myna/businesses",
+                        resource_type: "image"
+                    }
+                );
+
+            res.json({
+                success: true,
+                url: result.secure_url
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Cloudinary upload error:",
+                error
+            );
+
+            res.status(500).json({
+                success: false,
+                message:
+                    "Image upload failed."
+            });
+        }
+    }
+);
 
 app.use(
 express.urlencoded({

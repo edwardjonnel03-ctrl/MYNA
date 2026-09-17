@@ -19,6 +19,10 @@ const BusinessSchema = new mongoose.Schema(
             type: String,
             default: ""
         },
+        gallery: {
+    type: [String],
+    default: []
+},
 
         country: {
             type: String,
@@ -33,10 +37,10 @@ const BusinessSchema = new mongoose.Schema(
         },
 
         category: {
-            type: String,
-            required: true,
-            trim: true
-        },
+    type: String,
+    default: "Other",
+    trim: true
+},
 
         phone: {
             type: String,

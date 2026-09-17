@@ -816,6 +816,10 @@ router.post(
 
                     image:
                         req.body.image || "",
+                        gallery:
+    Array.isArray(req.body.gallery)
+        ? req.body.gallery
+        : [],
 
                     country:
                         "Namibia",
@@ -1117,6 +1121,15 @@ router.put(
                 business.image =
                     req.body.image;
             }
+            if (
+    req.body.gallery !==
+    undefined
+) {
+    business.gallery =
+        Array.isArray(req.body.gallery)
+            ? req.body.gallery
+            : [];
+}
 
             if (
                 req.body.category !==

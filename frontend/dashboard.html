@@ -401,13 +401,38 @@
             Maximum image size: 5 MB
         </p>
 
+        </div>
+
+
+    <div class="card">
+
+        <h2>Work Gallery</h2>
+
+        <p>
+            Add photos showing your work,
+            products, services or completed projects.
+        </p>
+
+        <input
+            type="file"
+            id="galleryInput"
+            accept="image/*"
+            multiple
+        >
+
+        <p>
+            You can select multiple photos.
+            Maximum 5 MB per image.
+        </p>
+
+        <div id="galleryPreview"></div>
+
     </div>
 
 
     <div class="card">
 
         <h2>Opening Hours</h2>
-
         <div class="grid">
 
 
@@ -545,6 +570,17 @@ document.addEventListener(
             document.getElementById(
                 "photoPlaceholder"
             );
+const galleryInput =
+    document.getElementById(
+        "galleryInput"
+    );
+
+const galleryPreview =
+    document.getElementById(
+        "galleryPreview"
+    );
+
+let galleryImages = [];
 
         const message =
             document.getElementById(
@@ -591,64 +627,333 @@ document.addEventListener(
         }
 
 
-        photoInput.addEventListener(
-            "change",
-            function () {
+      function showGallery() {
 
-                const file =
-                    photoInput.files[0];
+    galleryPreview.innerHTML = "";
 
-                if (!file) {
-                    return;
-                }
+    galleryImages.forEach(
+        function (imageSource, index) {
 
-                if (
-                    !file.type.startsWith(
-                        "image/"
-                    )
-                ) {
+            const container =
+                document.createElement("div");
 
-                    alert(
-                        "Please select an image file."
+            container.style.display =
+                "inline-block";
+
+            container.style.position =
+                "relative";
+
+            container.style.margin =
+                "8px";
+
+
+            const img =
+                document.createElement("img");
+
+            img.src = imageSource;
+
+            img.style.width = "150px";
+            img.style.height = "120px";
+            img.style.objectFit = "cover";
+            img.style.borderRadius = "8px";
+            img.style.display = "block";
+
+
+            const removeButton =
+                document.createElement("button");
+
+            removeButton.type =
+                "button";
+
+            removeButton.textContent =
+                "Remove";
+
+            removeButton.style.marginTop =
+                "6px";
+
+            removeButton.style.background =
+                "#dc2626";
+
+            removeButton.style.color =
+                "white";
+
+            removeButton.style.border =
+                "none";
+
+            removeButton.style.padding =
+                "7px 12px";
+
+            removeButton.style.borderRadius =
+                "6px";
+
+            removeButton.style.cursor =
+                "pointer";
+
+
+            removeButton.addEventListener(
+                "click",
+                function () {
+
+                    galleryImages.splice(
+                        index,
+                        1
                     );
 
-                    photoInput.value = "";
-
-                    return;
+                    showGallery();
                 }
+            );
 
-                if (
-                    file.size >
-                    5 * 1024 * 1024
-                ) {
 
-                    alert(
-                        "Please choose an image smaller than 5 MB."
+            container.appendChild(img);
+
+            container.appendChild(
+                removeButton
+            );
+
+            galleryPreview.appendChild(
+                container
+            );
+        }
+    );
+}
+
+
+       photoInput.addEventListener(
+    "change",
+    async function () {
+
+        const file =
+            photoInput.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (
+            !file.type.startsWith(
+                "image/"
+            )
+        ) {
+            alert(
+                "Please select an image file."
+            );
+
+            photoInput.value = "";
+
+            return;
+        }
+
+        if (
+            file.size >
+            5 * 1024 * 1024
+        ) {
+            alert(
+                "Image must be smaller than 5 MB."
+            );
+
+            photoInput.value = "";
+
+            return;
+        }
+
+        const imageData =
+            await new Promise(
+                function (resolve, reject) {
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload =
+                        function (event) {
+
+                            resolve(
+                                event.target.result
+                            );
+                        };
+
+                    reader.onerror =
+                        reject;
+
+                    reader.readAsDataURL(
+                        file
                     );
-
-                    photoInput.value = "";
-
-                    return;
                 }
+            );
 
-                const reader =
-                    new FileReader();
+        try {
 
-                reader.onload =
-                    function (event) {
+            const response =
+                await fetch(
+                    "/api/upload",
+                    {
+                        method: "POST",
 
-                        showPhoto(
-                            event.target.result
-                        );
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    };
+                        credentials:
+                            "include",
 
-                reader.readAsDataURL(file);
+                        body:
+                            JSON.stringify({
+                                image:
+                                    imageData
+                            })
+                    }
+                );
 
+            const result =
+                await response.json();
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+                throw new Error(
+                    result.message ||
+                    "Image upload failed."
+                );
             }
-        );
 
+            image =
+                result.url;
 
+            showPhoto(
+                image
+            );
+
+        } catch (error) {
+
+            alert(
+                "Could not upload image: " +
+                error.message
+            );
+        }
+
+        photoInput.value = "";
+    }
+);
+
+galleryInput.addEventListener(
+    "change",
+    async function () {
+
+        const files =
+            Array.from(
+                galleryInput.files
+            );
+
+        if (files.length === 0) {
+            return;
+        }
+
+        for (const file of files) {
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+                alert(
+                    "Please select image files only."
+                );
+                continue;
+            }
+
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
+                alert(
+                    file.name +
+                    " is larger than 5 MB."
+                );
+                continue;
+            }
+
+            const imageData =
+                await new Promise(
+                    function (resolve, reject) {
+
+                        const reader =
+                            new FileReader();
+
+                        reader.onload =
+                            function (event) {
+
+                                resolve(
+                                    event.target.result
+                                );
+                            };
+
+                        reader.onerror =
+                            reject;
+
+                        reader.readAsDataURL(
+                            file
+                        );
+                    }
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/upload",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            credentials:
+                                "include",
+
+                            body:
+                                JSON.stringify({
+                                    image:
+                                        imageData
+                                })
+                        }
+                    );
+
+                const result =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+                    throw new Error(
+                        result.message ||
+                        "Image upload failed."
+                    );
+                }
+
+                galleryImages.push(
+                    result.url
+                );
+
+                showGallery();
+
+            } catch (error) {
+
+                alert(
+                    "Could not upload " +
+                    file.name +
+                    ": " +
+                    error.message
+                );
+            }
+        }
+
+        galleryInput.value = "";
+    }
+);
         async function loadOwnerSession() {
 
             try {
@@ -756,7 +1061,14 @@ document.addEventListener(
                 showPhoto(
                     business.image || ""
                 );
+galleryImages =
+    Array.isArray(
+        business.gallery
+    )
+        ? [...business.gallery]
+        : [];
 
+showGallery();
 
                 const hours =
                     business.hours || {};
@@ -885,10 +1197,13 @@ document.addEventListener(
                             "email"
                         ).value.trim(),
 
-                    image:
-                        image,
+       image:
+    image,
 
-                    description:
+gallery:
+    galleryImages,
+
+description:
                         document.getElementById(
                             "description"
                         ).value.trim(),
@@ -995,6 +1310,14 @@ document.addEventListener(
                     showPhoto(
                         result.business.image || ""
                     );
+                    galleryImages =
+    Array.isArray(
+        result.business.gallery
+    )
+        ? [...result.business.gallery]
+        : [];
+
+showGallery();
 
 
                 } catch (error) {

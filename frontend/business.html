@@ -1,440 +1,23 @@
 <!DOCTYPE html>
-
-<html lang="en">
-
-<head> <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>Explore Businesses — MAYNA</title>
-
-<link
-    rel="stylesheet"
-    href="css/style.css"
->
-
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
->
-
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-    crossorigin
->
-
-<link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-    rel="stylesheet"
->
-
-<style>
-
-    .explore-page {
-        background: #f7f7f5;
-        min-height: 100vh;
-    }
-
-    .explore-hero {
-        background: #111111;
-        color: white;
-        padding: 90px 20px 70px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .explore-hero::before,
-    .explore-hero::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        background: #ff5a36;
-        opacity: 0.12;
-        animation: floatCircle 8s ease-in-out infinite;
-    }
-
-    .explore-hero::before {
-        width: 350px;
-        height: 350px;
-        top: -180px;
-        right: -100px;
-    }
-
-    .explore-hero::after {
-        width: 250px;
-        height: 250px;
-        bottom: -150px;
-        left: -80px;
-        animation-delay: 2s;
-    }
-
-    @keyframes floatCircle {
-        0%, 100% {
-            transform: translateY(0);
-        }
-
-        50% {
-            transform: translateY(25px);
-        }
-    }
-
-    .explore-container {
-        max-width: 1200px;
-        margin: auto;
-        position: relative;
-        z-index: 2;
-    }
-
-    .explore-label {
-        color: #ff5a36;
-        font-weight: 700;
-        font-size: 14px;
-        letter-spacing: 2px;
-        margin-bottom: 15px;
-    }
-
-    .explore-hero h1 {
-        font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(38px, 6vw, 70px);
-        line-height: 1;
-        margin: 0 0 20px;
-    }
-
-    .explore-hero p {
-        color: #cccccc;
-        max-width: 600px;
-        font-size: 18px;
-        margin-bottom: 35px;
-    }
-
-    .explore-controls {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .explore-search {
-        flex: 1;
-        min-width: 250px;
-        padding: 17px 20px;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        outline: none;
-    }
-
-    .explore-filter {
-        padding: 17px 20px;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        background: white;
-        min-width: 180px;
-    }
-
-    .explore-results {
-        max-width: 1200px;
-        margin: auto;
-        padding: 70px 20px;
-    }
-
-    .results-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .results-header h2 {
-        margin: 0;
-        font-family: "Space Grotesk", sans-serif;
-    }
-
-    .results-count {
-        color: #777777;
-    }
-
-    .business-grid {
-        display: grid;
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(280px, 1fr)
-            );
-        gap: 25px;
-    }
-
-    .business-card {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        border: 1px solid #e8e8e5;
-        box-shadow:
-            0 15px 40px
-            rgba(0, 0, 0, 0.06);
-        transition:
-            transform 0.25s ease,
-            box-shadow 0.25s ease;
-    }
-
-    .business-card:hover {
-        transform: translateY(-8px);
-        box-shadow:
-            0 25px 55px
-            rgba(0, 0, 0, 0.12);
-    }
-
-    .business-image {
-        height: 190px;
-        background:
-            linear-gradient(
-                135deg,
-                #ff5a36,
-                #111111
-            );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-family: "Space Grotesk", sans-serif;
-        font-size: 45px;
-        font-weight: 700;
-    }
-
-    .business-info {
-        padding: 25px;
-    }
-
-    .business-category {
-        color: #ff5a36;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
-    }
-
-    .business-info h3 {
-        font-family: "Space Grotesk", sans-serif;
-        margin: 0 0 10px;
-        font-size: 24px;
-    }
-
-    .business-location {
-        color: #777777;
-        margin-bottom: 15px;
-    }
-
-    .business-description {
-        color: #555555;
-        line-height: 1.6;
-        margin-bottom: 20px;
-    }
-
-    .business-rating {
-        font-weight: 700;
-        margin-bottom: 20px;
-    }
-
-    .view-business {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        padding: 14px 18px;
-        background: #ff5a36;
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        font-weight: 700;
-        transition: background 0.2s ease;
-    }
-
-    .view-business:hover {
-        background: #e84825;
-    }
-
-    .explore-message {
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        text-align: center;
-        color: #777777;
-    }
-
-    @media (max-width: 700px) {
-
-        .explore-hero {
-            padding-top: 65px;
-        }
-
-        .results-header {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-    }
-
-</style>
-
-</head>
-
-<body class="explore-page">
-
-<header class="navbar">
-
-<div class="nav-container">
-
-    <a
-        href="index.html"
-        class="logo"
-    >
-        MAYNA
-    </a>
-
-    <nav class="nav-links">
-
-        <a href="businesses.html">
-            Explore
-        </a>
-
-        <a href="register.html">
-            List your business
-        </a>
-
-    </nav>
-
-    <a
-        href="register.html"
-        class="nav-button"
-    >
-        Register business
-    </a>
-    <a href="owner-login.html">Business Login</a>
-
-</div>
-
-</header>
-
-<section class="explore-hero">
-
-<div class="explore-container">
-
-    <div class="explore-label">
-        DISCOVER LOCAL BUSINESSES
-    </div>
-
-    <h1>
-        Explore businesses.
-    </h1>
-
-    <p>
-        Find businesses, services and
-        professionals across Namibia.
-    </p>
-
-    <div class="explore-controls">
-
-        <input
-            id="businessSearch"
-            class="explore-search"
-            type="text"
-            placeholder="Search businesses..."
-        >
-
-        <select
-            id="categoryFilter"
-            class="explore-filter"
-        >
-
-            <option value="">
-                All categories
-            </option>
-
-            <option value="ICT">
-                ICT
-            </option>
-
-            <option value="Beauty">
-                Beauty
-            </option>
-
-            <option value="Automotive">
-                Automotive
-            </option>
-
-            <option value="Food">
-                Food
-            </option>
-
-            <option value="Retail">
-                Retail
-            </option>
-
-            <option value="Construction">
-                Construction
-            </option>
-
-            <option value="Other">
-                Other
-            </option>
-
-        </select>
-
-    </div>
-
-</div>
-
-</section>
-
-<main class="explore-results">
-
-<div class="results-header">
-
-    <h2>
-        Businesses
-    </h2>
-
-    <div
-        id="resultsCount"
-        class="results-count"
-    >
-        Loading...
-    </div>
-
-</div>
-
-
-<div
-    id="businessGrid"
-    class="business-grid"
->
-
-    <div class="explore-message">
-        Loading businesses...
-    </div>
-
-</div>
-
-</main>
-
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Business | MAYNA</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
     <style>
+
         .profile-page {
             min-height: 100vh;
             padding: 110px 6% 70px;
@@ -458,7 +41,9 @@
             background: white;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,.08);
+            box-shadow:
+                0 15px 40px
+                rgba(0, 0, 0, 0.08);
         }
 
         .profile-banner {
@@ -476,18 +61,23 @@
             height: 250px;
             border-radius: 50%;
             background: #ff5a36;
-            opacity: .15;
+            opacity: 0.15;
             right: -70px;
             top: -80px;
+            pointer-events: none;
         }
-.profile-image {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    border-radius: 18px;
-    margin-bottom: 25px;
-    display: block;
-}
+
+        .profile-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
         .profile-logo {
             width: 100px;
             height: 100px;
@@ -499,33 +89,44 @@
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
         }
-       .verified-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin: 10px 0 15px;
-    padding: 7px 12px;
-    border-radius: 20px;
-    background: #fff1ec;
-    color: #e84825;
-    font-size: 14px;
-    font-weight: 700;
-} 
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 10px 0 15px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #fff1ec;
+            color: #e84825;
+            font-size: 14px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
 
         .profile-category {
             color: #ff8a70;
             font-weight: 700;
             margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-banner h1 {
             font-size: 46px;
             margin: 0 0 12px;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-location {
             color: #cccccc;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-content {
@@ -536,13 +137,17 @@
             margin-bottom: 40px;
         }
 
+        .profile-section:last-child {
+            margin-bottom: 0;
+        }
+
         .profile-section h2 {
             margin-bottom: 15px;
             font-size: 25px;
         }
 
         .profile-description {
-            color: #666;
+            color: #666666;
             line-height: 1.8;
         }
 
@@ -560,9 +165,72 @@
             font-weight: 600;
         }
 
+        .work-gallery {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(200px, 1fr)
+                );
+            gap: 15px;
+        }
+
+    .work-gallery img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.work-gallery img:hover {
+    transform: scale(1.03);
+    opacity: 0.9;
+}
+
+.gallery-lightbox {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.gallery-lightbox.active {
+    display: flex;
+}
+
+.gallery-lightbox img {
+    max-width: 95%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.gallery-lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns:
+                repeat(3, 1fr);
             gap: 15px;
         }
 
@@ -588,6 +256,8 @@
             background: #fff1ec;
             color: #e84825;
             font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-message {
@@ -615,10 +285,27 @@
                 padding: 30px 25px;
             }
 
+            .profile-image {
+                height: 220px;
+            }
+
+            .work-gallery {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0, 1fr)
+                    );
+            }
+
+            .work-gallery img {
+                height: 150px;
+            }
+
             .contact-grid {
                 grid-template-columns: 1fr;
             }
         }
+
     </style>
 </head>
 
@@ -719,10 +406,15 @@
 
                     profileContainer.innerHTML = `
                         <div class="profile-message">
-                            <h2>Business not found</h2>
+
+                            <h2>
+                                Business not found
+                            </h2>
+
                             <p>
                                 No business ID was provided.
                             </p>
+
                         </div>
                     `;
 
@@ -762,10 +454,15 @@
 
                     profileContainer.innerHTML = `
                         <div class="profile-message">
-                            <h2>Business not found</h2>
+
+                            <h2>
+                                Business not found
+                            </h2>
+
                             <p>
                                 This business could not be found.
                             </p>
+
                         </div>
                     `;
 
@@ -786,6 +483,7 @@
 
                 const location =
                     business.town ||
+                    business.location ||
                     "Namibia";
 
 
@@ -807,6 +505,15 @@
                                 service =>
                                     service.trim()
                             )
+                            .filter(Boolean)
+                        : [];
+
+
+                const gallery =
+                    Array.isArray(
+                        business.gallery
+                    )
+                        ? business.gallery
                             .filter(Boolean)
                         : [];
 
@@ -836,43 +543,49 @@
 
                         <div class="profile-banner">
 
-    ${
-        business.image
-        ? `
-            <img
-                src="${business.image}"
-                class="profile-image"
-                alt="${name}"
-            >
-        `
-        : ""
-    }
+                            ${
+                                business.image
+                                ? `
+                                    <img
+                                        src="${business.image}"
+                                        class="profile-image"
+                                        alt="${name}"
+                                    >
+                                `
+                                : ""
+                            }
 
-    <div class="profile-logo">
-        ${initials}
-    </div>
 
-       <div class="profile-category">
-    ${category}
-</div>
+                            <div class="profile-logo">
+                                ${initials}
+                            </div>
 
-${
-    business.verified
-    ? `
-        <div class="verified-badge">
-            ✓ Verified Business
-        </div>
-    `
-    : ""
-}
 
-<h1>
-    ${name}
-</h1>
+                            <div class="profile-category">
+                                ${category}
+                            </div>
+
+
+                            ${
+                                business.verified
+                                ? `
+                                    <div class="verified-badge">
+                                        ✓ Verified Business
+                                    </div>
+                                `
+                                : ""
+                            }
+
+
+                            <h1>
+                                ${name}
+                            </h1>
+
 
                             <div class="profile-location">
                                 📍 ${location}, Namibia
                             </div>
+
 
                             ${
                                 rating
@@ -892,6 +605,7 @@ ${
 
 
                         <div class="profile-content">
+
 
                             <section class="profile-section">
 
@@ -921,9 +635,43 @@ ${
                                                 .map(
                                                     service =>
                                                         `
-                                                        <span class="service-tag">
-                                                            ${service}
-                                                        </span>
+                                                            <span class="service-tag">
+                                                                ${service}
+                                                            </span>
+                                                        `
+                                                )
+                                                .join("")
+                                            }
+
+                                        </div>
+
+                                    </section>
+                                `
+                                : ""
+                            }
+
+
+                            ${
+                                gallery.length
+                                ? `
+                                    <section class="profile-section">
+
+                                        <h2>
+                                            Work Gallery
+                                        </h2>
+
+                                        <div class="work-gallery">
+
+                                            ${gallery
+                                                .map(
+                                                    image =>
+                                                        `
+                                                           <img
+    src="${image}"
+    alt="${name} work"
+    class="gallery-work-image"
+    loading="lazy"
+>
                                                         `
                                                 )
                                                 .join("")
@@ -944,6 +692,7 @@ ${
                                 </h2>
 
                                 <div class="contact-grid">
+
 
                                     ${
                                         phone
@@ -966,6 +715,7 @@ ${
                                                 class="contact-button"
                                                 href="https://wa.me/${whatsapp.replace(/\D/g, "")}"
                                                 target="_blank"
+                                                rel="noopener noreferrer"
                                             >
                                                 💬 WhatsApp
                                             </a>
@@ -987,9 +737,11 @@ ${
                                         : ""
                                     }
 
+
                                 </div>
 
                             </section>
+
 
                         </div>
 
@@ -997,9 +749,11 @@ ${
 
                 `;
 
+
             } catch (error) {
 
                 console.error(error);
+
 
                 profileContainer.innerHTML = `
                     <div class="profile-message">
@@ -1019,15 +773,123 @@ ${
 
         }
 
+              loadBusiness();
 
-        loadBusiness();
+    </script>
+
+
+    <div
+        id="galleryLightbox"
+        class="gallery-lightbox"
+    >
+        <span
+            id="galleryLightboxClose"
+            class="gallery-lightbox-close"
+        >
+            &times;
+        </span>
+
+        <img
+            id="galleryLightboxImage"
+            src=""
+            alt="Work gallery image"
+        >
+    </div>
+
+
+    <script>
+
+        const galleryLightbox =
+            document.getElementById(
+                "galleryLightbox"
+            );
+
+        const galleryLightboxImage =
+            document.getElementById(
+                "galleryLightboxImage"
+            );
+
+        const galleryLightboxClose =
+            document.getElementById(
+                "galleryLightboxClose"
+            );
+
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                const clickedImage =
+                    event.target.closest(
+                        ".gallery-work-image"
+                    );
+
+                if (!clickedImage) {
+                    return;
+                }
+
+                galleryLightboxImage.src =
+                    clickedImage.src;
+
+                galleryLightbox.classList.add(
+                    "active"
+                );
+            }
+        );
+
+
+        galleryLightboxClose.addEventListener(
+            "click",
+            function () {
+
+                galleryLightbox.classList.remove(
+                    "active"
+                );
+
+                galleryLightboxImage.src = "";
+            }
+        );
+
+
+        galleryLightbox.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    galleryLightbox
+                ) {
+                    galleryLightbox.classList.remove(
+                        "active"
+                    );
+
+                    galleryLightboxImage.src = "";
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    galleryLightbox.classList.contains(
+                        "active"
+                    )
+                ) {
+                    galleryLightbox.classList.remove(
+                        "active"
+                    );
+
+                    galleryLightboxImage.src = "";
+                }
+            }
+        );
 
     </script>
 
 </body>
 
-</html>
-
-</body>
-
-</html>
+</html> 
