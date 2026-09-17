@@ -5,6 +5,7 @@ const cloudinary =
 
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
@@ -176,11 +177,35 @@ app.use(
 
 
 // =========================================
+// ADMIN LOGIN RATE LIMIT
+// =========================================
+
+const adminLoginLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many login attempts. Please try again in 15 minutes."
+        }
+    });
+
+
+// =========================================
 // ADMIN LOGIN
 // =========================================
 
 app.post(
     "/api/admin/login",
+    adminLoginLimiter,
     async (req, res) => {
 
         try {
