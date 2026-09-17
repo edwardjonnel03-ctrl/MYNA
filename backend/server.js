@@ -87,7 +87,7 @@ extended: true
 
 app.use(
 session({
-secret: "MAYNA-DEVELOPMENT-SESSION-SECRET",
+secret: process.env.SESSION_SECRET,
 resave: false,
 saveUninitialized: false,
 
