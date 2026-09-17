@@ -22,11 +22,11 @@ function publicBusiness(business) {
             ? business.toObject()
             : { ...business };
 
-delete safeBusiness.ownerEmail;
-delete safeBusiness.ownerPasswordHash;
-delete safeBusiness.ownerPasswordSalt;
-delete safeBusiness.resetTokenHash;
-delete safeBusiness.resetTokenExpires;
+    delete safeBusiness.ownerEmail;
+    delete safeBusiness.ownerPasswordHash;
+    delete safeBusiness.ownerPasswordSalt;
+    delete safeBusiness.resetTokenHash;
+    delete safeBusiness.resetTokenExpires;
 
     return safeBusiness;
 }
@@ -192,8 +192,8 @@ router.post(
                 String(
                     req.body.email || ""
                 )
-                .trim()
-                .toLowerCase();
+                    .trim()
+                    .toLowerCase();
 
             const genericMessage =
                 "If an account exists for that email, a password reset link has been generated.";
@@ -525,8 +525,8 @@ router.post(
                 String(
                     req.body.email || ""
                 )
-                .trim()
-                .toLowerCase();
+                    .trim()
+                    .toLowerCase();
 
             const password =
                 String(
@@ -747,8 +747,8 @@ router.post(
                 String(
                     req.body.ownerEmail || ""
                 )
-                .trim()
-                .toLowerCase();
+                    .trim()
+                    .toLowerCase();
 
             const ownerPassword =
                 String(
@@ -816,14 +816,16 @@ router.post(
 
                     image:
                         req.body.image || "",
-                        gallery:
-    Array.isArray(req.body.gallery)
-        ? req.body.gallery
-        : [],
-        services:
-    Array.isArray(req.body.services)
-        ? req.body.services
-        : [],
+
+                    gallery:
+                        Array.isArray(req.body.gallery)
+                            ? req.body.gallery
+                            : [],
+
+                    services:
+                        Array.isArray(req.body.services)
+                            ? req.body.services
+                            : [],
 
                     country:
                         "Namibia",
@@ -845,9 +847,6 @@ router.post(
 
                     description:
                         req.body.description || "",
-
-                    services:
-                        req.body.services || "",
 
                     ownerEmail:
                         ownerEmail,
@@ -1125,24 +1124,26 @@ router.put(
                 business.image =
                     req.body.image;
             }
+
             if (
-    req.body.gallery !==
-    undefined
-) {
-    business.gallery =
-        Array.isArray(req.body.gallery)
-            ? req.body.gallery
-            : [];
-}
-if (
-    req.body.services !==
-    undefined
-) {
-    business.services =
-        Array.isArray(req.body.services)
-            ? req.body.services
-            : [];
-}
+                req.body.gallery !==
+                undefined
+            ) {
+                business.gallery =
+                    Array.isArray(req.body.gallery)
+                        ? req.body.gallery
+                        : [];
+            }
+
+            if (
+                req.body.services !==
+                undefined
+            ) {
+                business.services =
+                    Array.isArray(req.body.services)
+                        ? req.body.services
+                        : [];
+            }
 
             if (
                 req.body.category !==
@@ -1190,14 +1191,6 @@ if (
             ) {
                 business.description =
                     req.body.description;
-            }
-
-            if (
-                req.body.services !==
-                undefined
-            ) {
-                business.services =
-                    req.body.services;
             }
 
             if (

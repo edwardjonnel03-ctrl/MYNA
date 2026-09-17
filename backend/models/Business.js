@@ -19,32 +19,11 @@ const BusinessSchema = new mongoose.Schema(
             type: String,
             default: ""
         },
+
         gallery: {
-    type: [String],
-    default: []
-},
-services: {
-    type: [
-        {
-            name: {
-                type: String,
-                trim: true
-            },
-
-            price: {
-                type: String,
-                trim: true
-            },
-
-            description: {
-                type: String,
-                trim: true
-            }
-        }
-    ],
-
-    default: []
-},
+            type: [String],
+            default: []
+        },
 
         country: {
             type: String,
@@ -59,10 +38,10 @@ services: {
         },
 
         category: {
-    type: String,
-    default: "Other",
-    trim: true
-},
+            type: String,
+            default: "Other",
+            trim: true
+        },
 
         phone: {
             type: String,
@@ -86,52 +65,52 @@ services: {
             default: ""
         },
 
-       services: {
-    type: [
-        {
-            name: {
-                type: String,
-                trim: true
-            },
+        services: {
+            type: [
+                {
+                    name: {
+                        type: String,
+                        trim: true
+                    },
 
-            price: {
-                type: String,
-                trim: true
-            },
+                    price: {
+                        type: String,
+                        trim: true
+                    },
 
-            description: {
-                type: String,
-                trim: true
-            }
-        }
-    ],
+                    description: {
+                        type: String,
+                        trim: true
+                    }
+                }
+            ],
 
-    default: []
-},
+            default: []
+        },
 
         // BUSINESS OWNER ACCOUNT
 
-       ownerEmail: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    default: null
-},
+        ownerEmail: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            default: null
+        },
 
-ownerPasswordHash: {
-    type: String,
-    default: null
-},
+        ownerPasswordHash: {
+            type: String,
+            default: null
+        },
 
-ownerPasswordSalt: {
-    type: String,
-    default: null
-},
+        ownerPasswordSalt: {
+            type: String,
+            default: null
+        },
 
-claimed: {
-    type: Boolean,
-    default: false
-},
+        claimed: {
+            type: Boolean,
+            default: false
+        },
 
         // ADMIN VERIFICATION
 
@@ -147,26 +126,32 @@ claimed: {
                 type: String,
                 default: ""
             },
+
             tuesday: {
                 type: String,
                 default: ""
             },
+
             wednesday: {
                 type: String,
                 default: ""
             },
+
             thursday: {
                 type: String,
                 default: ""
             },
+
             friday: {
                 type: String,
                 default: ""
             },
+
             saturday: {
                 type: String,
                 default: ""
             },
+
             sunday: {
                 type: String,
                 default: ""
