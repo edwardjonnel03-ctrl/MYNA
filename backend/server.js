@@ -4,6 +4,7 @@ const cloudinary =
 
 const express = require("express");
 const cors = require("cors");
+const crypto = require("crypto");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const path = require("path");
@@ -167,14 +168,20 @@ app.post(
     const correctUsername =
     process.env.ADMIN_USERNAME;
 
-const correctPassword =
-    process.env.ADMIN_PASSWORD;
+const correctPasswordHash =
+    process.env.ADMIN_PASSWORD_HASH;
+
+const enteredPasswordHash =
+    crypto
+        .createHash("sha256")
+        .update(password || "")
+        .digest("hex");
 
 
     if (
-        username === correctUsername &&
-        password === correctPassword
-    ) {
+    username === correctUsername &&
+    enteredPasswordHash === correctPasswordHash
+) {
 
         req.session.isAdmin = true;
 
