@@ -468,22 +468,46 @@
                             ).toLowerCase();
 
 
-                        const services =
-                            (
-                                business.services ||
-                                ""
-                            ).toLowerCase();
+                 const services =
+    Array.isArray(business.services)
+        ? business.services
+            .map(
+                service =>
+                    [
+                        service.name || "",
+                        service.price || "",
+                        service.description || ""
+                    ].join(" ")
+            )
+            .join(" ")
+            .toLowerCase()
+        : "";
 
 
-                        const matchesSearch =
-                            !search ||
-                            name.includes(search) ||
-                            businessCategory
-                                .toLowerCase()
-                                .includes(search) ||
-                            town.includes(search) ||
-                            description.includes(search) ||
-                            services.includes(search);
+                 const matchesSearch =
+    !search ||
+    name.includes(search) ||
+    businessCategory
+        .toLowerCase()
+        .includes(search) ||
+    town.includes(search) ||
+    description.includes(search) ||
+    (
+        Array.isArray(business.services)
+            ? business.services.some(
+                service =>
+                    (
+                        (service.name || "") +
+                        " " +
+                        (service.price || "") +
+                        " " +
+                        (service.description || "")
+                    )
+                        .toLowerCase()
+                        .includes(search)
+            )
+            : false
+    );
 
 
                         const matchesCategory =
