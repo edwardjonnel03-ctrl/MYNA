@@ -5,7 +5,7 @@ const cloudinary =
 
 const express = require("express");
 const cors = require("cors");
-const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const path = require("path");
@@ -181,74 +181,98 @@ app.use(
 
 app.post(
     "/api/admin/login",
-    (req, res) => {
+    async (req, res) => {
 
-        const username =
-            req.body.username;
+        try {
 
-        const password =
-            req.body.password;
+            const username =
+                req.body.username;
 
-        const correctUsername =
-            process.env.ADMIN_USERNAME;
+            const password =
+                req.body.password;
 
-        const correctPasswordHash =
-            process.env.ADMIN_PASSWORD_HASH;
+            const correctUsername =
+                process.env.ADMIN_USERNAME;
 
-        const enteredPasswordHash =
-            crypto
-                .createHash("sha256")
-                .update(password || "")
-                .digest("hex");
+            const correctPasswordHash =
+                process.env.ADMIN_PASSWORD_BCRYPT;
 
 
-        if (
-            username === correctUsername &&
-            enteredPasswordHash ===
-                correctPasswordHash
-        ) {
+            if (
+                !username ||
+                !password ||
+                !correctPasswordHash
+            ) {
 
-            req.session.isAdmin = true;
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Invalid username or password."
+                });
+            }
 
-            return req.session.save(
-                (error) => {
 
-                    if (error) {
+            const passwordMatches =
+                await bcrypt.compare(
+                    password,
+                    correctPasswordHash
+                );
 
-                        console.error(
-                            "Admin session save failed:",
-                            error
-                        );
 
-                        return res
-                            .status(500)
-                            .json({
+            if (
+                username === correctUsername &&
+                passwordMatches
+            ) {
+
+                req.session.isAdmin = true;
+
+                return req.session.save(
+                    (error) => {
+
+                        if (error) {
+
+                            console.error(
+                                "Admin session save failed:",
+                                error
+                            );
+
+                            return res.status(500).json({
                                 success: false,
-
                                 message:
                                     "Could not create admin session."
                             });
+                        }
+
+
+                        return res.json({
+                            success: true,
+                            message:
+                                "Admin login successful."
+                        });
                     }
-
-                    return res.json({
-                        success: true,
-
-                        message:
-                            "Admin login successful."
-                    });
-                }
-            );
-        }
+                );
+            }
 
 
-        return res
-            .status(401)
-            .json({
+            return res.status(401).json({
                 success: false,
-
                 message:
                     "Invalid username or password."
             });
+
+        } catch (error) {
+
+            console.error(
+                "Admin login error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Admin login failed."
+            });
+        }
     }
 );
 
