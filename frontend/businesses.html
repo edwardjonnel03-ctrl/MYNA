@@ -485,7 +485,7 @@
         : "";
 
 
-                 const matchesSearch =
+const matchesSearch =
     !search ||
     name.includes(search) ||
     businessCategory
@@ -493,22 +493,7 @@
         .includes(search) ||
     town.includes(search) ||
     description.includes(search) ||
-    (
-        Array.isArray(business.services)
-            ? business.services.some(
-                service =>
-                    (
-                        (service.name || "") +
-                        " " +
-                        (service.price || "") +
-                        " " +
-                        (service.description || "")
-                    )
-                        .toLowerCase()
-                        .includes(search)
-            )
-            : false
-    );
+    services.includes(search);
 
 
                         const matchesCategory =
