@@ -5,6 +5,7 @@ const cloudinary =
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
 const path = require("path");
 const { Resend } = require("resend");
 const connectDatabase = require("./config/database");
@@ -86,19 +87,24 @@ extended: true
 // =========================================
 
 app.use(
-session({
-secret: process.env.SESSION_SECRET,
-resave: false,
-saveUninitialized: false,
+    session({
+        secret: process.env.SESSION_SECRET,
 
+        resave: false,
 
-    cookie: {
-        httpOnly: true,
-        secure: false,
-        maxAge: 1000 * 60 * 60 * 8
-    }
-})
+        saveUninitialized: false,
 
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI,
+            collectionName: "sessions"
+        }),
+
+        cookie: {
+            httpOnly: true,
+            secure: false,
+            maxAge: 1000 * 60 * 60 * 8
+        }
+    })
 );
 
 // =========================================
