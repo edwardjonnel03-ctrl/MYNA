@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const cloudinary =
     require("./config/cloudinary");
 
@@ -9,7 +10,8 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const path = require("path");
 const { Resend } = require("resend");
-const connectDatabase = require("./config/database");
+const connectDatabase =
+    require("./config/database");
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
@@ -17,7 +19,11 @@ const resend = new Resend(
 
 const app = express();
 
+// Required for secure cookies behind Render's proxy
+app.set("trust proxy", 1);
+
 const PORT = 5000;
+
 
 // =========================================
 // MIDDLEWARE
@@ -56,6 +62,12 @@ app.use(
         limit: "30mb"
     })
 );
+
+
+// =========================================
+// CLOUDINARY UPLOAD
+// =========================================
+
 app.post(
     "/api/upload",
     async (req, res) => {
@@ -82,7 +94,7 @@ app.post(
                     }
                 );
 
-            res.json({
+            return res.json({
                 success: true,
                 url: result.secure_url
             });
@@ -94,7 +106,7 @@ app.post(
                 error
             );
 
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message:
                     "Image upload failed."
@@ -104,10 +116,11 @@ app.post(
 );
 
 app.use(
-express.urlencoded({
-extended: true
-})
+    express.urlencoded({
+        extended: true
+    })
 );
+
 
 // =========================================
 // SESSION
@@ -115,39 +128,52 @@ extended: true
 
 app.use(
     session({
-        secret: process.env.SESSION_SECRET,
+        secret:
+            process.env.SESSION_SECRET,
 
         resave: false,
 
         saveUninitialized: false,
 
         store: MongoStore.create({
-            mongoUrl: process.env.MONGODB_URI,
-            collectionName: "sessions"
+            mongoUrl:
+                process.env.MONGODB_URI,
+
+            collectionName:
+                "sessions"
         }),
 
         cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 8
-}
+            httpOnly: true,
+
+            secure:
+                process.env.NODE_ENV ===
+                "production",
+
+            sameSite: "lax",
+
+            maxAge:
+                1000 * 60 * 60 * 8
+        }
     })
 );
+
 
 // =========================================
 // FRONTEND
 // =========================================
 
-const frontendPath = path.join(
-__dirname,
-"..",
-"frontend"
-);
+const frontendPath =
+    path.join(
+        __dirname,
+        "..",
+        "frontend"
+    );
 
 app.use(
-express.static(frontendPath)
+    express.static(frontendPath)
 );
+
 
 // =========================================
 // ADMIN LOGIN
@@ -175,9 +201,11 @@ app.post(
                 .update(password || "")
                 .digest("hex");
 
+
         if (
             username === correctUsername &&
-            enteredPasswordHash === correctPasswordHash
+            enteredPasswordHash ===
+                correctPasswordHash
         ) {
 
             req.session.isAdmin = true;
@@ -186,20 +214,25 @@ app.post(
                 (error) => {
 
                     if (error) {
+
                         console.error(
                             "Admin session save failed:",
                             error
                         );
 
-                        return res.status(500).json({
-                            success: false,
-                            message:
-                                "Could not create admin session."
-                        });
+                        return res
+                            .status(500)
+                            .json({
+                                success: false,
+
+                                message:
+                                    "Could not create admin session."
+                            });
                     }
 
                     return res.json({
                         success: true,
+
                         message:
                             "Admin login successful."
                     });
@@ -208,135 +241,119 @@ app.post(
         }
 
 
-        return res.status(401).json({
-            success: false,
-            message:
-                "Invalid username or password."
-        });
+        return res
+            .status(401)
+            .json({
+                success: false,
+
+                message:
+                    "Invalid username or password."
+            });
     }
 );
+
 
 // =========================================
 // ADMIN AUTH CHECK
 // =========================================
 
 app.get(
-"/api/admin/check",
-(req, res) => {
+    "/api/admin/check",
+    (req, res) => {
+
+        if (
+            req.session &&
+            req.session.isAdmin === true
+        ) {
+
+            return res.json({
+                success: true,
+                authenticated: true
+            });
+        }
 
 
-    if (
-        req.session &&
-        req.session.isAdmin === true
-    ) {
-
-        return res.json({
-
-            success: true,
-
-            authenticated: true
-
-        });
-
+        return res
+            .status(401)
+            .json({
+                success: false,
+                authenticated: false
+            });
     }
-
-
-    return res.status(401).json({
-
-        success: false,
-
-        authenticated: false
-
-    });
-
-}
-
-
 );
+
 
 // =========================================
 // ADMIN LOGOUT
 // =========================================
 
 app.post(
-"/api/admin/logout",
-(req, res) => {
+    "/api/admin/logout",
+    (req, res) => {
+
+        req.session.destroy(
+            (error) => {
+
+                if (error) {
+
+                    console.error(
+                        "LOGOUT ERROR:",
+                        error
+                    );
+
+                    return res
+                        .status(500)
+                        .json({
+                            success: false,
+
+                            message:
+                                "Could not log out."
+                        });
+                }
 
 
-    req.session.destroy(
-        (error) => {
-
-            if (error) {
-
-                console.error(
-                    "LOGOUT ERROR:",
-                    error
-                );
-
-
-                return res.status(500).json({
-
-                    success: false,
+                return res.json({
+                    success: true,
 
                     message:
-                        "Could not log out."
-
+                        "Logged out successfully."
                 });
-
             }
-
-
-            return res.json({
-
-                success: true,
-
-                message:
-                    "Logged out successfully."
-
-            });
-
-        }
-    );
-
-}
-
-
+        );
+    }
 );
+
 
 // =========================================
 // BUSINESS ROUTES
 // =========================================
 
 const businessRoutes =
-require("./routes/businesses");
+    require("./routes/businesses");
 
 app.use(
-"/api/businesses",
-businessRoutes
+    "/api/businesses",
+    businessRoutes
 );
+
 
 // =========================================
 // HEALTH CHECK
 // =========================================
 
 app.get(
-"/api/health",
-(req, res) => {
+    "/api/health",
+    (req, res) => {
 
+        return res.json({
+            success: true,
 
-    res.json({
-
-        success: true,
-
-        message:
-            "MAYNA API is running"
-
-    });
-
-}
-
-
+            message:
+                "MAYNA API is running"
+        });
+    }
 );
+
 
 // =========================================
 // START SERVER
@@ -353,12 +370,24 @@ async function startServer() {
             () => {
 
                 console.log("");
-                console.log("==============================");
-                console.log("       MAYNA IS RUNNING");
-                console.log("==============================");
-                console.log("http://localhost:" + PORT);
-                console.log("");
 
+                console.log(
+                    "=============================="
+                );
+
+                console.log(
+                    "       MAYNA IS RUNNING"
+                );
+
+                console.log(
+                    "=============================="
+                );
+
+                console.log(
+                    "http://localhost:" + PORT
+                );
+
+                console.log("");
             }
         );
 
