@@ -174,6 +174,13 @@ app.post(
                 .createHash("sha256")
                 .update(password || "")
                 .digest("hex");
+                console.log(
+    "ADMIN AUTH CHECK:",
+    !!process.env.ADMIN_USERNAME,
+    !!process.env.ADMIN_PASSWORD_HASH,
+    (process.env.ADMIN_PASSWORD_HASH || "").length,
+    enteredPasswordHash === process.env.ADMIN_PASSWORD_HASH
+);
 
 
         if (
