@@ -154,62 +154,67 @@ express.static(frontendPath)
 // =========================================
 
 app.post(
-"/api/admin/login",
-(req, res) => {
+    "/api/admin/login",
+    (req, res) => {
+
+        const username =
+            req.body.username;
+
+        const password =
+            req.body.password;
+
+        const correctUsername =
+            process.env.ADMIN_USERNAME;
+
+        const correctPasswordHash =
+            process.env.ADMIN_PASSWORD_HASH;
+
+        const enteredPasswordHash =
+            crypto
+                .createHash("sha256")
+                .update(password || "")
+                .digest("hex");
 
 
-    const username =
-        req.body.username;
+        if (
+            username === correctUsername &&
+            enteredPasswordHash === correctPasswordHash
+        ) {
 
-    const password =
-        req.body.password;
+            req.session.isAdmin = true;
+
+            return req.session.save(
+                (error) => {
+
+                    if (error) {
+                        console.error(
+                            "Admin session save failed:",
+                            error
+                        );
+
+                        return res.status(500).json({
+                            success: false,
+                            message:
+                                "Could not create admin session."
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
+                        message:
+                            "Admin login successful."
+                    });
+                }
+            );
+        }
 
 
-    const correctUsername =
-    process.env.ADMIN_USERNAME;
-
-const correctPasswordHash =
-    process.env.ADMIN_PASSWORD_HASH;
-
-const enteredPasswordHash =
-    crypto
-        .createHash("sha256")
-        .update(password || "")
-        .digest("hex");
-
-
-    if (
-    username === correctUsername &&
-    enteredPasswordHash === correctPasswordHash
-) {
-
-        req.session.isAdmin = true;
-
-
-        return res.json({
-
-            success: true,
-
+        return res.status(401).json({
+            success: false,
             message:
-                "Admin login successful."
-
+                "Invalid username or password."
         });
-
     }
-
-
-    return res.status(401).json({
-
-        success: false,
-
-        message:
-            "Invalid username or password."
-
-    });
-
-}
-
-
 );
 
 // =========================================
