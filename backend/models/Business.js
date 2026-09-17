@@ -23,6 +23,28 @@ const BusinessSchema = new mongoose.Schema(
     type: [String],
     default: []
 },
+services: {
+    type: [
+        {
+            name: {
+                type: String,
+                trim: true
+            },
+
+            price: {
+                type: String,
+                trim: true
+            },
+
+            description: {
+                type: String,
+                trim: true
+            }
+        }
+    ],
+
+    default: []
+},
 
         country: {
             type: String,
@@ -64,10 +86,28 @@ const BusinessSchema = new mongoose.Schema(
             default: ""
         },
 
-        services: {
-            type: String,
-            default: ""
-        },
+       services: {
+    type: [
+        {
+            name: {
+                type: String,
+                trim: true
+            },
+
+            price: {
+                type: String,
+                trim: true
+            },
+
+            description: {
+                type: String,
+                trim: true
+            }
+        }
+    ],
+
+    default: []
+},
 
         // BUSINESS OWNER ACCOUNT
 

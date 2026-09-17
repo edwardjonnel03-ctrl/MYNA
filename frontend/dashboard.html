@@ -359,20 +359,6 @@
             </div>
 
 
-            <div class="full">
-
-                <label for="services">
-                    Services
-                </label>
-
-                <textarea
-                    id="services"
-                    placeholder="List the services you provide..."
-                ></textarea>
-
-            </div>
-
-
         </div>
 
     </div>
@@ -426,6 +412,27 @@
         </p>
 
         <div id="galleryPreview"></div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Services & Prices</h2>
+
+        <p>
+            Add the services or products
+            your business offers.
+        </p>
+
+        <div id="servicesList"></div>
+
+        <button
+            type="button"
+            id="addServiceButton"
+        >
+            + Add Service
+        </button>
 
     </div>
 
@@ -581,6 +588,16 @@ const galleryPreview =
     );
 
 let galleryImages = [];
+let businessServices = [];
+const servicesList =
+    document.getElementById(
+        "servicesList"
+    );
+
+const addServiceButton =
+    document.getElementById(
+        "addServiceButton"
+    );
 
         const message =
             document.getElementById(
@@ -646,7 +663,6 @@ let galleryImages = [];
             container.style.margin =
                 "8px";
 
-
             const img =
                 document.createElement("img");
 
@@ -657,7 +673,6 @@ let galleryImages = [];
             img.style.objectFit = "cover";
             img.style.borderRadius = "8px";
             img.style.display = "block";
-
 
             const removeButton =
                 document.createElement("button");
@@ -689,7 +704,6 @@ let galleryImages = [];
             removeButton.style.cursor =
                 "pointer";
 
-
             removeButton.addEventListener(
                 "click",
                 function () {
@@ -702,7 +716,6 @@ let galleryImages = [];
                     showGallery();
                 }
             );
-
 
             container.appendChild(img);
 
@@ -718,7 +731,176 @@ let galleryImages = [];
 }
 
 
-       photoInput.addEventListener(
+function showServices() {
+
+    servicesList.innerHTML = "";
+
+    businessServices.forEach(
+        function (service, index) {
+
+            const serviceCard =
+                document.createElement("div");
+
+            serviceCard.style.padding =
+                "15px";
+
+            serviceCard.style.marginBottom =
+                "15px";
+
+            serviceCard.style.border =
+                "1px solid #d1d5db";
+
+            serviceCard.style.borderRadius =
+                "8px";
+
+            const nameInput =
+                document.createElement("input");
+
+            nameInput.type = "text";
+
+            nameInput.placeholder =
+                "Service or product name";
+
+            nameInput.value =
+                service.name || "";
+
+            nameInput.style.marginBottom =
+                "10px";
+
+            const priceInput =
+                document.createElement("input");
+
+            priceInput.type = "text";
+
+            priceInput.placeholder =
+                "Price e.g. N$250";
+
+            priceInput.value =
+                service.price || "";
+
+            priceInput.style.marginBottom =
+                "10px";
+
+            const descriptionInput =
+                document.createElement(
+                    "textarea"
+                );
+
+            descriptionInput.placeholder =
+                "Short description";
+
+            descriptionInput.value =
+                service.description || "";
+
+            descriptionInput.style.marginBottom =
+                "10px";
+
+            const removeButton =
+                document.createElement(
+                    "button"
+                );
+
+            removeButton.type =
+                "button";
+
+            removeButton.textContent =
+                "Remove";
+
+            removeButton.style.background =
+                "#dc2626";
+
+            removeButton.style.color =
+                "white";
+
+            removeButton.style.border =
+                "none";
+
+            removeButton.style.padding =
+                "9px 14px";
+
+            removeButton.style.borderRadius =
+                "6px";
+
+            removeButton.style.cursor =
+                "pointer";
+
+            nameInput.addEventListener(
+                "input",
+                function () {
+                    businessServices[index].name =
+                        nameInput.value;
+                }
+            );
+
+            priceInput.addEventListener(
+                "input",
+                function () {
+                    businessServices[index].price =
+                        priceInput.value;
+                }
+            );
+
+            descriptionInput.addEventListener(
+                "input",
+                function () {
+                    businessServices[index].description =
+                        descriptionInput.value;
+                }
+            );
+
+            removeButton.addEventListener(
+                "click",
+                function () {
+
+                    businessServices.splice(
+                        index,
+                        1
+                    );
+
+                    showServices();
+                }
+            );
+
+            serviceCard.appendChild(
+                nameInput
+            );
+
+            serviceCard.appendChild(
+                priceInput
+            );
+
+            serviceCard.appendChild(
+                descriptionInput
+            );
+
+            serviceCard.appendChild(
+                removeButton
+            );
+
+            servicesList.appendChild(
+                serviceCard
+            );
+        }
+    );
+}
+
+
+addServiceButton.addEventListener(
+    "click",
+    function () {
+
+        businessServices.push({
+            name: "",
+            price: "",
+            description: ""
+        });
+
+        showServices();
+    }
+);
+
+
+        photoInput.addEventListener(
     "change",
     async function () {
 
@@ -1052,10 +1234,27 @@ galleryInput.addEventListener(
                     business.description || "";
 
 
-                document.getElementById(
-                    "services"
-                ).value =
-                    business.services || "";
+                businessServices =
+                    Array.isArray(
+                        business.services
+                    )
+                        ? business.services.map(
+                            function (service) {
+                                return {
+                                    name:
+                                        service.name || "",
+
+                                    price:
+                                        service.price || "",
+
+                                    description:
+                                        service.description || ""
+                                };
+                            }
+                        )
+                        : [];
+
+                showServices();
 
 
                 showPhoto(
@@ -1209,9 +1408,30 @@ description:
                         ).value.trim(),
 
                     services:
-                        document.getElementById(
-                            "services"
-                        ).value.trim(),
+                        businessServices
+                            .filter(
+                                function (service) {
+                                    return (
+                                        service.name.trim() ||
+                                        service.price.trim() ||
+                                        service.description.trim()
+                                    );
+                                }
+                            )
+                            .map(
+                                function (service) {
+                                    return {
+                                        name:
+                                            service.name.trim(),
+
+                                        price:
+                                            service.price.trim(),
+
+                                        description:
+                                            service.description.trim()
+                                    };
+                                }
+                            ),
 
                     hours: {
 

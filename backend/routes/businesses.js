@@ -820,6 +820,10 @@ router.post(
     Array.isArray(req.body.gallery)
         ? req.body.gallery
         : [],
+        services:
+    Array.isArray(req.body.services)
+        ? req.body.services
+        : [],
 
                     country:
                         "Namibia",
@@ -1128,6 +1132,15 @@ router.put(
     business.gallery =
         Array.isArray(req.body.gallery)
             ? req.body.gallery
+            : [];
+}
+if (
+    req.body.services !==
+    undefined
+) {
+    business.services =
+        Array.isArray(req.body.services)
+            ? req.body.services
             : [];
 }
 

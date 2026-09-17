@@ -157,13 +157,41 @@
             gap: 10px;
         }
 
-        .service-tag {
-            padding: 10px 15px;
-            background: #fff1ec;
-            color: #e84825;
-            border-radius: 30px;
-            font-weight: 600;
-        }
+        .services {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+    gap: 15px;
+}
+
+.service-card {
+    padding: 20px;
+    background: #fff7f4;
+    border: 1px solid #ffe0d7;
+    border-radius: 14px;
+}
+
+.service-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 8px;
+}
+
+.service-price {
+    color: #e84825;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.service-description {
+    color: #666666;
+    line-height: 1.6;
+}
 
         .work-gallery {
             display: grid;
@@ -498,15 +526,20 @@
 
 
                 const services =
-                    business.services
-                        ? business.services
-                            .split(",")
-                            .map(
-                                service =>
-                                    service.trim()
-                            )
-                            .filter(Boolean)
-                        : [];
+    Array.isArray(
+        business.services
+    )
+        ? business.services
+            .filter(
+                service =>
+                    service &&
+                    (
+                        service.name ||
+                        service.price ||
+                        service.description
+                    )
+            )
+        : [];
 
 
                 const gallery =
@@ -621,34 +654,58 @@
 
 
                             ${
-                                services.length
-                                ? `
-                                    <section class="profile-section">
+    services.length
+    ? `
+        <section class="profile-section">
 
-                                        <h2>
-                                            Services
-                                        </h2>
+            <h2>
+                Services & Prices
+            </h2>
 
-                                        <div class="services">
+            <div class="services">
 
-                                            ${services
-                                                .map(
-                                                    service =>
-                                                        `
-                                                            <span class="service-tag">
-                                                                ${service}
-                                                            </span>
-                                                        `
-                                                )
-                                                .join("")
-                                            }
+                ${services
+                    .map(
+                        service =>
+                            `
+                                <div class="service-card">
 
-                                        </div>
+                                    <div class="service-name">
+                                        ${service.name || "Service"}
+                                    </div>
 
-                                    </section>
-                                `
-                                : ""
-                            }
+                                    ${
+                                        service.price
+                                        ? `
+                                            <div class="service-price">
+                                                ${service.price}
+                                            </div>
+                                        `
+                                        : ""
+                                    }
+
+                                    ${
+                                        service.description
+                                        ? `
+                                            <div class="service-description">
+                                                ${service.description}
+                                            </div>
+                                        `
+                                        : ""
+                                    }
+
+                                </div>
+                            `
+                    )
+                    .join("")
+                }
+
+            </div>
+
+        </section>
+    `
+        : ""
+}
 
 
                             ${
@@ -666,12 +723,12 @@
                                                 .map(
                                                     image =>
                                                         `
-                                                           <img
-    src="${image}"
-    alt="${name} work"
-    class="gallery-work-image"
-    loading="lazy"
->
+                                                            <img
+                                                                src="${image}"
+                                                                alt="${name} work"
+                                                                class="gallery-work-image"
+                                                                loading="lazy"
+                                                            >
                                                         `
                                                 )
                                                 .join("")
@@ -685,68 +742,70 @@
                             }
 
 
-                            <section class="profile-section">
+                            ${
+                                phone ||
+                                whatsapp ||
+                                email
+                                ? `
+                                    <section class="profile-section">
 
-                                <h2>
-                                    Contact
-                                </h2>
+                                        <h2>
+                                            Contact
+                                        </h2>
 
-                                <div class="contact-grid">
+                                        <div class="contact-grid">
 
+                                            ${
+                                                phone
+                                                ? `
+                                                    <a
+                                                        href="tel:${phone}"
+                                                        class="contact-button"
+                                                    >
+                                                        Call
+                                                    </a>
+                                                `
+                                                : ""
+                                            }
 
-                                    ${
-                                        phone
-                                        ? `
-                                            <a
-                                                class="contact-button"
-                                                href="tel:${phone}"
-                                            >
-                                                📞 Call
-                                            </a>
-                                        `
-                                        : ""
-                                    }
+                                            ${
+                                                whatsapp
+                                                ? `
+                                                    <a
+                                                        href="https://wa.me/${whatsapp.replace(/\D/g, "")}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="contact-button"
+                                                    >
+                                                        WhatsApp
+                                                    </a>
+                                                `
+                                                : ""
+                                            }
 
+                                            ${
+                                                email
+                                                ? `
+                                                    <a
+                                                        href="mailto:${email}"
+                                                        class="contact-button"
+                                                    >
+                                                        Email
+                                                    </a>
+                                                `
+                                                : ""
+                                            }
 
-                                    ${
-                                        whatsapp
-                                        ? `
-                                            <a
-                                                class="contact-button"
-                                                href="https://wa.me/${whatsapp.replace(/\D/g, "")}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                💬 WhatsApp
-                                            </a>
-                                        `
-                                        : ""
-                                    }
+                                        </div>
 
-
-                                    ${
-                                        email
-                                        ? `
-                                            <a
-                                                class="contact-button"
-                                                href="mailto:${email}"
-                                            >
-                                                ✉ Email
-                                            </a>
-                                        `
-                                        : ""
-                                    }
-
-
-                                </div>
-
-                            </section>
-
+                                    </section>
+                                `
+                                : ""
+                            }
 
                         </div>
 
                     </div>
-
                 `;
 
 
