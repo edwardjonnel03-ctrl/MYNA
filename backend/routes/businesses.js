@@ -22,7 +22,7 @@ function publicBusiness(business) {
             ? business.toObject()
             : { ...business };
 
-    delete safeBusiness.ownerEmail;
+delete safeBusiness.ownerEmail;
 delete safeBusiness.ownerPasswordHash;
 delete safeBusiness.ownerPasswordSalt;
 delete safeBusiness.resetTokenHash;
