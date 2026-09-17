@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const { Resend } = require("resend");
 
@@ -512,11 +513,35 @@ router.post(
 
 
 // ========================================
+// OWNER LOGIN RATE LIMIT
+// ========================================
+
+const ownerLoginLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many login attempts. Please try again in 15 minutes."
+        }
+    });
+
+
+// ========================================
 // OWNER LOGIN
 // ========================================
 
 router.post(
     "/owner/login",
+    ownerLoginLimiter,
     async (req, res) => {
 
         try {
@@ -539,12 +564,9 @@ router.post(
             ) {
 
                 return res.status(400).json({
-
                     success: false,
-
                     message:
                         "Email and password are required."
-
                 });
             }
 
@@ -556,12 +578,9 @@ router.post(
             if (!business) {
 
                 return res.status(401).json({
-
                     success: false,
-
                     message:
                         "Invalid email or password."
-
                 });
             }
 
@@ -575,12 +594,9 @@ router.post(
             if (!passwordCorrect) {
 
                 return res.status(401).json({
-
                     success: false,
-
                     message:
                         "Invalid email or password."
-
                 });
             }
 
@@ -588,9 +604,7 @@ router.post(
                 business.id;
 
             return res.json({
-
                 success: true,
-
                 message:
                     "Owner login successful.",
 
@@ -598,7 +612,6 @@ router.post(
                     publicBusiness(
                         business
                     )
-
             });
 
         } catch (error) {
@@ -609,12 +622,9 @@ router.post(
             );
 
             return res.status(500).json({
-
                 success: false,
-
                 message:
                     "Server error during owner login."
-
             });
         }
     }
