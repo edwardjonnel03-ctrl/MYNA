@@ -1,41 +1,36 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
 
-```
-<meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <title>MAYNA — Find Businesses & Services</title>
 
-<title>MAYNA — Find Businesses & Services</title>
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
-<link
-    rel="stylesheet"
-    href="css/style.css"
->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
->
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
-<link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
->
-
-<link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-    rel="stylesheet"
->
-```
-
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
 </head>
 
 <body>
@@ -46,43 +41,42 @@
 
 <header class="navbar">
 
-```
-<div class="nav-container">
-
-    <a
-        href="index.html"
-        class="logo"
-    >
-        MAYNA
-    </a>
-
-
-    <nav class="nav-links">
+    <div class="nav-container">
 
         <a
-            href="businesses.html"
-            class="active"
+            href="index.html"
+            class="logo"
         >
-            Explore
+            MAYNA
         </a>
 
-        <a href="register.html">
-            List your business
+        <nav class="nav-links">
+
+            <a
+                href="businesses.html"
+                class="active"
+            >
+                Explore
+            </a>
+
+            <a href="register.html">
+                List your business
+            </a>
+
+            <a href="owner-login.html">
+                Business Login
+            </a>
+
+        </nav>
+
+        <a
+            href="register.html"
+            class="nav-button"
+        >
+            Register business
         </a>
-        <a href="owner-login.html">Business Login</a>
 
-    </nav>
-
-
-    <a
-        href="register.html"
-        class="nav-button"
-    >
-        Register business
-    </a>
-
-</div>
-```
+    </div>
 
 </header>
 
@@ -94,168 +88,95 @@
 
 <section class="hero">
 
-```
-<div class="hero-container">
+    <div class="hero-container">
 
-    <div class="hero-content">
+        <div class="hero-content">
 
-        <div class="hero-label">
-            DISCOVER LOCAL BUSINESSES
-        </div>
+            <div class="hero-label">
+                DISCOVER LOCAL BUSINESSES
+            </div>
 
+            <h1>
+                Find the right
+                <span>business</span>
+                for you.
+            </h1>
 
-        <h1>
+            <p class="hero-description">
+                Discover businesses, services and products
+                across Namibia — all in one place.
+            </p>
 
-            Find the right
+            <div class="hero-search">
 
-            <span>
-                business
-            </span>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="What are you looking for?"
+                    autocomplete="off"
+                >
 
-            for you.
+                <button
+                    type="button"
+                    id="searchButton"
+                >
+                    Search
+                </button>
 
-        </h1>
+            </div>
 
+            <div class="popular-searches">
 
-        <p class="hero-description">
+                <span>Popular:</span>
 
-            Discover businesses, services and products
-            across Namibia — all in one place.
+                <button type="button" data-search="ICT">
+                    ICT
+                </button>
 
-        </p>
+                <button type="button" data-search="Construction">
+                    Construction
+                </button>
 
+                <button type="button" data-search="Beauty">
+                    Beauty
+                </button>
 
-        <!-- SEARCH -->
+                <button type="button" data-search="Repairs">
+                    Repairs
+                </button>
 
-        <div class="hero-search">
+            </div>
 
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="What are you looking for?"
-                autocomplete="off"
+            <a
+                href="businesses.html"
+                class="hero-cta"
             >
-
-
-            <button
-                type="button"
-                id="searchButton"
-            >
-
-                Search
-
-            </button>
-
-        </div>
-
-
-        <!-- POPULAR SEARCHES -->
-
-        <div class="popular-searches">
-
-            <span>
-                Popular:
-            </span>
-
-
-            <button
-                type="button"
-                data-search="ICT"
-            >
-                ICT
-            </button>
-
-
-            <button
-                type="button"
-                data-search="Construction"
-            >
-                Construction
-            </button>
-
-
-            <button
-                type="button"
-                data-search="Beauty"
-            >
-                Beauty
-            </button>
-
-
-            <button
-                type="button"
-                data-search="Repairs"
-            >
-                Repairs
-            </button>
+                Explore businesses
+                <span>→</span>
+            </a>
 
         </div>
 
+        <div class="hero-side">
 
-        <!-- MAIN CTA -->
+            <div class="hero-stat">
+                <strong>Discover</strong>
+                <span>Local businesses</span>
+            </div>
 
-        <a
-            href="businesses.html"
-            class="hero-cta"
-        >
+            <div class="hero-stat">
+                <strong>Search</strong>
+                <span>Services you need</span>
+            </div>
 
-            Explore businesses
-
-            <span>
-                →
-            </span>
-
-        </a>
-
-    </div>
-
-
-    <!-- HERO SIDE -->
-
-    <div class="hero-side">
-
-        <div class="hero-stat">
-
-            <strong>
-                Discover
-            </strong>
-
-            <span>
-                Local businesses
-            </span>
-
-        </div>
-
-
-        <div class="hero-stat">
-
-            <strong>
-                Search
-            </strong>
-
-            <span>
-                Services you need
-            </span>
-
-        </div>
-
-
-        <div class="hero-stat">
-
-            <strong>
-                Connect
-            </strong>
-
-            <span>
-                Directly with businesses
-            </span>
+            <div class="hero-stat">
+                <strong>Connect</strong>
+                <span>Directly with businesses</span>
+            </div>
 
         </div>
 
     </div>
-
-</div>
-```
 
 </section>
 
@@ -265,162 +186,70 @@
 
 <section class="categories-section">
 
-```
-<div class="section-container">
+    <div class="section-container">
 
-    <div class="section-heading">
+        <div class="section-heading">
 
-        <div>
+            <div>
+                <span class="section-label">
+                    EXPLORE
+                </span>
 
-            <span class="section-label">
-                EXPLORE
-            </span>
+                <h2>
+                    Browse by category
+                </h2>
+            </div>
 
-            <h2>
-                Browse by category
-            </h2>
+            <a
+                href="businesses.html"
+                class="section-link"
+            >
+                View all →
+            </a>
 
         </div>
 
+        <div class="category-grid">
 
-        <a
-            href="businesses.html"
-            class="section-link"
-        >
+            <button class="category-card" data-search="ICT">
+                <span class="category-icon">💻</span>
+                <strong>ICT</strong>
+                <small>Technology & services</small>
+            </button>
 
-            View all →
+            <button class="category-card" data-search="Construction">
+                <span class="category-icon">🏗️</span>
+                <strong>Construction</strong>
+                <small>Building & contractors</small>
+            </button>
 
-        </a>
+            <button class="category-card" data-search="Beauty">
+                <span class="category-icon">✨</span>
+                <strong>Beauty</strong>
+                <small>Beauty & personal care</small>
+            </button>
 
-    </div>
+            <button class="category-card" data-search="Transport">
+                <span class="category-icon">🚗</span>
+                <strong>Transport</strong>
+                <small>Transport & logistics</small>
+            </button>
 
+            <button class="category-card" data-search="Repairs">
+                <span class="category-icon">🔧</span>
+                <strong>Repairs</strong>
+                <small>Repair & maintenance</small>
+            </button>
 
-    <div class="category-grid">
+            <button class="category-card" data-search="Food">
+                <span class="category-icon">🍴</span>
+                <strong>Food</strong>
+                <small>Food & restaurants</small>
+            </button>
 
-
-        <button
-            class="category-card"
-            data-search="ICT"
-        >
-
-            <span class="category-icon">
-                💻
-            </span>
-
-            <strong>
-                ICT
-            </strong>
-
-            <small>
-                Technology & services
-            </small>
-
-        </button>
-
-
-        <button
-            class="category-card"
-            data-search="Construction"
-        >
-
-            <span class="category-icon">
-                🏗️
-            </span>
-
-            <strong>
-                Construction
-            </strong>
-
-            <small>
-                Building & contractors
-            </small>
-
-        </button>
-
-
-        <button
-            class="category-card"
-            data-search="Beauty"
-        >
-
-            <span class="category-icon">
-                ✨
-            </span>
-
-            <strong>
-                Beauty
-            </strong>
-
-            <small>
-                Beauty & personal care
-            </small>
-
-        </button>
-
-
-        <button
-            class="category-card"
-            data-search="Transport"
-        >
-
-            <span class="category-icon">
-                🚗
-            </span>
-
-            <strong>
-                Transport
-            </strong>
-
-            <small>
-                Transport & logistics
-            </small>
-
-        </button>
-
-
-        <button
-            class="category-card"
-            data-search="Repairs"
-        >
-
-            <span class="category-icon">
-                🔧
-            </span>
-
-            <strong>
-                Repairs
-            </strong>
-
-            <small>
-                Repair & maintenance
-            </small>
-
-        </button>
-
-
-        <button
-            class="category-card"
-            data-search="Food"
-        >
-
-            <span class="category-icon">
-                🍴
-            </span>
-
-            <strong>
-                Food
-            </strong>
-
-            <small>
-                Food & restaurants
-            </small>
-
-        </button>
+        </div>
 
     </div>
-
-</div>
-```
 
 </section>
 
@@ -430,78 +259,56 @@
 
 <section class="business-section">
 
-```
-<div class="section-container">
+    <div class="section-container">
 
-    <div class="section-heading">
+        <div class="section-heading">
 
-        <div>
+            <div>
+                <span class="section-label">
+                    FEATURED
+                </span>
 
-            <span class="section-label">
-                FEATURED
-            </span>
+                <h2>
+                    Discover businesses
+                </h2>
 
+                <p class="section-description">
+                    Find verified businesses and services
+                    that can help you get things done.
+                </p>
+            </div>
 
-            <h2>
-                Discover businesses
-            </h2>
-
-
-            <p class="section-description">
-
-                Find verified businesses and services
-                that can help you get things done.
-
-            </p>
-
-        </div>
-
-
-        <a
-            href="businesses.html"
-            class="section-link"
-        >
-
-            Explore all businesses →
-
-        </a>
-
-    </div>
-
-
-    <div
-        id="featuredBusinesses"
-        class="business-grid"
-    >
-
-        <div class="business-card">
-
-            Loading businesses...
+            <a
+                href="businesses.html"
+                class="section-link"
+            >
+                Explore all businesses →
+            </a>
 
         </div>
 
-    </div>
-
-
-    <div class="center-button">
-
-        <a
-            href="businesses.html"
-            class="outline-button"
+        <div
+            id="featuredBusinesses"
+            class="business-grid"
         >
+            <div class="business-card">
+                Loading businesses...
+            </div>
+        </div>
 
-            Explore businesses
+        <div class="center-button">
 
-            <span>
-                →
-            </span>
+            <a
+                href="businesses.html"
+                class="outline-button"
+            >
+                Explore businesses
+                <span>→</span>
+            </a>
 
-        </a>
+        </div>
 
     </div>
-
-</div>
-```
 
 </section>
 
@@ -511,51 +318,33 @@
 
 <section class="owner-section">
 
-```
-<div class="owner-container">
+    <div class="owner-container">
 
-    <div>
+        <div>
+            <span class="section-label">
+                FOR BUSINESS OWNERS
+            </span>
 
-        <span class="section-label">
+            <h2>
+                Get your business
+                discovered on MAYNA.
+            </h2>
 
-            FOR BUSINESS OWNERS
+            <p>
+                Create a business listing and help
+                customers find your services.
+            </p>
+        </div>
 
-        </span>
-
-
-        <h2>
-
-            Get your business
-            discovered on MAYNA.
-
-        </h2>
-
-
-        <p>
-
-            Create a business listing and help
-            customers find your services.
-
-        </p>
+        <a
+            href="register.html"
+            class="owner-button"
+        >
+            Register your business
+            <span>→</span>
+        </a>
 
     </div>
-
-
-    <a
-        href="register.html"
-        class="owner-button"
-    >
-
-        Register your business
-
-        <span>
-            →
-        </span>
-
-    </a>
-
-</div>
-```
 
 </section>
 
@@ -567,69 +356,48 @@
 
 <footer class="footer">
 
-```
-<div class="footer-container">
+    <div class="footer-container">
 
-    <div>
+        <div>
+            <a
+                href="index.html"
+                class="footer-logo"
+            >
+                MAYNA
+            </a>
 
-        <a
-            href="index.html"
-            class="footer-logo"
-        >
+            <p>
+                Discover businesses.
+                Find services.
+                Connect locally.
+            </p>
+        </div>
 
-            MAYNA
+        <div class="footer-links">
 
-        </a>
+            <a href="businesses.html">
+                Explore businesses
+            </a>
 
+            <a href="register.html">
+                Register business
+            </a>
 
-        <p>
-
-            Discover businesses.
-            Find services.
-            Connect locally.
-
-        </p>
-
-    </div>
-
-
-    <div class="footer-links">
-
-        <a href="businesses.html">
-
-            Explore businesses
-
-        </a>
-
-
-        <a href="register.html">
-
-            Register business
-
-        </a>
+        </div>
 
     </div>
 
-</div>
+    <div class="footer-bottom">
 
+        <span>
+            © 2026 MAYNA
+        </span>
 
-<div class="footer-bottom">
+        <span>
+            Built for Namibia
+        </span>
 
-    <span>
-
-        © 2026 MAYNA
-
-    </span>
-
-
-    <span>
-
-        Built for Namibia
-
-    </span>
-
-</div>
-```
+    </div>
 
 </footer>
 
@@ -648,14 +416,12 @@
                 "featuredBusinesses"
             );
 
-
         try {
 
             const response =
                 await fetch(
                     "/api/businesses"
                 );
-
 
             if (!response.ok) {
 
@@ -665,10 +431,8 @@
 
             }
 
-
             const result =
                 await response.json();
-
 
             if (!result.success) {
 
@@ -678,7 +442,6 @@
 
             }
 
-
             const verifiedBusinesses =
                 result.businesses
                     .filter(
@@ -686,7 +449,6 @@
                             business.verified === true
                     )
                     .slice(0, 3);
-
 
             if (
                 verifiedBusinesses.length === 0
@@ -716,7 +478,6 @@
                 return;
             }
 
-
             container.innerHTML =
                 verifiedBusinesses
                     .map(
@@ -725,7 +486,6 @@
                             const name =
                                 business.businessName ||
                                 "Unnamed Business";
-
 
                             const initials =
                                 name
@@ -737,7 +497,6 @@
                                     .join("")
                                     .substring(0, 2)
                                     .toUpperCase();
-
 
                             return `
 
@@ -752,22 +511,16 @@
                                         <div
                                             class="business-logo"
                                         >
-
                                             ${initials}
-
                                         </div>
-
 
                                         <span
                                             class="rating"
                                         >
-
                                             ✓ Verified
-
                                         </span>
 
                                     </div>
-
 
                                     <div
                                         class="business-info"
@@ -776,60 +529,43 @@
                                         <span
                                             class="business-category"
                                         >
-
                                             ${
                                                 business.category ||
                                                 "Business"
                                             }
-
                                         </span>
 
-
                                         <h3>
-
                                             ${name}
-
                                         </h3>
-
 
                                         <p
                                             class="business-location"
                                         >
-
                                             📍
                                             ${
                                                 business.town ||
                                                 "Namibia"
                                             }
-
                                         </p>
-
 
                                         <p
                                             class="business-description"
                                         >
-
                                             ${
                                                 business.description ||
                                                 "Local business and services."
                                             }
-
                                         </p>
 
                                     </div>
-
 
                                     <a
                                         href="business.html?id=${business.id}"
                                         class="business-link"
                                     >
-
                                         View business
-
-                                        <span>
-                                            →
-                                        </span>
-
+                                        <span>→</span>
                                     </a>
 
                                 </article>
@@ -840,14 +576,12 @@
                     )
                     .join("");
 
-
         } catch (error) {
 
             console.error(
                 "FEATURED BUSINESSES ERROR:",
                 error
             );
-
 
             container.innerHTML = `
 
@@ -873,115 +607,9 @@
 
     }
 
-
     loadFeaturedBusinesses();
 
 </script>
 
 </body>
-
 </html>
-/* =========================
-   NAVIGATION LINKS
-========================= */
-
-.navbar {
-    width: 100%;
-    border-bottom: 1px solid #e5e7eb;
-    background: #ffffff;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 18px 24px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-}
-
-.logo {
-    text-decoration: none;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-}
-
-.nav-links a {
-    display: inline-block;
-    text-decoration: none;
-    color: #4b5563;
-    font-family: "DM Sans", sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 8px 0;
-    border: none;
-    background: transparent;
-    transition: color 0.2s ease;
-}
-
-.nav-links a:hover {
-    color: #111827;
-}
-
-.nav-links a.active {
-    color: #111827;
-}
-
-.nav-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    text-decoration: none;
-    background: #111827;
-    color: #ffffff;
-
-    padding: 11px 18px;
-    border-radius: 8px;
-
-    font-family: "DM Sans", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-
-    transition: 0.2s ease;
-}
-
-.nav-button:hover {
-    background: #374151;
-}
-
-/* =========================
-   MOBILE NAVIGATION
-========================= */
-
-@media (max-width: 768px) {
-
-    .nav-container {
-        flex-wrap: wrap;
-        padding: 16px;
-    }
-
-    .nav-links {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .nav-button {
-        font-size: 13px;
-        padding: 9px 14px;
-    }
-
-}
