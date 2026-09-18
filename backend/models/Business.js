@@ -101,7 +101,13 @@ const BusinessSchema = new mongoose.Schema(
                 }
             ],
 
-            default: []
+            default: [],
+            validate: {
+                validator: function (services) {
+                    return services.length <= 50;
+                },
+                message: "Services cannot contain more than 50 items."
+            }
         },
 
         // BUSINESS OWNER ACCOUNT
