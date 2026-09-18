@@ -792,11 +792,35 @@ router.post(
 
 
 // ========================================
+// BUSINESS REGISTRATION RATE LIMIT
+// ========================================
+
+const registrationLimiter =
+    rateLimit({
+        windowMs:
+            60 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many registration attempts. Please try again later."
+        }
+    });
+
+
+// ========================================
 // REGISTER BUSINESS
 // ========================================
 
 router.post(
     "/",
+    registrationLimiter,
     async (req, res) => {
 
         try {
