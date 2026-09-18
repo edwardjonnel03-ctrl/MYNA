@@ -135,37 +135,44 @@ const BusinessSchema = new mongoose.Schema(
         hours: {
             monday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             tuesday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             wednesday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             thursday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             friday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             saturday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             },
 
             sunday: {
                 type: String,
-                default: ""
+                default: "",
+                maxlength: 50
             }
         },
 
