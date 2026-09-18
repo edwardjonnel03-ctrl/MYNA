@@ -37,15 +37,15 @@ function publicBusiness(business) {
 function validateBusinessInput(body) {
 
     const stringFields = [
-    ["businessName", 120],
-    ["location", 100],
-    ["category", 80],
-    ["phone", 30],
-    ["whatsapp", 30],
-    ["email", 254],
-    ["ownerEmail", 254],
-    ["description", 2000]
-];
+        ["businessName", 120],
+        ["location", 100],
+        ["category", 80],
+        ["phone", 30],
+        ["whatsapp", 30],
+        ["email", 254],
+        ["ownerEmail", 254],
+        ["description", 2000]
+    ];
 
     for (
         const [field, maxLength]
@@ -66,28 +66,44 @@ function validateBusinessInput(body) {
             return `${field} is too long.`;
         }
     }
+
+    // BUSINESS EMAIL
     if (
-    body.ownerEmail &&
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        body.ownerEmail
-    )
-) {
-    return "Please enter a valid owner email address.";
-}
-if (
-    body.businessName !== undefined &&
-    body.businessName.trim() === ""
-) {
-    return "Business name is required.";
-}
+        body.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            body.email
+        )
+    ) {
+        return "Please enter a valid email address.";
+    }
 
-if (
-    body.location !== undefined &&
-    body.location.trim() === ""
-) {
-    return "Business location is required.";
-}
+    // OWNER EMAIL
+    if (
+        body.ownerEmail &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            body.ownerEmail
+        )
+    ) {
+        return "Please enter a valid owner email address.";
+    }
 
+    // BUSINESS NAME
+    if (
+        body.businessName !== undefined &&
+        body.businessName.trim() === ""
+    ) {
+        return "Business name is required.";
+    }
+
+    // LOCATION
+    if (
+        body.location !== undefined &&
+        body.location.trim() === ""
+    ) {
+        return "Business location is required.";
+    }
+
+    // MAIN IMAGE
     if (
         body.image !== undefined &&
         typeof body.image !== "string"
@@ -104,6 +120,7 @@ if (
         return "Invalid business image URL.";
     }
 
+    // GALLERY
     if (
         body.gallery !== undefined &&
         !Array.isArray(
@@ -141,6 +158,7 @@ if (
         }
     }
 
+    // SERVICES
     if (
         body.services !== undefined &&
         !Array.isArray(
@@ -168,12 +186,12 @@ if (
         ) {
 
             if (
-    !service ||
-    typeof service !== "object" ||
-    Array.isArray(service)
-) {
-    return "Invalid service.";
-}
+                !service ||
+                typeof service !== "object" ||
+                Array.isArray(service)
+            ) {
+                return "Invalid service.";
+            }
 
             if (
                 service.name !== undefined &&
@@ -207,6 +225,7 @@ if (
         }
     }
 
+    // OPENING HOURS
     if (
         body.hours !== undefined
     ) {
