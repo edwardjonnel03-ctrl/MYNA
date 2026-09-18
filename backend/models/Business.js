@@ -77,17 +77,20 @@ const BusinessSchema = new mongoose.Schema(
                 {
                     name: {
                         type: String,
-                        trim: true
+                        trim: true,
+                        maxlength: 120
                     },
 
                     price: {
                         type: String,
-                        trim: true
+                        trim: true,
+                        maxlength: 80
                     },
 
                     description: {
                         type: String,
-                        trim: true
+                        trim: true,
+                        maxlength: 500
                     }
                 }
             ],
