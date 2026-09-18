@@ -12,7 +12,8 @@ const BusinessSchema = new mongoose.Schema(
         businessName: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            maxlength: 120
         },
 
         image: {
@@ -34,35 +35,41 @@ const BusinessSchema = new mongoose.Schema(
         town: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            maxlength: 100
         },
 
         category: {
             type: String,
             default: "Other",
-            trim: true
+            trim: true,
+            maxlength: 80
         },
 
         phone: {
             type: String,
-            default: ""
+            default: "",
+            maxlength: 30
         },
 
         whatsapp: {
             type: String,
-            default: ""
+            default: "",
+            maxlength: 30
         },
 
         email: {
             type: String,
             default: "",
             trim: true,
-            lowercase: true
+            lowercase: true,
+            maxlength: 254
         },
 
         description: {
             type: String,
-            default: ""
+            default: "",
+            maxlength: 2000
         },
 
         services: {
@@ -94,7 +101,8 @@ const BusinessSchema = new mongoose.Schema(
             type: String,
             trim: true,
             lowercase: true,
-            default: null
+            default: null,
+            maxlength: 254
         },
 
         ownerPasswordHash: {
