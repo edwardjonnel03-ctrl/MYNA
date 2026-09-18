@@ -430,6 +430,52 @@
         }
     );
 }
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function (character) {
+
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return characters[character];
+        }
+    );
+}
+
+function safeImageURL(value) {
+
+    try {
+
+        const url =
+            new URL(
+                String(value || "")
+            );
+
+        if (
+            url.protocol !== "https:" ||
+            url.hostname !== "res.cloudinary.com"
+        ) {
+            return "";
+        }
+
+        return escapeHTML(
+            url.href
+        );
+
+    } catch {
+
+        return "";
+    }
+}
 
 
         async function loadBusiness() {
@@ -563,12 +609,18 @@ const description =
 
 
                 const gallery =
-                    Array.isArray(
-                        business.gallery
+    Array.isArray(
+        business.gallery
+    )
+        ? business.gallery
+            .map(
+                image =>
+                    safeImageURL(
+                        image
                     )
-                        ? business.gallery
-                            .filter(Boolean)
-                        : [];
+            )
+            .filter(Boolean)
+        : [];
 
 
                 const initials =
@@ -576,18 +628,46 @@ const description =
 
 
                 const phone =
-                    business.phone ||
-                    "";
+    String(
+        business.phone ||
+        ""
+    );
 
+const safePhone =
+    phone.replace(
+        /[^0-9+]/g,
+        ""
+    );
 
-                const whatsapp =
-                    business.whatsapp ||
-                    "";
+const whatsapp =
+    String(
+        business.whatsapp ||
+        ""
+    );
+    const safeWhatsapp =
+    whatsapp.replace(
+        /\D/g,
+        ""
+    );
 
+const email =
+    String(
+        business.email ||
+        ""
+    );
 
-                const email =
-                    business.email ||
-                    "";
+const safeEmail =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email
+    )
+        ? encodeURIComponent(
+            email
+        )
+        : "";
+                    const profileImage =
+    safeImageURL(
+        business.image
+    );
 
 
                 profileContainer.innerHTML = `
@@ -597,16 +677,16 @@ const description =
                         <div class="profile-banner">
 
                             ${
-                                business.image
-                                ? `
-                                    <img
-                                        src="${business.image}"
-                                        class="profile-image"
-                                        alt="${name}"
-                                    >
-                                `
-                                : ""
-                            }
+    profileImage
+    ? `
+        <img
+            src="${profileImage}"
+            class="profile-image"
+            alt="${name}"
+        >
+    `
+    : ""
+}
 
 
                             <div class="profile-logo">
@@ -770,9 +850,9 @@ const description =
 
 
                             ${
-                                phone ||
-                                whatsapp ||
-                                email
+                                safePhone ||
+                                safeWhatsapp ||
+                                safeEmail
                                 ? `
                                     <section class="profile-section">
 
@@ -786,7 +866,7 @@ const description =
                                                 phone
                                                 ? `
                                                     <a
-                                                        href="tel:${phone}"
+                                                        href="tel:${safePhone}"
                                                         class="contact-button"
                                                     >
                                                         Call
@@ -799,7 +879,7 @@ const description =
                                                 whatsapp
                                                 ? `
                                                     <a
-                                                        href="https://wa.me/${whatsapp.replace(/\D/g, "")}"
+                                                        href="https://wa.me/${safeWhatsapp}"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         class="contact-button"
@@ -814,7 +894,7 @@ const description =
                                                 email
                                                 ? `
                                                     <a
-                                                        href="mailto:${email}"
+                                                        href="mailto:${safeEmail}"
                                                         class="contact-button"
                                                     >
                                                         Email
