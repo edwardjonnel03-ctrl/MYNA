@@ -37,14 +37,15 @@ function publicBusiness(business) {
 function validateBusinessInput(body) {
 
     const stringFields = [
-        ["businessName", 120],
-        ["location", 100],
-        ["category", 80],
-        ["phone", 30],
-        ["whatsapp", 30],
-        ["email", 254],
-        ["description", 2000]
-    ];
+    ["businessName", 120],
+    ["location", 100],
+    ["category", 80],
+    ["phone", 30],
+    ["whatsapp", 30],
+    ["email", 254],
+    ["ownerEmail", 254],
+    ["description", 2000]
+];
 
     for (
         const [field, maxLength]
@@ -65,15 +66,14 @@ function validateBusinessInput(body) {
             return `${field} is too long.`;
         }
     }
-
     if (
-        body.email &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-            body.email
-        )
-    ) {
-        return "Please enter a valid email address.";
-    }
+    body.ownerEmail &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        body.ownerEmail
+    )
+) {
+    return "Please enter a valid owner email address.";
+}
 
     if (
         body.image !== undefined &&
