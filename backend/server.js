@@ -65,13 +65,69 @@ app.use(
 );
 
 
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
+
+
 // =========================================
-// CLOUDINARY UPLOAD
+// SESSION
+// =========================================
+
+app.use(
+    session({
+        secret:
+            process.env.SESSION_SECRET,
+
+        resave: false,
+
+        saveUninitialized: false,
+
+        store: MongoStore.create({
+            mongoUrl:
+                process.env.MONGODB_URI,
+
+            collectionName:
+                "sessions"
+        }),
+
+        cookie: {
+            httpOnly: true,
+
+            secure:
+                process.env.NODE_ENV ===
+                "production",
+
+            sameSite: "lax",
+
+            maxAge:
+                1000 * 60 * 60 * 8
+        }
+    })
+);
+// =========================================
+// OWNER/AUTHENTICATED IMAGE UPLOAD
 // =========================================
 
 app.post(
     "/api/upload",
     async (req, res) => {
+
+        if (
+            !req.session ||
+            (
+                !req.session.ownerBusinessId &&
+                req.session.isAdmin !== true
+            )
+        ) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "You must be logged in to upload images."
+            });
+        }
 
         try {
 
@@ -114,49 +170,6 @@ app.post(
             });
         }
     }
-);
-
-app.use(
-    express.urlencoded({
-        extended: true
-    })
-);
-
-
-// =========================================
-// SESSION
-// =========================================
-
-app.use(
-    session({
-        secret:
-            process.env.SESSION_SECRET,
-
-        resave: false,
-
-        saveUninitialized: false,
-
-        store: MongoStore.create({
-            mongoUrl:
-                process.env.MONGODB_URI,
-
-            collectionName:
-                "sessions"
-        }),
-
-        cookie: {
-            httpOnly: true,
-
-            secure:
-                process.env.NODE_ENV ===
-                "production",
-
-            sameSite: "lax",
-
-            maxAge:
-                1000 * 60 * 60 * 8
-        }
-    })
 );
 
 
