@@ -74,6 +74,19 @@ function validateBusinessInput(body) {
 ) {
     return "Please enter a valid owner email address.";
 }
+if (
+    body.businessName !== undefined &&
+    body.businessName.trim() === ""
+) {
+    return "Business name is required.";
+}
+
+if (
+    body.location !== undefined &&
+    body.location.trim() === ""
+) {
+    return "Business location is required.";
+}
 
     if (
         body.image !== undefined &&
@@ -155,11 +168,12 @@ function validateBusinessInput(body) {
         ) {
 
             if (
-                !service ||
-                typeof service !== "object"
-            ) {
-                return "Invalid service.";
-            }
+    !service ||
+    typeof service !== "object" ||
+    Array.isArray(service)
+) {
+    return "Invalid service.";
+}
 
             if (
                 service.name !== undefined &&
