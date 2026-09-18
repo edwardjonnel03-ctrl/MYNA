@@ -87,9 +87,10 @@ function validateBusinessInput(body) {
         return "Please enter a valid owner email address.";
     }
 
-    // BUSINESS NAME
+        // BUSINESS NAME
     if (
-        body.businessName !== undefined &&
+        body.businessName === undefined ||
+        typeof body.businessName !== "string" ||
         body.businessName.trim() === ""
     ) {
         return "Business name is required.";
@@ -97,7 +98,8 @@ function validateBusinessInput(body) {
 
     // LOCATION
     if (
-        body.location !== undefined &&
+        body.location === undefined ||
+        typeof body.location !== "string" ||
         body.location.trim() === ""
     ) {
         return "Business location is required.";
