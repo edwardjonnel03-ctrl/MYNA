@@ -1358,7 +1358,103 @@ router.put(
     }
 );
 
+// ========================================
+// DELETE BUSINESS
+// ADMIN ONLY
+// ========================================
 
+router.delete(
+    "/:id",
+
+    async (req, res) => {
+
+        try {
+
+            if (
+                !req.session ||
+                req.session.isAdmin !== true
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Admin authentication required."
+
+                });
+            }
+
+
+            const id =
+                Number(
+                    req.params.id
+                );
+
+
+            if (
+                !Number.isFinite(id)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid business ID."
+
+                });
+            }
+
+
+            const business =
+                await Business.findOneAndDelete({
+                    id: id
+                });
+
+
+            if (!business) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Business not found."
+
+                });
+            }
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Business deleted successfully."
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "DELETE BUSINESS ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while deleting business."
+
+            });
+        }
+    }
+);
 // ========================================
 // UPDATE BUSINESS
 // OWNER ONLY

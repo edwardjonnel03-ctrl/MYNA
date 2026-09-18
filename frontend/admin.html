@@ -87,20 +87,41 @@
     }
 
     .business-list {
-        display: grid;
-        gap: 15px;
-    }
+    display: grid;
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+    gap: 20px;
+}
 
-    .business-card {
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 22px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-    }
+.business-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 230px;
+}
+
+.business-info {
+    flex: 1;
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.admin-button,
+.delete-button {
+    width: 100%;
+}
 
     .business-info h3 {
         margin: 0 0 6px;
@@ -149,10 +170,32 @@
     }
 
     .admin-button:hover {
+    .delete-button {
+    border: none;
+    background: #c62828;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: #a61f1f;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
         background: var(--orange-dark);
     }
 
     @media (max-width: 700px) {
+    .business-list {
+    grid-template-columns: 1fr;
+}
 
         .admin-stats {
             grid-template-columns: 1fr;
@@ -501,7 +544,89 @@
 
     }
 
+// =========================================
+// DELETE BUSINESS
+// =========================================
 
+async function deleteBusiness(
+    id,
+    businessName
+) {
+
+    const confirmed =
+        confirm(
+            `Permanently delete "${businessName}"?\n\nThis cannot be undone.`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/businesses/${id}`,
+                {
+                    method:
+                        "DELETE",
+
+                    credentials:
+                        "include"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            if (
+                response.status === 401
+            ) {
+
+                window.location.href =
+                    "admin-login.html";
+
+                return;
+            }
+
+
+            throw new Error(
+                result.message ||
+                "Could not delete business."
+            );
+        }
+
+
+        alert(
+            result.message
+        );
+
+
+        loadBusinesses();
+
+
+    } catch (error) {
+
+        console.error(
+            "DELETE BUSINESS ERROR:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Could not delete business."
+        );
+    }
+
+}
     // =========================================
     // LOAD BUSINESSES
     // =========================================
@@ -706,29 +831,41 @@ const town =
                                 </div>
 
 
-                                <button
-    class="admin-button"
-    data-business-id="${businessId}"
-    data-verified="${business.verified}"
->
+                                <div class="admin-actions">
 
-                                    ${
-                                        business.verified
-                                            ? "Unverify"
-                                            : "Verify"
-                                    }
+    <button
+        class="admin-button verification-button"
+        data-business-id="${businessId}"
+        data-verified="${business.verified}"
+    >
 
-                                </button>
+        ${
+            business.verified
+                ? "Unverify"
+                : "Verify"
+        }
 
-                            </div>
+    </button>
+
+
+    <button
+        class="delete-button"
+        data-business-id="${businessId}"
+        data-business-name="${businessName}"
+    >
+        Delete
+    </button>
+
+</div>
+
+</div>
 
                         `;
-
                     }
                 ).join("");
        businessList
     .querySelectorAll(
-        ".admin-button"
+        ".verification-button"
     )
     .forEach(
         button => {
@@ -753,7 +890,35 @@ const town =
                 }
             );
         }
-    );         
+    );  
+       businessList
+    .querySelectorAll(
+        ".delete-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        decodeURIComponent(
+                            button.dataset.businessId
+                        );
+
+                    const businessName =
+                        button.dataset.businessName ||
+                        "this business";
+
+                    deleteBusiness(
+                        id,
+                        businessName
+                    );
+                }
+            );
+        }
+    );    
 
 
         } catch (error) {
