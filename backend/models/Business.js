@@ -18,7 +18,19 @@ const BusinessSchema = new mongoose.Schema(
 
         image: {
             type: String,
-            default: ""
+            default: "",
+            validate: {
+                validator: function (value) {
+                    return (
+                        !value ||
+                        value.startsWith(
+                            "https://res.cloudinary.com/"
+                        )
+                    );
+                },
+                message:
+                    "Business image must be a valid Cloudinary URL."
+            }
         },
 
         gallery: {
