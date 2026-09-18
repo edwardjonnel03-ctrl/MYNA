@@ -723,7 +723,8 @@ router.post(
 
             if (
                 !newPassword ||
-                newPassword.length < 6
+                newPassword.length < 6 ||
+                newPassword.length > 128
             ) {
 
                 return res.status(400).json({
@@ -731,7 +732,9 @@ router.post(
                     success: false,
 
                     message:
-                        "Password must be at least 6 characters."
+                        newPassword.length > 128
+                            ? "Password cannot exceed 128 characters."
+                            : "Password must be at least 6 characters."
 
                 });
             }
@@ -1117,7 +1120,8 @@ if (validationError) {
 
             if (
                 !ownerPassword ||
-                ownerPassword.length < 6
+                ownerPassword.length < 6 ||
+                ownerPassword.length > 128
             ) {
 
                 return res.status(400).json({
@@ -1125,7 +1129,9 @@ if (validationError) {
                     success: false,
 
                     message:
-                        "Password must be at least 6 characters."
+                        ownerPassword.length > 128
+                            ? "Password cannot exceed 128 characters."
+                            : "Password must be at least 6 characters."
 
                 });
             }
