@@ -410,6 +410,26 @@
                 .toUpperCase();
 
         }
+        function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function (character) {
+
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return characters[character];
+        }
+    );
+}
 
 
         async function loadBusiness() {
@@ -495,24 +515,29 @@
 
 
                 const name =
-                    business.businessName ||
-                    "Business";
+    escapeHTML(
+        business.businessName ||
+        "Business"
+    );
 
+const category =
+    escapeHTML(
+        business.category ||
+        "Business"
+    );
 
-                const category =
-                    business.category ||
-                    "Business";
+const location =
+    escapeHTML(
+        business.town ||
+        business.location ||
+        "Namibia"
+    );
 
-
-                const location =
-                    business.town ||
-                    business.location ||
-                    "Namibia";
-
-
-                const description =
-                    business.description ||
-                    "No description available yet.";
+const description =
+    escapeHTML(
+        business.description ||
+        "No description available yet."
+    );
 
 
                 const rating =
@@ -666,14 +691,19 @@
                                 <div class="service-card">
 
                                     <div class="service-name">
-                                        ${service.name || "Service"}
+                                        ${escapeHTML(
+                                            service.name ||
+                                            "Service"
+                                        )}
                                     </div>
 
                                     ${
                                         service.price
                                         ? `
                                             <div class="service-price">
-                                                ${service.price}
+                                                ${escapeHTML(
+                                                    service.price
+                                                )}
                                             </div>
                                         `
                                         : ""
@@ -683,7 +713,9 @@
                                         service.description
                                         ? `
                                             <div class="service-description">
-                                                ${service.description}
+                                                ${escapeHTML(
+                                                    service.description
+                                                )}
                                             </div>
                                         `
                                         : ""
