@@ -430,26 +430,6 @@
         }
     );
 }
-function escapeHTML(value) {
-
-    return String(
-        value ?? ""
-    ).replace(
-        /[&<>"']/g,
-        function (character) {
-
-            const characters = {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#039;"
-            };
-
-            return characters[character];
-        }
-    );
-}
 
 function safeImageURL(value) {
 
