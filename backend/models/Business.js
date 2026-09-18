@@ -36,12 +36,29 @@ const BusinessSchema = new mongoose.Schema(
         gallery: {
             type: [String],
             default: [],
-            validate: {
-                validator: function (images) {
-                    return images.length <= 20;
+            validate: [
+                {
+                    validator: function (images) {
+                        return images.length <= 20;
+                    },
+                    message:
+                        "Gallery cannot contain more than 20 images."
                 },
-                message: "Gallery cannot contain more than 20 images."
-            }
+                {
+                    validator: function (images) {
+                        return images.every(function (value) {
+                            return (
+                                typeof value === "string" &&
+                                value.startsWith(
+                                    "https://res.cloudinary.com/"
+                                )
+                            );
+                        });
+                    },
+                    message:
+                        "All gallery images must be valid Cloudinary URLs."
+                }
+            ]
         },
 
         country: {
