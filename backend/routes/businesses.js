@@ -1264,6 +1264,27 @@ if (validationError) {
 
             if (
                 error &&
+                error.name === "ValidationError"
+            ) {
+
+                const firstError =
+                    Object.values(
+                        error.errors || {}
+                    )[0];
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        firstError?.message ||
+                        "Invalid business data."
+
+                });
+            }
+
+            if (
+                error &&
                 error.code === 11000
             ) {
 
