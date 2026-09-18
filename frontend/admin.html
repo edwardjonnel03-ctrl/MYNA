@@ -506,6 +506,26 @@
     // LOAD BUSINESSES
     // =========================================
 
+    function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function (character) {
+
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return characters[character];
+        }
+    );
+}
     async function loadBusinesses() {
 
         const businessList =
@@ -627,7 +647,30 @@
 
                             `;
 
+const businessName =
+    escapeHTML(
+        business.businessName ||
+        "Unnamed Business"
+    );
 
+const category =
+    escapeHTML(
+        business.category ||
+        "Not specified"
+    );
+
+const town =
+    escapeHTML(
+        business.town ||
+        "Not specified"
+    );
+    
+    const businessId =
+    encodeURIComponent(
+        String(
+            business.id ?? ""
+        )
+    );
                         return `
 
                             <div class="business-card">
@@ -636,10 +679,7 @@
 
                                     <h3>
 
-                                        ${
-                                            business.businessName ||
-                                            "Unnamed Business"
-                                        }
+                                        ${businessName}
 
                                     </h3>
 
@@ -647,10 +687,8 @@
                                     <p>
 
                                         Category:
-                                        ${
-                                            business.category ||
-                                            "Not specified"
-                                        }
+                                        ${category}
+                                        
 
                                     </p>
 
@@ -658,10 +696,7 @@
                                     <p>
 
                                         Location:
-                                        ${
-                                            business.town ||
-                                            "Not specified"
-                                        }
+                                        ${town}
 
                                     </p>
 
@@ -672,17 +707,10 @@
 
 
                                 <button
-
-                                    class="admin-button"
-
-                                    onclick="
-                                        toggleVerification(
-                                            ${business.id},
-                                            ${business.verified}
-                                        )
-                                    "
-
-                                >
+    class="admin-button"
+    data-business-id="${businessId}"
+    data-verified="${business.verified}"
+>
 
                                     ${
                                         business.verified
@@ -698,6 +726,34 @@
 
                     }
                 ).join("");
+       businessList
+    .querySelectorAll(
+        ".admin-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        decodeURIComponent(
+                            button.dataset.businessId
+                        );
+
+                    const currentStatus =
+                        button.dataset.verified ===
+                        "true";
+
+                    toggleVerification(
+                        id,
+                        currentStatus
+                    );
+                }
+            );
+        }
+    );         
 
 
         } catch (error) {
