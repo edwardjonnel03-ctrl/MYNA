@@ -31,7 +31,211 @@ function publicBusiness(business) {
 
     return safeBusiness;
 }
+// ========================================
+// BUSINESS INPUT VALIDATION
+// ========================================
+function validateBusinessInput(body) {
 
+    const stringFields = [
+        ["businessName", 120],
+        ["location", 100],
+        ["category", 80],
+        ["phone", 30],
+        ["whatsapp", 30],
+        ["email", 254],
+        ["description", 2000]
+    ];
+
+    for (
+        const [field, maxLength]
+        of stringFields
+    ) {
+
+        if (
+            body[field] !== undefined &&
+            typeof body[field] !== "string"
+        ) {
+            return `${field} must be text.`;
+        }
+
+        if (
+            typeof body[field] === "string" &&
+            body[field].length > maxLength
+        ) {
+            return `${field} is too long.`;
+        }
+    }
+
+    if (
+        body.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            body.email
+        )
+    ) {
+        return "Please enter a valid email address.";
+    }
+
+    if (
+        body.image !== undefined &&
+        typeof body.image !== "string"
+    ) {
+        return "Invalid business image.";
+    }
+
+    if (
+        body.image &&
+        !body.image.startsWith(
+            "https://res.cloudinary.com/"
+        )
+    ) {
+        return "Invalid business image URL.";
+    }
+
+    if (
+        body.gallery !== undefined &&
+        !Array.isArray(
+            body.gallery
+        )
+    ) {
+        return "Gallery must be an array.";
+    }
+
+    if (
+        Array.isArray(
+            body.gallery
+        )
+    ) {
+
+        if (
+            body.gallery.length > 20
+        ) {
+            return "Gallery cannot contain more than 20 images.";
+        }
+
+        for (
+            const image
+            of body.gallery
+        ) {
+
+            if (
+                typeof image !== "string" ||
+                !image.startsWith(
+                    "https://res.cloudinary.com/"
+                )
+            ) {
+                return "Gallery contains an invalid image URL.";
+            }
+        }
+    }
+
+    if (
+        body.services !== undefined &&
+        !Array.isArray(
+            body.services
+        )
+    ) {
+        return "Services must be an array.";
+    }
+
+    if (
+        Array.isArray(
+            body.services
+        )
+    ) {
+
+        if (
+            body.services.length > 50
+        ) {
+            return "Too many services.";
+        }
+
+        for (
+            const service
+            of body.services
+        ) {
+
+            if (
+                !service ||
+                typeof service !== "object"
+            ) {
+                return "Invalid service.";
+            }
+
+            if (
+                service.name !== undefined &&
+                (
+                    typeof service.name !== "string" ||
+                    service.name.length > 120
+                )
+            ) {
+                return "Invalid service name.";
+            }
+
+            if (
+                service.price !== undefined &&
+                (
+                    typeof service.price !== "string" ||
+                    service.price.length > 80
+                )
+            ) {
+                return "Invalid service price.";
+            }
+
+            if (
+                service.description !== undefined &&
+                (
+                    typeof service.description !== "string" ||
+                    service.description.length > 500
+                )
+            ) {
+                return "Invalid service description.";
+            }
+        }
+    }
+
+    if (
+        body.hours !== undefined
+    ) {
+
+        if (
+            !body.hours ||
+            typeof body.hours !== "object" ||
+            Array.isArray(
+                body.hours
+            )
+        ) {
+            return "Invalid opening hours.";
+        }
+
+        const days = [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+        ];
+
+        for (
+            const day
+            of days
+        ) {
+
+            if (
+                body.hours[day] !== undefined &&
+                (
+                    typeof body.hours[day] !== "string" ||
+                    body.hours[day].length > 50
+                )
+            ) {
+                return `Invalid ${day} opening hours.`;
+            }
+        }
+    }
+
+    return null;
+}
 
 // ========================================
 // PASSWORD HASHING
@@ -235,10 +439,13 @@ router.post(
                 });
             }
 
+
             const business =
                 await Business.findOne({
-                    ownerEmail: email
+                    ownerEmail:
+                        email
                 });
+
 
             if (!business) {
 
@@ -252,15 +459,18 @@ router.post(
                 });
             }
 
+
             const resetToken =
                 crypto
                     .randomBytes(32)
                     .toString("hex");
 
+
             business.resetTokenHash =
                 hashResetToken(
                     resetToken
                 );
+
 
             business.resetTokenExpires =
                 new Date(
@@ -268,10 +478,13 @@ router.post(
                     (60 * 60 * 1000)
                 );
 
+
             await business.save();
+
 
             const resetLink =
                 `https://myna-web-i92o.onrender.com/reset-password.html?token=${resetToken}`;
+
 
             const {
                 data,
@@ -304,7 +517,10 @@ router.post(
                             </h2>
 
                             <p>
-                                Hello ${business.businessName || "Business Owner"},
+                                Hello ${
+                                    business.businessName ||
+                                    "Business Owner"
+                                },
                             </p>
 
                             <p>
@@ -361,6 +577,7 @@ router.post(
                     `
                 });
 
+
             if (error) {
 
                 console.error(
@@ -378,10 +595,12 @@ router.post(
                 });
             }
 
+
             console.log(
                 "PASSWORD RESET EMAIL SENT:",
                 data?.id || "No ID"
             );
+
 
             return res.json({
 
@@ -391,6 +610,7 @@ router.post(
                     genericMessage
 
             });
+
 
         } catch (error) {
 
@@ -824,6 +1044,19 @@ router.post(
     async (req, res) => {
 
         try {
+            const validationError =
+    validateBusinessInput(
+        req.body
+    );
+
+if (validationError) {
+
+    return res.status(400).json({
+        success: false,
+        message:
+            validationError
+    });
+}
 
             const ownerEmail =
                 String(
@@ -1136,6 +1369,20 @@ router.put(
     async (req, res) => {
 
         try {
+            const validationError =
+    validateBusinessInput(
+        req.body
+    );
+
+if (validationError) {
+
+    return res.status(400).json({
+        success: false,
+        message:
+            validationError
+    });
+}
+            
 
             if (
                 !req.session ||
