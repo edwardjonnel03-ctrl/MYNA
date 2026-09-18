@@ -339,6 +339,26 @@
 
 
         let businesses = [];
+        function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function (character) {
+
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return characters[character];
+        }
+    );
+}
 
 
         /*
@@ -554,36 +574,51 @@ const matchesSearch =
                         "business-card";
 
 
-                    const name =
-                        business.businessName ||
-                        "Unnamed Business";
+                    const rawName =
+    business.businessName ||
+    "Unnamed Business";
 
 
-                    const category =
-                        business.category ||
-                        "Business";
+const name =
+    escapeHTML(
+        rawName
+    );
 
 
-                    const town =
-                        business.town ||
-                        "Namibia";
+const category =
+    escapeHTML(
+        business.category ||
+        "Business"
+    );
 
 
-                    const description =
-                        business.description ||
-                        "Local business and services.";
+const town =
+    escapeHTML(
+        business.town ||
+        "Namibia"
+    );
 
 
-                    const initials =
-                        name
-                            .split(" ")
-                            .map(
-                                word =>
-                                    word.charAt(0)
-                            )
-                            .join("")
-                            .substring(0, 2)
-                            .toUpperCase();
+const description =
+    escapeHTML(
+        business.description ||
+        "Local business and services."
+    );
+
+
+const initials =
+    escapeHTML(
+        rawName
+            .split(" ")
+            .filter(Boolean)
+            .map(
+                word =>
+                    word.charAt(0)
+            )
+            .join("")
+            .substring(0, 2)
+            .toUpperCase()
+    );
 
 
                     card.innerHTML = `
