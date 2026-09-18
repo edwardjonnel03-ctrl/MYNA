@@ -1658,20 +1658,56 @@ if (validationError) {
 
         } catch (error) {
 
-            console.error(
-                "UPDATE BUSINESS ERROR:",
-                error
-            );
+    console.error(
+        "UPDATE BUSINESS ERROR:",
+        error
+    );
 
-            return res.status(500).json({
+    if (
+        error &&
+        error.name === "ValidationError"
+    ) {
 
-                success: false,
+        const firstError =
+            Object.values(
+                error.errors || {}
+            )[0];
 
-                message:
-                    "Server error while updating business."
+        return res.status(400).json({
 
-            });
-        }
+            success: false,
+
+            message:
+                firstError?.message ||
+                "Invalid business data."
+
+        });
+    }
+
+    if (
+        error &&
+        error.code === 11000
+    ) {
+
+        return res.status(409).json({
+
+            success: false,
+
+            message:
+                "This business information conflicts with an existing record."
+
+        });
+    }
+
+    return res.status(500).json({
+
+        success: false,
+
+        message:
+            "Server error while updating business."
+
+    });
+}
     }
 );
 
