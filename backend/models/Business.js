@@ -23,7 +23,13 @@ const BusinessSchema = new mongoose.Schema(
 
         gallery: {
             type: [String],
-            default: []
+            default: [],
+            validate: {
+                validator: function (images) {
+                    return images.length <= 20;
+                },
+                message: "Gallery cannot contain more than 20 images."
+            }
         },
 
         country: {
