@@ -132,15 +132,49 @@ app.post(
         try {
 
             const image =
-                req.body.image;
+    req.body.image;
 
-            if (!image) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "No image provided."
-                });
-            }
+if (!image) {
+    return res.status(400).json({
+        success: false,
+        message:
+            "No image provided."
+    });
+}
+
+if (
+    typeof image !== "string" ||
+    !image.startsWith("data:image/")
+) {
+    return res.status(400).json({
+        success: false,
+        message:
+            "Invalid image format."
+    });
+}
+
+const base64Data =
+    image.split(",")[1] || "";
+
+const imageSizeBytes =
+    Buffer.byteLength(
+        base64Data,
+        "base64"
+    );
+
+const maxImageSize =
+    5 * 1024 * 1024;
+
+if (
+    imageSizeBytes >
+    maxImageSize
+) {
+    return res.status(413).json({
+        success: false,
+        message:
+            "Image must be smaller than 5 MB."
+    });
+}
 
             const result =
                 await cloudinary.uploader.upload(
