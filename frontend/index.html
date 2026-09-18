@@ -409,6 +409,26 @@
     // LOAD VERIFIED BUSINESSES
     // =========================================
 
+    function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function (character) {
+
+            const characters = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return characters[character];
+        }
+    );
+}
     async function loadFeaturedBusinesses() {
 
         const container =
@@ -483,20 +503,51 @@
                     .map(
                         business => {
 
-                            const name =
-                                business.businessName ||
-                                "Unnamed Business";
+                            const rawName =
+    business.businessName ||
+    "Unnamed Business";
 
-                            const initials =
-                                name
-                                    .split(" ")
-                                    .map(
-                                        word =>
-                                            word.charAt(0)
-                                    )
-                                    .join("")
-                                    .substring(0, 2)
-                                    .toUpperCase();
+const name =
+    escapeHTML(
+        rawName
+    );
+
+const initials =
+    escapeHTML(
+        rawName
+            .split(" ")
+            .filter(Boolean)
+            .map(
+                word =>
+                    word.charAt(0)
+            )
+            .join("")
+            .substring(0, 2)
+            .toUpperCase()
+    );
+
+const category =
+    escapeHTML(
+        business.category ||
+        "Business"
+    );
+
+const town =
+    escapeHTML(
+        business.town ||
+        "Namibia"
+    );
+
+const description =
+    escapeHTML(
+        business.description ||
+        "Local business and services."
+    );
+
+const businessId =
+    encodeURIComponent(
+        business.id
+    );
 
                             return `
 
@@ -529,10 +580,7 @@
                                         <span
                                             class="business-category"
                                         >
-                                            ${
-                                                business.category ||
-                                                "Business"
-                                            }
+                                            ${category}
                                         </span>
 
                                         <h3>
@@ -543,25 +591,19 @@
                                             class="business-location"
                                         >
                                             📍
-                                            ${
-                                                business.town ||
-                                                "Namibia"
-                                            }
+                                            ${town}
                                         </p>
 
                                         <p
                                             class="business-description"
                                         >
-                                            ${
-                                                business.description ||
-                                                "Local business and services."
-                                            }
+                                            ${description}
                                         </p>
 
                                     </div>
 
                                     <a
-                                        href="business.html?id=${business.id}"
+                                        href="business.html?id=${businessId}"
                                         class="business-link"
                                     >
                                         View business
