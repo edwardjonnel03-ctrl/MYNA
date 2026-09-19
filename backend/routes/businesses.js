@@ -380,12 +380,56 @@ router.get(
 
         try {
 
-            const businesses =
-                await Business
+            const requestedPage =
+                Number.parseInt(
+                    req.query.page,
+                    10
+                );
+
+            const requestedLimit =
+                Number.parseInt(
+                    req.query.limit,
+                    10
+                );
+
+            const paginationRequested =
+                Number.isFinite(requestedPage) ||
+                Number.isFinite(requestedLimit);
+
+            const page =
+                Number.isFinite(requestedPage) &&
+                requestedPage > 0
+                    ? requestedPage
+                    : 1;
+
+            const limit =
+                Number.isFinite(requestedLimit) &&
+                requestedLimit > 0
+                    ? Math.min(
+                        requestedLimit,
+                        50
+                    )
+                    : 20;
+
+            let query =
+                Business
                     .find()
                     .sort({
                         createdAt: -1
                     });
+
+            if (paginationRequested) {
+
+                query =
+                    query
+                        .skip(
+                            (page - 1) * limit
+                        )
+                        .limit(limit);
+            }
+
+            const businesses =
+                await query;
 
             return res.json({
 
