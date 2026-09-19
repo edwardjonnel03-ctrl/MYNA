@@ -238,6 +238,18 @@ resetTokenExpires: {
     }
 );
 
+BusinessSchema.index(
+    { ownerEmail: 1 },
+    {
+        unique: true,
+        partialFilterExpression: {
+            ownerEmail: {
+                $type: "string"
+            }
+        }
+    }
+);
+
 module.exports = mongoose.model(
     "Business",
     BusinessSchema
