@@ -396,6 +396,14 @@ router.get(
 
             const filter = {};
 
+            if (
+                req.query.verified === "true"
+            ) {
+
+                filter.verified =
+                    true;
+            }
+
             if (category) {
 
                 filter.category =
