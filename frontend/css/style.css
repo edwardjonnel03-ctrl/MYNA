@@ -81,19 +81,50 @@ input {
 }
 
 .logo {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     font-family: "Space Grotesk", sans-serif;
-
     font-size: 28px;
-    font-weight: 700;
-
+    font-weight: 800;
     letter-spacing: -1.5px;
 
     color: var(--black);
+    text-decoration: none;
+
+    z-index: 1;
 }
 
+/* MAYNA orange-circle identity */
+.logo::before {
+    content: "";
+
+    position: absolute;
+
+    width: 62px;
+    height: 62px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #ff9d00,
+        #ff5a00
+    );
+
+    left: 53%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: -1;
+}
+
+/* Remove old orange dot */
 .logo::after {
-    content: ".";
-    color: var(--orange);
+    content: none;
 }
 
 .nav-links {
