@@ -152,14 +152,15 @@ app.use((req, res, next) => {
 
 app.use(
     express.json({
-        limit: "30mb"
+        limit: "8mb"
     })
 );
 
 
 app.use(
     express.urlencoded({
-        extended: true
+        extended: true,
+        limit: "1mb"
     })
 );
 
