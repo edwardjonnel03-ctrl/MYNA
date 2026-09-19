@@ -389,6 +389,7 @@ app.post(
             if (
                 !username ||
                 !password ||
+                !correctUsername ||
                 !correctPasswordHash
             ) {
 
@@ -412,16 +413,14 @@ app.post(
                 passwordMatches
             ) {
 
-                req.session.isAdmin = true;
+                return req.session.regenerate(
+                    (regenerateError) => {
 
-                return req.session.save(
-                    (error) => {
-
-                        if (error) {
+                        if (regenerateError) {
 
                             console.error(
-                                "Admin session save failed:",
-                                error
+                                "Admin session regeneration failed:",
+                                regenerateError
                             );
 
                             return res.status(500).json({
@@ -432,11 +431,34 @@ app.post(
                         }
 
 
-                        return res.json({
-                            success: true,
-                            message:
-                                "Admin login successful."
-                        });
+                        req.session.isAdmin = true;
+
+
+                        return req.session.save(
+                            (saveError) => {
+
+                                if (saveError) {
+
+                                    console.error(
+                                        "Admin session save failed:",
+                                        saveError
+                                    );
+
+                                    return res.status(500).json({
+                                        success: false,
+                                        message:
+                                            "Could not create admin session."
+                                    });
+                                }
+
+
+                                return res.json({
+                                    success: true,
+                                    message:
+                                        "Admin login successful."
+                                });
+                            }
+                        );
                     }
                 );
             }
