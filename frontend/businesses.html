@@ -371,9 +371,41 @@
 
             try {
 
+                const search =
+                    searchInput.value
+                        .trim();
+
+                const category =
+                    categoryFilter.value;
+
+                const params =
+                    new URLSearchParams();
+
+                params.set(
+                    "verified",
+                    "true"
+                );
+
+                if (search) {
+
+                    params.set(
+                        "search",
+                        search
+                    );
+                }
+
+                if (category) {
+
+                    params.set(
+                        "category",
+                        category
+                    );
+                }
+
                 const response =
                     await fetch(
-                        "/api/businesses"
+                        "/api/businesses?" +
+                        params.toString()
                     );
 
 
@@ -447,89 +479,8 @@
 
         function renderBusinesses() {
 
-            const search =
-                searchInput.value
-                    .toLowerCase()
-                    .trim();
-
-
-            const category =
-                categoryFilter.value;
-
-
             const filteredBusinesses =
-                businesses.filter(
-                    function(business) {
-
-                        const name =
-                            (
-                                business.businessName ||
-                                ""
-                            ).toLowerCase();
-
-
-                        const businessCategory =
-                            (
-                                business.category ||
-                                ""
-                            );
-
-
-                        const town =
-                            (
-                                business.town ||
-                                ""
-                            ).toLowerCase();
-
-
-                        const description =
-                            (
-                                business.description ||
-                                ""
-                            ).toLowerCase();
-
-
-                 const services =
-    Array.isArray(business.services)
-        ? business.services
-            .map(
-                service =>
-                    [
-                        service.name || "",
-                        service.price || "",
-                        service.description || ""
-                    ].join(" ")
-            )
-            .join(" ")
-            .toLowerCase()
-        : "";
-
-
-const matchesSearch =
-    !search ||
-    name.includes(search) ||
-    businessCategory
-        .toLowerCase()
-        .includes(search) ||
-    town.includes(search) ||
-    description.includes(search) ||
-    services.includes(search);
-
-
-                        const matchesCategory =
-                            !category ||
-                            businessCategory === category;
-
-
-                        return (
-                            matchesSearch &&
-                            matchesCategory
-                        );
-
-                    }
-                );
-
-
+                businesses;
             /*
             Clear existing cards
             */
@@ -684,9 +635,22 @@ const initials =
         ========================================
         */
 
+        let searchTimeout;
+
         searchInput.addEventListener(
             "input",
-            renderBusinesses
+            function() {
+
+                clearTimeout(
+                    searchTimeout
+                );
+
+                searchTimeout =
+                    setTimeout(
+                        loadBusinesses,
+                        300
+                    );
+            }
         );
 
 
@@ -698,7 +662,7 @@ const initials =
 
         categoryFilter.addEventListener(
             "change",
-            renderBusinesses
+            loadBusinesses
         );
 
 
