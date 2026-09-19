@@ -270,14 +270,29 @@ if (!image) {
     });
 }
 
+const allowedImageTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+];
+
+const imageMatch =
+    typeof image === "string"
+        ? image.match(
+            /^data:(image\/[a-zA-Z0-9.+-]+);base64,/
+        )
+        : null;
+
 if (
-    typeof image !== "string" ||
-    !image.startsWith("data:image/")
+    !imageMatch ||
+    !allowedImageTypes.includes(
+        imageMatch[1].toLowerCase()
+    )
 ) {
     return res.status(400).json({
         success: false,
         message:
-            "Invalid image format."
+            "Only JPEG, PNG and WebP images are allowed."
     });
 }
 
