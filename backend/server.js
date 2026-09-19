@@ -597,6 +597,42 @@ app.get(
         });
     }
 );
+// =========================================
+// API ERROR HANDLER
+// =========================================
+
+app.use((error, req, res, next) => {
+
+    if (
+        error instanceof SyntaxError &&
+        error.status === 400 &&
+        "body" in error
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid JSON request."
+        });
+    }
+
+    if (
+        error.type === "entity.too.large"
+    ) {
+        return res.status(413).json({
+            success: false,
+            message: "Request body is too large."
+        });
+    }
+
+    console.error(
+        "Unhandled server error:",
+        error
+    );
+
+    return res.status(500).json({
+        success: false,
+        message: "Internal server error."
+    });
+});
 
 
 // =========================================
