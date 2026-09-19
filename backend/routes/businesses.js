@@ -906,19 +906,57 @@ router.post(
                 });
             }
 
-            req.session.ownerBusinessId =
-                business.id;
+ return req.session.regenerate(
+    (regenerateError) => {
 
-            return res.json({
-                success: true,
+        if (regenerateError) {
+
+            console.error(
+                "Owner session regeneration failed:",
+                regenerateError
+            );
+
+            return res.status(500).json({
+                success: false,
                 message:
-                    "Owner login successful.",
-
-                business:
-                    publicBusiness(
-                        business
-                    )
+                    "Could not create owner session."
             });
+        }
+
+        req.session.ownerBusinessId =
+            business.id;
+
+        return req.session.save(
+            (saveError) => {
+
+                if (saveError) {
+
+                    console.error(
+                        "Owner session save failed:",
+                        saveError
+                    );
+
+                    return res.status(500).json({
+                        success: false,
+                        message:
+                            "Could not create owner session."
+                    });
+                }
+
+                return res.json({
+                    success: true,
+                    message:
+                        "Owner login successful.",
+
+                    business:
+                        publicBusiness(
+                            business
+                        )
+                });
+            }
+        );
+    }
+);
 
         } catch (error) {
 
@@ -1233,27 +1271,65 @@ if (validationError) {
 
                 });
 
-            req.session.ownerBusinessId =
-                newBusiness.id;
+return req.session.regenerate(
+    (regenerateError) => {
 
-            console.log(
-                "New MongoDB business registered:",
-                newBusiness.businessName
+        if (regenerateError) {
+
+            console.error(
+                "Registration session regeneration failed:",
+                regenerateError
             );
 
-            return res.status(201).json({
-
-                success: true,
-
+            return res.status(500).json({
+                success: false,
                 message:
-                    "Business registered successfully.",
-
-                business:
-                    publicBusiness(
-                        newBusiness
-                    )
-
+                    "Business was registered, but the owner session could not be created."
             });
+        }
+
+        req.session.ownerBusinessId =
+            newBusiness.id;
+
+        return req.session.save(
+            (saveError) => {
+
+                if (saveError) {
+
+                    console.error(
+                        "Registration session save failed:",
+                        saveError
+                    );
+
+                    return res.status(500).json({
+                        success: false,
+                        message:
+                            "Business was registered, but the owner session could not be created."
+                    });
+                }
+
+                console.log(
+                    "New MongoDB business registered:",
+                    newBusiness.businessName
+                );
+
+                return res.status(201).json({
+
+                    success: true,
+
+                    message:
+                        "Business registered successfully.",
+
+                    business:
+                        publicBusiness(
+                            newBusiness
+                        )
+
+                });
+            }
+        );
+    }
+);
 
         } catch (error) {
 
