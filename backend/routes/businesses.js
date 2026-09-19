@@ -1074,17 +1074,32 @@ router.post(
             });
         }
 
-        req.session.ownerBusinessId =
-            null;
+        req.session.destroy(
+            (error) => {
 
-        return res.json({
+                if (error) {
 
-            success: true,
+                    console.error(
+                        "OWNER LOGOUT ERROR:",
+                        error
+                    );
 
-            message:
-                "Owner logged out successfully."
+                    return res
+                        .status(500)
+                        .json({
+                            success: false,
+                            message:
+                                "Could not log out."
+                        });
+                }
 
-        });
+                return res.json({
+                    success: true,
+                    message:
+                        "Owner logged out successfully."
+                });
+            }
+        );
     }
 );
 
