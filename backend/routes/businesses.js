@@ -1041,6 +1041,19 @@ router.post(
                 }).select(
                     "+ownerPasswordHash +ownerPasswordSalt"
                 );
+                console.log(
+    "OWNER LOGIN DIAGNOSTIC:",
+    {
+        businessFound:
+            !!business,
+
+        hasPasswordHash:
+            !!business?.ownerPasswordHash,
+
+        hasPasswordSalt:
+            !!business?.ownerPasswordSalt
+    }
+);
 
             if (!business) {
 
