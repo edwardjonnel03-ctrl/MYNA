@@ -380,6 +380,74 @@ router.get(
 
         try {
 
+            const search =
+                typeof req.query.search === "string"
+                    ? req.query.search
+                        .trim()
+                        .slice(0, 100)
+                    : "";
+
+            const category =
+                typeof req.query.category === "string"
+                    ? req.query.category
+                        .trim()
+                        .slice(0, 80)
+                    : "";
+
+            const filter = {};
+
+            if (category) {
+
+                filter.category =
+                    category;
+            }
+
+            if (search) {
+
+                const escapedSearch =
+                    search.replace(
+                        /[.*+?^${}()|[\]\\]/g,
+                        "\\$&"
+                    );
+
+                const searchRegex =
+                    new RegExp(
+                        escapedSearch,
+                        "i"
+                    );
+
+                filter.$or = [
+                    {
+                        businessName:
+                            searchRegex
+                    },
+                    {
+                        category:
+                            searchRegex
+                    },
+                    {
+                        town:
+                            searchRegex
+                    },
+                    {
+                        description:
+                            searchRegex
+                    },
+                    {
+                        "services.name":
+                            searchRegex
+                    },
+                    {
+                        "services.price":
+                            searchRegex
+                    },
+                    {
+                        "services.description":
+                            searchRegex
+                    }
+                ];
+            }
+
             const requestedPage =
                 Number.parseInt(
                     req.query.page,
@@ -413,7 +481,7 @@ router.get(
 
             let query =
                 Business
-                    .find()
+                    .find(filter)
                     .sort({
                         createdAt: -1
                     });
