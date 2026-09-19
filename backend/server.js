@@ -111,6 +111,46 @@ app.use(
         credentials: true
     })
 );
+// =========================================
+// CSRF ORIGIN PROTECTION
+// =========================================
+
+app.use((req, res, next) => {
+
+    const protectedMethods = [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+    ];
+
+    if (
+        !protectedMethods.includes(req.method)
+    ) {
+        return next();
+    }
+
+    const origin =
+        req.get("Origin");
+
+    // Allow requests without an Origin header.
+    // Authentication and authorization still apply.
+    if (!origin) {
+        return next();
+    }
+
+    if (
+        allowedOrigins.includes(origin)
+    ) {
+        return next();
+    }
+
+    return res.status(403).json({
+        success: false,
+        message:
+            "Request blocked by origin protection."
+    });
+});
 
 app.use(
     express.json({
