@@ -507,6 +507,45 @@ router.get(
             const businesses =
                 await query;
 
+
+            if (paginationRequested) {
+
+                const total =
+                    await Business.countDocuments(
+                        filter
+                    );
+
+                return res.json({
+
+                    success: true,
+
+                    businesses:
+                        businesses.map(
+                            publicBusiness
+                        ),
+
+                    pagination: {
+
+                        page:
+                            page,
+
+                        limit:
+                            limit,
+
+                        total:
+                            total,
+
+                        totalPages:
+                            Math.ceil(
+                                total / limit
+                            )
+
+                    }
+
+                });
+            }
+
+
             return res.json({
 
                 success: true,
