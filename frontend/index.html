@@ -69,6 +69,16 @@
 
         </nav>
 
+        <button
+            type="button"
+            class="mobile-menu-button"
+            id="mobileMenuButton"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+        >
+            &#9776;
+        </button>
+
         <a
             href="register.html"
             class="nav-button"
@@ -651,6 +661,30 @@ const businessId =
 
     loadFeaturedBusinesses();
 
+</script>
+
+<script>
+    const mobileMenuButton =
+        document.getElementById("mobileMenuButton");
+
+    const navLinks =
+        document.querySelector(".nav-links");
+
+    mobileMenuButton.addEventListener("click", function () {
+
+        navLinks.classList.toggle("mobile-open");
+
+        const isOpen =
+            navLinks.classList.contains("mobile-open");
+
+        mobileMenuButton.setAttribute(
+            "aria-expanded",
+            isOpen
+        );
+
+        mobileMenuButton.textContent =
+            isOpen ? "✕" : "☰";
+    });
 </script>
 
 </body>

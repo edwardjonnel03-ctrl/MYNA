@@ -135,6 +135,26 @@ input {
     background: var(--orange-dark);
     transform: translateY(-2px);
 }
+.nav-links.mobile-open {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 12px 20px 18px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+}
+
+.nav-links.mobile-open a {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+}
 
 
 /* =========================================
@@ -1275,8 +1295,20 @@ input {
 
 }
 
-
+/* Mobile menu button - hidden on desktop */
+.mobile-menu-button {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 6px 10px;
+}
 @media (max-width: 700px) {
+
+.mobile-menu-button {
+    display: block;
+}    
 
     .nav-links {
         display: none;
