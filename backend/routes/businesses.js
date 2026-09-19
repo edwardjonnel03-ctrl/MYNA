@@ -473,8 +473,6 @@ router.post(
 
                 });
             }
-
-
             const business =
                 await Business.findOne({
                     ownerEmail:
@@ -756,7 +754,9 @@ router.post(
                         $gt: new Date()
                     }
 
-                });
+                }).select(
+                    "+resetTokenHash +resetTokenExpires"
+                );
 
             if (!business) {
 
@@ -879,7 +879,9 @@ router.post(
             const business =
                 await Business.findOne({
                     ownerEmail: email
-                });
+                }).select(
+                    "+ownerPasswordHash +ownerPasswordSalt"
+                );
 
             if (!business) {
 

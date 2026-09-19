@@ -149,15 +149,17 @@ const BusinessSchema = new mongoose.Schema(
             maxlength: 254
         },
 
-        ownerPasswordHash: {
-            type: String,
-            default: null
-        },
+ownerPasswordHash: {
+    type: String,
+    default: null,
+    select: false
+},
 
-        ownerPasswordSalt: {
-            type: String,
-            default: null
-        },
+ownerPasswordSalt: {
+    type: String,
+    default: null,
+    select: false
+},
 
         claimed: {
             type: Boolean,
@@ -219,15 +221,17 @@ const BusinessSchema = new mongoose.Schema(
 
         // PASSWORD RESET
 
-        resetTokenHash: {
-            type: String,
-            default: null
-        },
+resetTokenHash: {
+    type: String,
+    default: null,
+    select: false
+},
 
-        resetTokenExpires: {
-            type: Date,
-            default: null
-        }
+resetTokenExpires: {
+    type: Date,
+    default: null,
+    select: false
+}
     },
     {
         timestamps: true
