@@ -673,6 +673,28 @@ app.get(
     }
 );
 // =========================================
+// 404 HANDLER
+// =========================================
+
+app.use((req, res) => {
+
+    // Unknown API route
+    if (req.path.startsWith("/api/")) {
+        return res.status(404).json({
+            success: false,
+            message: "API endpoint not found."
+        });
+    }
+
+    // Unknown website page
+    return res.status(404).sendFile(
+        path.join(
+            frontendPath,
+            "404.html"
+        )
+    );
+});
+// =========================================
 // API ERROR HANDLER
 // =========================================
 
