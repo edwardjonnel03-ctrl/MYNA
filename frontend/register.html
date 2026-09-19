@@ -506,10 +506,16 @@ category:
                         "email"
                     ).value.trim(),
 
-                services:
-                    document.getElementById(
-                        "services"
-                    ).value.trim()
+services:
+    document.getElementById(
+        "services"
+    ).value
+        .split(",")
+        .map(
+            service =>
+                service.trim()
+        )
+        .filter(Boolean)
 
             };
 
