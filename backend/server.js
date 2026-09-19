@@ -1,6 +1,15 @@
 const helmet = require("helmet");
 require("dotenv").config();
 
+if (
+    !process.env.SESSION_SECRET ||
+    process.env.SESSION_SECRET.length < 32
+) {
+    throw new Error(
+        "SESSION_SECRET must be configured and contain at least 32 characters."
+    );
+}
+
 const cloudinary =
     require("./config/cloudinary");
 
