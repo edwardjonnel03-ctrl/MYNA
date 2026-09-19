@@ -365,10 +365,13 @@ background-repeat: no-repeat;
 }
 
 .hero-search:focus-within {
-    border-color: var(--orange);
+    background: rgba(255, 255, 255, 0.88);
+
+    border-color: rgba(255, 90, 54, 0.65);
 
     box-shadow:
-        0 15px 40px rgba(255, 90, 54, 0.14);
+        0 16px 40px rgba(0, 0, 0, 0.12),
+        0 0 0 3px rgba(255, 90, 54, 0.10);
 }
 
 .hero-search input {
@@ -383,6 +386,7 @@ background-repeat: no-repeat;
     font-size: 15px;
 
     color: var(--black);
+    background: transparent;
 }
 
 .hero-search input::placeholder {
@@ -439,19 +443,25 @@ background-repeat: no-repeat;
 }
 
 .popular-searches button {
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.7);
 
-    background: white;
+    background: rgba(255, 255, 255, 0.58);
 
-    color: #555;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
-    padding: 7px 12px;
+    color: #333;
+
+    padding: 7px 13px;
 
     border-radius: 20px;
 
     font-size: 12px;
+    font-weight: 600;
 
     cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 
     transition: 0.25s ease;
 }
@@ -459,9 +469,13 @@ background-repeat: no-repeat;
 .popular-searches button:hover {
     background: var(--orange);
 
+    border-color: var(--orange);
+
     color: white;
 
     transform: translateY(-2px);
+
+    box-shadow: 0 7px 16px rgba(255, 90, 54, 0.22);
 }
 
 
@@ -1370,19 +1384,26 @@ background-repeat: no-repeat;
         letter-spacing: -3px;
     }
 
-    .hero-search {
-        flex-direction: column;
+.hero-search {
+    max-width: 650px;
 
-        gap: 7px;
+    display: flex;
 
-        background: transparent;
+    background: rgba(255, 255, 255, 0.72);
 
-        border: none;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 
-        box-shadow: none;
+    padding: 7px;
 
-        padding: 0;
-    }
+    border-radius: 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.75);
+
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+
+    transition: 0.3s ease;
+}
 
     .hero-search input {
         background: white;
