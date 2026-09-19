@@ -23,6 +23,8 @@ const path = require("path");
 const { Resend } = require("resend");
 const connectDatabase =
     require("./config/database");
+    const SupportRequest =
+    require("./models/SupportRequest");
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
@@ -417,6 +419,27 @@ app.use(
     express.static(frontendPath)
 );
 
+// =========================================
+// SUPPORT RATE LIMITER
+// =========================================
+
+const supportLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many support requests. Please try again later."
+        }
+    });
 
 // =========================================
 // ADMIN LOGIN RATE LIMIT
@@ -670,6 +693,146 @@ app.get(
             message:
                 "MAYNA API is running"
         });
+    }
+);
+// =========================================
+// SUPPORT REQUEST
+// =========================================
+
+app.post(
+    "/api/support",
+    supportLimiter,
+    async (req, res, next) => {
+
+        try {
+
+            const {
+                name,
+                email,
+                subject,
+                message
+            } = req.body;
+
+            // -----------------------------
+            // Validate required fields
+            // -----------------------------
+
+            if (
+                typeof name !== "string" ||
+                typeof email !== "string" ||
+                typeof subject !== "string" ||
+                typeof message !== "string"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please complete all required fields."
+                });
+            }
+
+            const cleanName =
+                name.trim();
+
+            const cleanEmail =
+                email.trim().toLowerCase();
+
+            const cleanSubject =
+                subject.trim();
+
+            const cleanMessage =
+                message.trim();
+
+            if (
+                !cleanName ||
+                !cleanEmail ||
+                !cleanSubject ||
+                !cleanMessage
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please complete all required fields."
+                });
+            }
+
+            // -----------------------------
+            // Length limits
+            // -----------------------------
+
+            if (
+                cleanName.length > 100 ||
+                cleanEmail.length > 200 ||
+                cleanMessage.length > 3000
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "One or more fields are too long."
+                });
+            }
+
+            // -----------------------------
+            // Basic email validation
+            // -----------------------------
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (
+                !emailPattern.test(cleanEmail)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please enter a valid email address."
+                });
+            }
+
+            // -----------------------------
+            // Allowed subjects
+            // -----------------------------
+
+            const allowedSubjects = [
+                "General support",
+                "Business listing",
+                "Report a problem",
+                "Report a business",
+                "Other"
+            ];
+
+            if (
+                !allowedSubjects.includes(
+                    cleanSubject
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid support topic."
+                });
+            }
+
+            // -----------------------------
+            // Save request
+            // -----------------------------
+
+            await SupportRequest.create({
+                name: cleanName,
+                email: cleanEmail,
+                subject: cleanSubject,
+                message: cleanMessage
+            });
+
+            return res.status(201).json({
+                success: true,
+                message:
+                    "Your message has been received. MAYNA support will review it."
+            });
+
+        } catch (error) {
+
+            return next(error);
+        }
     }
 );
 // =========================================
