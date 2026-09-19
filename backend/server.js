@@ -180,6 +180,8 @@ app.use(
 
 app.use(
     session({
+        name: "mayna.sid",
+
         secret:
             process.env.SESSION_SECRET,
 
@@ -555,6 +557,12 @@ app.post(
                         });
                 }
 
+                res.clearCookie(
+                    "mayna.sid",
+                    {
+                        path: "/"
+                    }
+                );
 
                 return res.json({
                     success: true,

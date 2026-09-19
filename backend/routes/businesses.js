@@ -1092,6 +1092,12 @@ router.post(
                                 "Could not log out."
                         });
                 }
+                res.clearCookie(
+                    "mayna.sid",
+                    {
+                        path: "/"
+                    }
+                );
 
                 return res.json({
                     success: true,
