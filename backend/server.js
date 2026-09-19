@@ -307,7 +307,8 @@ const imageBuffer =
 
 const imageSizeBytes =
     imageBuffer.length;
-    const declaredImageType =
+
+const declaredImageType =
     imageMatch[1].toLowerCase();
 
 const isJPEG =
