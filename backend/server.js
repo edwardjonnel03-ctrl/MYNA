@@ -1,3 +1,4 @@
+const helmet = require("helmet");
 require("dotenv").config();
 
 const cloudinary =
@@ -29,6 +30,11 @@ const PORT = 5000;
 // =========================================
 // MIDDLEWARE
 // =========================================
+app.use(
+    helmet({
+        contentSecurityPolicy: false
+    })
+);
 
 const allowedOrigins = [
     "https://myna-web-i92o.onrender.com",
