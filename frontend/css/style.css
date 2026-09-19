@@ -198,16 +198,18 @@ input {
     overflow: hidden;
 
     background:
-        radial-gradient(
-            circle at 85% 20%,
-            rgba(255, 90, 54, 0.18),
-            transparent 30%
-        ),
-        linear-gradient(
-            135deg,
-            #fff 0%,
-            #fff8f5 100%
-        );
+    linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(255, 255, 255, 0.88) 28%,
+        rgba(255, 255, 255, 0.42) 55%,
+        rgba(255, 255, 255, 0.08) 100%
+    ),
+    url("../images/hero-background.png");
+
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
 
     min-height: 650px;
 
