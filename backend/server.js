@@ -1377,6 +1377,108 @@ if (premiumRequest.status === "confirmed") {
     }
 );
 // =========================================
+// TEMPORARY PREMIUM DATE REPAIR
+// Remove after successful repair.
+// =========================================
+
+app.post(
+    "/api/admin/repair-premium-dates",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const premiumRequest =
+                await PremiumRequest.findOne({
+                    reference:
+                        "MAYNA-PREM-690475",
+                    businessId:
+                        1789624193883,
+                    status:
+                        "confirmed"
+                });
+
+            if (!premiumRequest) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Confirmed Premium request not found."
+                });
+            }
+
+            if (!premiumRequest.confirmedAt) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Premium request has no confirmation date."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: 1789624193883
+                });
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            const startedAt =
+                new Date(
+                    premiumRequest.confirmedAt
+                );
+
+            const expiresAt =
+                new Date(startedAt);
+
+            expiresAt.setFullYear(
+                expiresAt.getFullYear() + 1
+            );
+
+            business.plan =
+                "premium";
+
+            business.planStatus =
+                "active";
+
+            business.planStartedAt =
+                startedAt;
+
+            business.planExpiresAt =
+                expiresAt;
+
+            await business.save();
+
+            return res.json({
+                success: true,
+                message:
+                    "Premium dates repaired successfully.",
+                planStartedAt:
+                    business.planStartedAt,
+                planExpiresAt:
+                    business.planExpiresAt
+            });
+
+        } catch (error) {
+
+            console.error(
+                "PREMIUM DATE REPAIR ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not repair Premium dates."
+            });
+        }
+    }
+);
+// =========================================
 // BUSINESS ROUTES
 // =========================================
 
