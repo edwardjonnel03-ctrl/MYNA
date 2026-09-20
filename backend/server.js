@@ -13,6 +13,7 @@ if (
 const cloudinary =
     require("./config/cloudinary");
 
+const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
@@ -588,7 +589,26 @@ app.post(
     }
 );
 
+// =========================================
+// ADMIN AUTH MIDDLEWARE
+// =========================================
 
+function requireAdmin(req, res, next) {
+
+    if (
+        req.session &&
+        req.session.isAdmin === true
+    ) {
+        return next();
+    }
+
+    return res
+        .status(401)
+        .json({
+            success: false,
+            message: "Admin authentication required."
+        });
+}
 // =========================================
 // ADMIN AUTH CHECK
 // =========================================
@@ -645,7 +665,7 @@ app.post(
                             message:
                                 "Could not log out."
                         });
-                }
+                }               
 
                 res.clearCookie(
                     "mayna.sid",
@@ -664,8 +684,210 @@ app.post(
         );
     }
 );
+// =========================================
+// ADMIN SUPPORT INBOX
+// =========================================
 
+app.get(
+    "/api/admin/support",
+    requireAdmin,
+    async (req, res) => {
 
+        try {
+
+const requests =
+    await SupportRequest
+        .find()
+        .select(
+            "name email subject message status createdAt updatedAt"
+        )
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .lean();
+
+            return res.json({
+                success: true,
+                requests
+            });
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN SUPPORT INBOX ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not load support requests."
+                });
+        }
+    }
+);
+
+// =========================================
+// UPDATE SUPPORT REQUEST STATUS
+// =========================================
+
+app.patch(
+    "/api/admin/support/:id/status",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const allowedStatuses = [
+                "open",
+                "in-progress",
+                "resolved"
+            ];
+
+            const status =
+                String(req.body.status || "")
+                    .trim()
+                    .toLowerCase();
+
+            if (!allowedStatuses.includes(status)) {
+
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid support request status."
+                    });
+            }
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid support request ID."
+                    });
+            }
+
+            const request =
+                await SupportRequest.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                        $set: {
+                            status
+                        }
+                    },
+                    {
+                        new: true,
+                        runValidators: true
+                    }
+                );
+
+            if (!request) {
+
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        message:
+                            "Support request not found."
+                    });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Support request status updated.",
+                status: request.status
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPDATE SUPPORT STATUS ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not update support request."
+                });
+        }
+    }
+);
+// =========================================
+// DELETE SUPPORT REQUEST
+// =========================================
+
+app.delete(
+    "/api/admin/support/:id",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid support request ID."
+                    });
+            }
+
+            const request =
+                await SupportRequest.findByIdAndDelete(
+                    req.params.id
+                );
+
+            if (!request) {
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        message:
+                            "Support request not found."
+                    });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Support request deleted."
+            });
+
+        } catch (error) {
+
+            console.error(
+                "DELETE SUPPORT REQUEST ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not delete support request."
+                });
+        }
+    }
+);
 // =========================================
 // BUSINESS ROUTES
 // =========================================

@@ -4,7 +4,7 @@
 
 <head>
 
-```
+
 <meta charset="UTF-8">
 
 <meta
@@ -375,14 +375,93 @@
         font-size: 26px;
     }
 }
+/* =========================================
+   SUPPORT INBOX
+========================================= */
+
+.support-inbox-section {
+    margin-top: 40px;
+}
+
+.support-inbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.support-inbox-header h2 {
+    margin: 0 0 6px;
+}
+
+.support-inbox-header p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.support-count {
+    min-width: 42px;
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #ff7a00;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.support-inbox {
+    display: grid;
+    gap: 18px;
+}
+
+.support-message-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.support-message-card h3 {
+    margin: 0 0 14px;
+    color: #ff7a00;
+}
+
+.support-message-card p {
+    margin: 7px 0;
+    line-height: 1.6;
+}
+
+.support-message-text {
+    margin: 16px 0 !important;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f7f7f7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+    .support-inbox-header {
+        align-items: flex-start;
+    }
+
+    .support-message-card {
+        padding: 18px;
+    }
+}
 </style>
-```
+
 
 </head>
 
 <body>
 
-```
+
 <main class="admin-page">
 
     <div class="admin-header">
@@ -467,6 +546,34 @@
             class="business-list"
         >
             Checking admin access...
+        </div>
+
+    </section>
+        <!-- SUPPORT INBOX -->
+    <section class="support-inbox-section">
+
+        <div class="support-inbox-header">
+            <div>
+                <h2>Support Inbox</h2>
+                <p>
+                    View and manage messages sent through
+                    MAYNA Contact & Support.
+                </p>
+            </div>
+
+            <span
+                id="supportCount"
+                class="support-count"
+            >
+                0
+            </span>
+        </div>
+
+        <div
+            id="supportInbox"
+            class="support-inbox"
+        >
+            Loading support messages...
         </div>
 
     </section>
@@ -1268,7 +1375,354 @@ const town =
 
     }
 
+// =========================================
+// LOAD SUPPORT INBOX
+// =========================================
 
+// =========================================
+// UPDATE SUPPORT STATUS
+// =========================================
+
+async function updateSupportStatus(
+    id,
+    newStatus
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/support/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not update status."
+            );
+        }
+
+        await showMaynaAlert(
+            "Support request status updated.",
+            "Status Updated",
+            "success"
+        );
+
+        await loadSupportInbox();
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE SUPPORT STATUS ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not update support request.",
+            "Update Failed",
+            "error"
+        );
+
+        await loadSupportInbox();
+    }
+}
+
+
+// =========================================
+// DELETE SUPPORT REQUEST
+// =========================================
+
+async function deleteSupportRequest(
+    id,
+    subject
+) {
+
+    const confirmed =
+        await showMaynaConfirm(
+            `Permanently delete "${subject}"?
+
+This cannot be undone.`,
+            "Delete Support Message"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/support/${encodeURIComponent(id)}`,
+                {
+                    method: "DELETE",
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not delete support message."
+            );
+        }
+
+        await showMaynaAlert(
+            "Support message deleted.",
+            "Message Deleted",
+            "success"
+        );
+
+        await loadSupportInbox();
+
+    } catch (error) {
+
+        console.error(
+            "DELETE SUPPORT ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not delete support message.",
+            "Delete Failed",
+            "error"
+        );
+    }
+}
+async function loadSupportInbox() {
+
+    const supportInbox =
+        document.getElementById("supportInbox");
+
+    const supportCount =
+        document.getElementById("supportCount");
+
+    if (!supportInbox || !supportCount) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/support",
+                {
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not load support messages."
+            );
+        }
+
+        const requests =
+            Array.isArray(result.requests)
+                ? result.requests
+                : [];
+
+        supportCount.textContent =
+            requests.length;
+
+        supportInbox.textContent = "";
+
+        if (requests.length === 0) {
+
+            const emptyMessage =
+                document.createElement("p");
+
+            emptyMessage.textContent =
+                "No support messages yet.";
+
+            supportInbox.appendChild(
+                emptyMessage
+            );
+
+            return;
+        }
+
+        requests.forEach(request => {
+
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "support-message-card";
+
+            const title =
+                document.createElement("h3");
+
+            title.textContent =
+                request.subject ||
+                "Support Message";
+
+            const sender =
+                document.createElement("p");
+
+            sender.textContent =
+                `From: ${request.name || "Unknown"}`;
+
+            const email =
+                document.createElement("p");
+
+            email.textContent =
+                `Email: ${request.email || "Not provided"}`;
+
+            const message =
+                document.createElement("p");
+
+            message.className =
+                "support-message-text";
+
+            message.textContent =
+                request.message || "";
+
+const status =
+    document.createElement("p");
+
+status.textContent =
+    `Status: ${request.status || "open"}`;
+
+status.className =
+    "support-status";
+
+            const date =
+                document.createElement("p");
+
+            if (request.createdAt) {
+
+                const created =
+                    new Date(request.createdAt);
+
+                date.textContent =
+                    `Received: ${created.toLocaleString()}`;
+
+            }
+
+const actions =
+    document.createElement("div");
+
+actions.className =
+    "support-actions";
+
+
+const statusSelect =
+    document.createElement("select");
+
+statusSelect.className =
+    "support-status-select";
+
+[
+    ["open", "Open"],
+    ["in-progress", "In Progress"],
+    ["resolved", "Resolved"]
+].forEach(([value, label]) => {
+
+    const option =
+        document.createElement("option");
+
+    option.value = value;
+    option.textContent = label;
+
+    if (request.status === value) {
+        option.selected = true;
+    }
+
+    statusSelect.appendChild(option);
+});
+
+
+const deleteButton =
+    document.createElement("button");
+
+deleteButton.type = "button";
+deleteButton.className =
+    "support-delete-button";
+
+deleteButton.textContent = "Delete";
+
+
+statusSelect.addEventListener(
+    "change",
+    async () => {
+
+        await updateSupportStatus(
+            request._id,
+            statusSelect.value
+        );
+    }
+);
+
+
+deleteButton.addEventListener(
+    "click",
+    async () => {
+
+        await deleteSupportRequest(
+            request._id,
+            request.subject || "Support message"
+        );
+    }
+);
+
+
+actions.append(
+    statusSelect,
+    deleteButton
+);
+
+
+card.append(
+    title,
+    sender,
+    email,
+    message,
+    status,
+    date,
+    actions
+);
+
+            supportInbox.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "SUPPORT INBOX ERROR:",
+            error
+        );
+
+        supportCount.textContent = "0";
+
+        supportInbox.textContent =
+            "Unable to load support messages.";
+    }
+}
     // =========================================
     // START ADMIN DASHBOARD
     // =========================================
@@ -1286,8 +1740,9 @@ const town =
 
 
         await loadBusinesses();
-
+        await loadSupportInbox();
     }
+
 
 
     startAdminDashboard();
