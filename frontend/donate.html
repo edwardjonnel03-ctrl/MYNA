@@ -519,7 +519,44 @@
             develop new features for our community.
         </p>
 
+<label
+    for="donorName"
+    class="amount-label"
+>
+    Your name
+</label>
 
+<div class="custom-field">
+    <input
+        id="donorName"
+        type="text"
+        maxlength="100"
+        autocomplete="name"
+        placeholder="Enter your name"
+    >
+</div>
+
+<label
+    for="donorEmail"
+    class="amount-label"
+>
+    Email address
+</label>
+
+<div class="custom-field">
+    <input
+        id="donorEmail"
+        type="email"
+        maxlength="200"
+        autocomplete="email"
+        placeholder="Enter your email"
+    >
+</div>
+
+
+<label class="amount-label">
+    Choose an amount
+</label>
         <label class="amount-label">
             Choose an amount
         </label>
@@ -741,6 +778,15 @@
 
 
 <script>
+    const donorName =
+    document.getElementById(
+        "donorName"
+    );
+
+const donorEmail =
+    document.getElementById(
+        "donorEmail"
+    );
     const amountButtons =
         document.querySelectorAll(
             ".amount-button"
@@ -857,15 +903,45 @@ amountButtons.forEach(button => {
 
 continueButton.addEventListener(
     "click",
-    () => {
+    async () => {
+
+        const name =
+            donorName.value.trim();
+
+        const email =
+            donorEmail.value
+                .trim()
+                .toLowerCase();
+
+        if (!name) {
+            donationMessage.style.display =
+                "block";
+
+            donationMessage.textContent =
+                "Please enter your name.";
+
+            return;
+        }
+
+        if (
+            !email ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                email
+            )
+        ) {
+            donationMessage.style.display =
+                "block";
+
+            donationMessage.textContent =
+                "Please enter a valid email address.";
+
+            return;
+        }
 
         if (
             !Number.isFinite(selectedAmount) ||
             selectedAmount < 1
         ) {
-
-            eftPanel.style.display = "none";
-
             donationMessage.style.display =
                 "block";
 
@@ -875,29 +951,82 @@ continueButton.addEventListener(
             return;
         }
 
-        const reference =
-            "MAYNA" +
-            Math.floor(
-                100000 +
-                Math.random() * 900000
-            );
+        continueButton.disabled = true;
+        continueButton.textContent =
+            "Preparing donation...";
 
-        eftAmount.textContent =
-            `N$${selectedAmount.toLocaleString()}`;
+        try {
 
-        eftReference.textContent =
-            reference;
+            const response =
+                await fetch(
+                    "/api/donations",
+                    {
+                        method: "POST",
 
-        donationMessage.style.display =
-            "none";
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-        eftPanel.style.display =
-            "block";
+                        body: JSON.stringify({
+                            name,
+                            email,
+                            amount: selectedAmount,
+                            reference:
+                                donationReference
+                        })
+                    }
+                );
 
-        eftPanel.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-        });
+            const data =
+                await response.json();
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+                throw new Error(
+                    data.message ||
+                    "Could not prepare donation."
+                );
+            }
+
+            eftAmount.textContent =
+                `N$${selectedAmount.toLocaleString()}`;
+
+            eftReference.textContent =
+                donationReference;
+
+            donationMessage.style.display =
+                "block";
+
+            donationMessage.textContent =
+                "Donation prepared. Make the EFT using the payment reference below. Your donation will remain pending until MAYNA confirms the payment.";
+
+            eftPanel.style.display =
+                "block";
+
+            eftPanel.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+
+        } catch (error) {
+
+            donationMessage.style.display =
+                "block";
+
+            donationMessage.textContent =
+                error.message ||
+                "Could not prepare the donation.";
+
+        } finally {
+
+            continueButton.disabled = false;
+
+            continueButton.textContent =
+                "Continue";
+        }
     }
 );
 copyAccountButton.addEventListener(

@@ -578,6 +578,39 @@
 
     </section>
 
+    <!-- DONATION INBOX -->
+
+<section class="support-inbox-section">
+
+    <div class="support-inbox-header">
+
+        <div>
+            <h2>Donation Inbox</h2>
+
+            <p>
+                View EFT donation submissions and
+                confirm payments after checking
+                your bank account.
+            </p>
+        </div>
+
+        <span
+            id="donationCount"
+            class="support-count"
+        >
+            0
+        </span>
+
+    </div>
+
+    <div
+        id="donationInbox"
+        class="support-inbox"
+    >
+        Loading donations...
+    </div>
+
+</section>
 </main>
 
 <!-- MAYNA ADMIN MODAL -->
@@ -1375,6 +1408,15 @@ const town =
 
     }
 
+    const donationInbox =
+    document.getElementById(
+        "donationInbox"
+    );
+
+const donationCount =
+    document.getElementById(
+        "donationCount"
+    );
 // =========================================
 // LOAD SUPPORT INBOX
 // =========================================
@@ -1723,6 +1765,340 @@ card.append(
             "Unable to load support messages.";
     }
 }
+// =========================================
+// LOAD DONATION INBOX
+// =========================================
+
+async function loadDonationInbox() {
+
+    donationInbox.textContent =
+        "Loading donations...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/donations",
+                {
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+            throw new Error(
+                result.message ||
+                "Could not load donations."
+            );
+        }
+
+        const donations =
+            Array.isArray(result.donations)
+                ? result.donations
+                : [];
+
+        donationCount.textContent =
+            String(donations.length);
+
+        donationInbox.textContent = "";
+
+        if (donations.length === 0) {
+
+            donationInbox.textContent =
+                "No donation submissions yet.";
+
+            return;
+        }
+
+        donations.forEach(donation => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "support-message-card";
+
+            const title =
+                document.createElement("h3");
+
+            title.textContent =
+                `N$${Number(
+                    donation.amount
+                ).toLocaleString()}`;
+
+            const donor =
+                document.createElement("p");
+
+            donor.textContent =
+                `Donor: ${donation.name || "Unknown"}`;
+
+            const email =
+                document.createElement("p");
+
+            email.textContent =
+                `Email: ${donation.email || "Not provided"}`;
+
+            const reference =
+                document.createElement("p");
+
+            reference.textContent =
+                `Reference: ${donation.reference || "-"}`;
+
+            const paymentMethod =
+                document.createElement("p");
+
+            paymentMethod.textContent =
+                `Payment method: ${
+                    donation.paymentMethod || "eft"
+                }`;
+
+            const date =
+                document.createElement("p");
+
+            date.textContent =
+                `Submitted: ${
+                    donation.createdAt
+                        ? new Date(
+                            donation.createdAt
+                        ).toLocaleString()
+                        : "-"
+                }`;
+
+            const statusLabel =
+                document.createElement("p");
+
+            statusLabel.textContent =
+                "Status:";
+
+            const statusSelect =
+                document.createElement("select");
+
+            [
+                "pending",
+                "confirmed",
+                "rejected"
+            ].forEach(status => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value = status;
+
+                option.textContent =
+                    status.charAt(0)
+                        .toUpperCase() +
+                    status.slice(1);
+
+                if (
+                    donation.status === status
+                ) {
+                    option.selected = true;
+                }
+
+                statusSelect.appendChild(
+                    option
+                );
+            });
+
+            statusSelect.addEventListener(
+                "change",
+                () => {
+                    updateDonationStatus(
+                        donation._id,
+                        statusSelect.value
+                    );
+                }
+            );
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.type = "button";
+            deleteButton.className =
+                "delete-btn";
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.addEventListener(
+                "click",
+                () => {
+                    deleteDonation(
+                        donation._id,
+                        donation.reference
+                    );
+                }
+            );
+
+            card.appendChild(title);
+            card.appendChild(donor);
+            card.appendChild(email);
+            card.appendChild(reference);
+            card.appendChild(paymentMethod);
+            card.appendChild(date);
+            card.appendChild(statusLabel);
+            card.appendChild(statusSelect);
+            card.appendChild(deleteButton);
+
+            donationInbox.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(
+            "DONATION INBOX ERROR:",
+            error
+        );
+
+        donationCount.textContent = "0";
+
+        donationInbox.textContent =
+            "Unable to load donations.";
+    }
+}
+// =========================================
+// UPDATE DONATION STATUS
+// =========================================
+
+async function updateDonationStatus(
+    id,
+    newStatus
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/donations/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+            throw new Error(
+                result.message ||
+                "Could not update donation status."
+            );
+        }
+
+        await showMaynaAlert(
+            `Donation marked as ${result.status}.`,
+            "Donation Updated",
+            "success"
+        );
+
+        await loadDonationInbox();
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE DONATION STATUS ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not update donation status.",
+            "Update Failed",
+            "error"
+        );
+
+        await loadDonationInbox();
+    }
+}
+// =========================================
+// DELETE DONATION
+// =========================================
+
+async function deleteDonation(
+    id,
+    reference
+) {
+
+    const confirmed =
+        await showMaynaConfirm(
+            `Permanently delete donation ${reference}?
+
+This cannot be undone.`,
+            "Delete Donation"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/donations/${encodeURIComponent(id)}`,
+                {
+                    method: "DELETE",
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+            throw new Error(
+                result.message ||
+                "Could not delete donation."
+            );
+        }
+
+        await showMaynaAlert(
+            "Donation record deleted.",
+            "Donation Deleted",
+            "success"
+        );
+
+        await loadDonationInbox();
+
+    } catch (error) {
+
+        console.error(
+            "DELETE DONATION ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not delete donation.",
+            "Delete Failed",
+            "error"
+        );
+    }
+}
     // =========================================
     // START ADMIN DASHBOARD
     // =========================================
@@ -1741,6 +2117,7 @@ card.append(
 
         await loadBusinesses();
         await loadSupportInbox();
+        await loadDonationInbox();
     }
 
 

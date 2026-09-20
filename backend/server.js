@@ -26,6 +26,8 @@ const connectDatabase =
     require("./config/database");
 const SupportRequest =
     require("./models/SupportRequest");
+const Donation =
+    require("./models/Donation");
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
@@ -273,6 +275,7 @@ if (!image) {
     });
 }
 
+
 const allowedImageTypes = [
     "image/jpeg",
     "image/png",
@@ -439,6 +442,27 @@ const supportLimiter =
             success: false,
             message:
                 "Too many support requests. Please try again later."
+        }
+    });
+// =========================================
+// DONATION RATE LIMITER
+// =========================================
+
+const donationLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many donation submissions. Please try again later."
         }
     });
 
@@ -889,6 +913,211 @@ app.delete(
     }
 );
 // =========================================
+// ADMIN DONATION INBOX
+// =========================================
+
+app.get(
+    "/api/admin/donations",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const donations =
+                await Donation
+                    .find()
+                    .select(
+                        "name email amount reference paymentMethod status createdAt updatedAt"
+                    )
+                    .sort({ createdAt: -1 })
+                    .limit(100)
+                    .lean();
+
+            return res.json({
+                success: true,
+                donations
+            });
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN DONATIONS ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not load donations."
+                });
+        }
+    }
+);
+
+// =========================================
+// UPDATE DONATION STATUS
+// =========================================
+
+app.patch(
+    "/api/admin/donations/:id/status",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const allowedStatuses = [
+                "pending",
+                "confirmed",
+                "rejected"
+            ];
+
+            const status =
+                String(req.body.status || "")
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                !allowedStatuses.includes(status)
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid donation status."
+                    });
+            }
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid donation ID."
+                    });
+            }
+
+            const donation =
+                await Donation.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                        $set: {
+                            status
+                        }
+                    },
+                    {
+                        new: true,
+                        runValidators: true
+                    }
+                );
+
+            if (!donation) {
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        message:
+                            "Donation not found."
+                    });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Donation status updated.",
+                status:
+                    donation.status
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPDATE DONATION STATUS ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not update donation."
+                });
+        }
+    }
+);
+
+// =========================================
+// DELETE DONATION
+// =========================================
+
+app.delete(
+    "/api/admin/donations/:id",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        success: false,
+                        message:
+                            "Invalid donation ID."
+                    });
+            }
+
+            const donation =
+                await Donation.findByIdAndDelete(
+                    req.params.id
+                );
+
+            if (!donation) {
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        message:
+                            "Donation not found."
+                    });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Donation deleted."
+            });
+
+        } catch (error) {
+
+            console.error(
+                "DELETE DONATION ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not delete donation."
+                });
+        }
+    }
+);
+// =========================================
 // BUSINESS ROUTES
 // =========================================
 
@@ -1055,6 +1284,140 @@ app.post(
 
             return next(error);
         }
+    }
+);
+// =========================================
+// SUBMIT EFT DONATION
+// =========================================
+
+app.post(
+    "/api/donations",
+    donationLimiter,
+    async (req, res) => {
+
+        try {
+
+            const name =
+                String(req.body.name || "")
+                    .trim();
+
+            const email =
+                String(req.body.email || "")
+                    .trim()
+                    .toLowerCase();
+
+            const amount =
+                Number(req.body.amount);
+
+            const reference =
+                String(req.body.reference || "")
+                    .trim()
+                    .toUpperCase();
+
+            if (
+                !name ||
+                name.length > 100
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please enter a valid name."
+                });
+            }
+
+            if (
+                !email ||
+                email.length > 200 ||
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please enter a valid email address."
+                });
+            }
+
+            if (
+                !Number.isFinite(amount) ||
+                amount < 1 ||
+                amount > 1000000
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please enter a valid donation amount."
+                });
+            }
+
+            if (
+                !/^MAYNA-\d{6}$/.test(reference)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid MAYNA payment reference."
+                });
+            }
+            const existingDonation =
+    await Donation.findOne({
+        reference
+    }).lean();
+
+if (existingDonation) {
+
+    return res.status(409).json({
+        success: false,
+        message:
+            "This donation reference has already been submitted."
+    });
+}
+
+            const donation =
+                await Donation.create({
+                    name,
+                    email,
+                    amount,
+                    reference,
+                    paymentMethod: "eft",
+                    status: "pending"
+                });
+
+            return res.status(201).json({
+                success: true,
+                message:
+                    "Your EFT donation has been submitted for confirmation.",
+                donation: {
+                    reference:
+                        donation.reference,
+                    status:
+                        donation.status
+                }
+            });
+
+} catch (error) {
+
+    if (
+        error &&
+        error.code === 11000
+    ) {
+        return res.status(409).json({
+            success: false,
+            message:
+                "This donation reference has already been submitted."
+        });
+    }
+
+    console.error(
+        "DONATION SUBMISSION ERROR:",
+        error
+    );
+
+    return res.status(500).json({
+        success: false,
+        message:
+            "Could not submit the donation."
+    });
+}
     }
 );
 // =========================================
