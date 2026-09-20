@@ -23,7 +23,7 @@ const path = require("path");
 const { Resend } = require("resend");
 const connectDatabase =
     require("./config/database");
-    const SupportRequest =
+const SupportRequest =
     require("./models/SupportRequest");
 
 const resend = new Resend(
