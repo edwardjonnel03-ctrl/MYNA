@@ -4,6 +4,8 @@ const crypto = require("crypto");
 const { Resend } = require("resend");
 
 const Business = require("../models/Business");
+const PremiumRequest =
+    require("../models/PremiumRequest");
 
 const router = express.Router();
 
@@ -23,11 +25,13 @@ function publicBusiness(business) {
             ? business.toObject()
             : { ...business };
 
-    delete safeBusiness.ownerEmail;
-    delete safeBusiness.ownerPasswordHash;
-    delete safeBusiness.ownerPasswordSalt;
-    delete safeBusiness.resetTokenHash;
-    delete safeBusiness.resetTokenExpires;
+delete safeBusiness.ownerEmail;
+delete safeBusiness.ownerPasswordHash;
+delete safeBusiness.ownerPasswordSalt;
+delete safeBusiness.resetTokenHash;
+delete safeBusiness.resetTokenExpires;
+delete safeBusiness.planStartedAt;
+delete safeBusiness.planExpiresAt;
 
     return safeBusiness;
 }
@@ -1109,10 +1113,17 @@ router.post(
                     message:
                         "Owner login successful.",
 
-                    business:
-                        publicBusiness(
-                            business
-                        )
+business: {
+    ...publicBusiness(
+        business
+    ),
+
+    planStartedAt:
+        business.planStartedAt,
+
+    planExpiresAt:
+        business.planExpiresAt
+}
                 });
             }
         );
@@ -1212,6 +1223,179 @@ router.get(
                 authenticated:
                     false
 
+            });
+        }
+    }
+);
+// ========================================
+// CREATE PREMIUM REQUEST
+// OWNER ONLY
+// ========================================
+
+router.post(
+    "/premium/request",
+    async (req, res) => {
+
+        try {
+
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Business owner authentication required."
+                });
+            }
+
+            const billingCycle =
+                String(
+                    req.body.billingCycle || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                billingCycle !== "monthly" &&
+                billingCycle !== "yearly"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid billing cycle."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: Number(
+                        req.session.ownerBusinessId
+                    )
+                });
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            if (
+                business.plan === "premium" &&
+                business.planStatus === "active"
+            ) {
+                return res.status(409).json({
+                    success: false,
+                    message:
+                        "This business already has an active Premium plan."
+                });
+            }
+
+            const existingRequest =
+                await PremiumRequest.findOne({
+                    businessId: business.id,
+                    status: "pending"
+                });
+
+            if (existingRequest) {
+                return res.status(409).json({
+                    success: false,
+                    message:
+                        "This business already has a pending Premium request.",
+                    request: {
+                        billingCycle:
+                            existingRequest.billingCycle,
+                        amount:
+                            existingRequest.amount,
+                        reference:
+                            existingRequest.reference,
+                        status:
+                            existingRequest.status
+                    }
+                });
+            }
+
+            const amount =
+                billingCycle === "yearly"
+                    ? 863.89
+                    : 79.99;
+
+            let reference;
+            let referenceExists = true;
+
+            while (referenceExists) {
+
+                reference =
+                    "MAYNA-PREM-" +
+                    Math.floor(
+                        100000 +
+                        Math.random() * 900000
+                    );
+
+                referenceExists =
+                    await PremiumRequest.exists({
+                        reference
+                    });
+            }
+
+            const premiumRequest =
+                await PremiumRequest.create({
+                    businessId:
+                        business.id,
+
+                    businessName:
+                        business.businessName,
+
+                    ownerEmail:
+                        business.ownerEmail,
+
+                    billingCycle,
+
+                    amount,
+
+                    reference,
+
+                    paymentMethod:
+                        "eft",
+
+                    status:
+                        "pending"
+                });
+
+            return res.status(201).json({
+                success: true,
+
+                message:
+                    "Premium request created. Payment confirmation is required before Premium is activated.",
+
+                request: {
+                    billingCycle:
+                        premiumRequest.billingCycle,
+
+                    amount:
+                        premiumRequest.amount,
+
+                    reference:
+                        premiumRequest.reference,
+
+                    status:
+                        premiumRequest.status
+                }
+            });
+
+        } catch (error) {
+
+            console.error(
+                "PREMIUM REQUEST ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Server error while creating Premium request."
             });
         }
     }
@@ -1770,6 +1954,156 @@ router.delete(
 
                 message:
                     "Server error while deleting business."
+
+            });
+        }
+    }
+);
+// ========================================
+// CHANGE BUSINESS PLAN
+// ADMIN ONLY
+// ========================================
+
+router.put(
+    "/:id/plan",
+
+    async (req, res) => {
+
+        try {
+
+            if (
+                !req.session ||
+                req.session.isAdmin !== true
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Admin authentication required."
+
+                });
+            }
+
+            const id =
+                Number(
+                    req.params.id
+                );
+
+            if (
+                !Number.isFinite(id)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid business ID."
+
+                });
+            }
+
+            const plan =
+                String(
+                    req.body.plan || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                plan !== "free" &&
+                plan !== "premium"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid business plan."
+
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: id
+                });
+
+            if (!business) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Business not found."
+
+                });
+            }
+
+            if (plan === "premium") {
+
+                business.plan =
+                    "premium";
+
+                business.planStatus =
+                    "active";
+
+                business.planStartedAt =
+                    new Date();
+
+                business.planExpiresAt =
+                    null;
+
+            } else {
+
+                business.plan =
+                    "free";
+
+                business.planStatus =
+                    "active";
+
+                business.planStartedAt =
+                    null;
+
+                business.planExpiresAt =
+                    null;
+            }
+
+            await business.save();
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    plan === "premium"
+                        ? "Business upgraded to Premium."
+                        : "Business changed to Free plan.",
+
+                business:
+                    publicBusiness(
+                        business
+                    )
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "BUSINESS PLAN ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Server error while changing business plan."
 
             });
         }

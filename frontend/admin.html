@@ -611,6 +611,40 @@
     </div>
 
 </section>
+<!-- PREMIUM REQUEST INBOX -->
+
+<section class="support-inbox-section">
+
+    <div class="support-inbox-header">
+
+        <div>
+            <h2>Premium Requests</h2>
+
+            <p>
+                Review Premium upgrade requests and
+                confirm payments after checking
+                your bank account.
+            </p>
+        </div>
+
+        <span
+            id="premiumRequestCount"
+            class="support-count"
+        >
+            0
+        </span>
+
+    </div>
+
+    <div
+        id="premiumRequestInbox"
+        class="support-inbox"
+    >
+        Loading Premium requests...
+    </div>
+
+</section>
+
 </main>
 
 <!-- MAYNA ADMIN MODAL -->
@@ -1002,6 +1036,99 @@ await showMaynaAlert(
         }
 
     }
+    async function togglePlan(
+    id,
+    currentPlan
+) {
+
+    const newPlan =
+        currentPlan === "premium"
+            ? "free"
+            : "premium";
+
+    const action =
+        newPlan === "premium"
+            ? "upgrade this business to Premium"
+            : "change this business to the Free plan";
+
+    const confirmed =
+        await showMaynaConfirm(
+            `Are you sure you want to ${action}?`,
+            "Change Business Plan"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/businesses/${id}/plan`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    credentials:
+                        "include",
+
+                    body:
+                        JSON.stringify({
+                            plan:
+                                newPlan
+                        })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+
+            if (
+                response.status === 401
+            ) {
+
+                window.location.href =
+                    "admin-login.html";
+
+                return;
+            }
+
+            throw new Error(
+                result.message ||
+                "Business plan update failed."
+            );
+        }
+
+        await showMaynaAlert(
+            result.message,
+            "Plan Updated",
+            "success"
+        );
+
+        loadBusinesses();
+
+    } catch (error) {
+
+        console.error(
+            "PLAN UPDATE ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+            "Could not update the business plan.",
+            "Plan Update Failed",
+            "error"
+        );
+    }
+}
 
 // =========================================
 // DELETE BUSINESS
@@ -1237,6 +1364,18 @@ await showMaynaAlert(
                                 </div>
 
                             `;
+                            const planStatus =
+    business.plan === "premium"
+        ? `
+            <div class="verified-status">
+                Premium Plan
+            </div>
+        `
+        : `
+            <div class="unverified-status">
+                Free Plan
+            </div>
+        `;
 
 const businessName =
     escapeHTML(
@@ -1292,9 +1431,10 @@ const town =
                                     </p>
 
 
-                                    ${status}
+${status}
+${planStatus}
 
-                                </div>
+</div>
 
 
                                 <div class="admin-actions">
@@ -1312,6 +1452,19 @@ const town =
         }
 
     </button>
+    <button
+    class="admin-button plan-button"
+    data-business-id="${businessId}"
+    data-plan="${business.plan || "free"}"
+>
+
+    ${
+        business.plan === "premium"
+            ? "Change to Free"
+            : "Upgrade to Premium"
+    }
+
+</button>
 
 
     <button
@@ -1356,7 +1509,35 @@ const town =
                 }
             );
         }
-    );  
+    );
+    businessList
+    .querySelectorAll(
+        ".plan-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        decodeURIComponent(
+                            button.dataset.businessId
+                        );
+
+                    const currentPlan =
+                        button.dataset.plan ||
+                        "free";
+
+                    togglePlan(
+                        id,
+                        currentPlan
+                    );
+                }
+            );
+        }
+    ); 
        businessList
     .querySelectorAll(
         ".delete-button"
@@ -1416,6 +1597,15 @@ const town =
 const donationCount =
     document.getElementById(
         "donationCount"
+    );
+const premiumRequestInbox =
+    document.getElementById(
+        "premiumRequestInbox"
+    );
+
+const premiumRequestCount =
+    document.getElementById(
+        "premiumRequestCount"
     );
 // =========================================
 // LOAD SUPPORT INBOX
@@ -1965,6 +2155,306 @@ async function loadDonationInbox() {
     }
 }
 // =========================================
+// LOAD PREMIUM REQUEST INBOX
+// =========================================
+
+async function loadPremiumRequestInbox() {
+
+    premiumRequestInbox.textContent =
+        "Loading Premium requests...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/premium-requests",
+                {
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (response.status === 401) {
+
+            window.location.href =
+                "admin.html";
+
+            return;
+        }
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+            throw new Error(
+                result.message ||
+                "Could not load Premium requests."
+            );
+        }
+
+        const requests =
+            Array.isArray(result.requests)
+                ? result.requests
+                : [];
+
+        premiumRequestCount.textContent =
+            String(requests.length);
+
+        premiumRequestInbox.textContent =
+            "";
+
+        if (requests.length === 0) {
+
+            premiumRequestInbox.textContent =
+                "No Premium requests yet.";
+
+            return;
+        }
+
+        requests.forEach(
+            function (request) {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+                card.className =
+                    "support-message-card";
+
+                const title =
+                    document.createElement(
+                        "h3"
+                    );
+
+                title.textContent =
+                    request.businessName ||
+                    "MAYNA Business";
+
+                const details =
+                    document.createElement(
+                        "p"
+                    );
+
+                const billingLabel =
+                    request.billingCycle ===
+                    "yearly"
+                        ? "Yearly"
+                        : "Monthly";
+
+                details.textContent =
+                    `${billingLabel} Premium · N$${Number(
+                        request.amount
+                    ).toFixed(2)}`;
+
+                const email =
+                    document.createElement(
+                        "p"
+                    );
+
+                email.textContent =
+                    `Owner: ${
+                        request.ownerEmail ||
+                        "Not available"
+                    }`;
+
+                const reference =
+                    document.createElement(
+                        "p"
+                    );
+
+                reference.textContent =
+                    `Reference: ${
+                        request.reference
+                    }`;
+
+                const statusLabel =
+                    document.createElement(
+                        "label"
+                    );
+
+                statusLabel.textContent =
+                    "Payment status";
+
+                const statusSelect =
+                    document.createElement(
+                        "select"
+                    );
+
+                [
+                    "pending",
+                    "confirmed",
+                    "rejected"
+                ].forEach(
+                    function (status) {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+                        option.value =
+                            status;
+
+                        option.textContent =
+                            status
+                                .charAt(0)
+                                .toUpperCase() +
+                            status.slice(1);
+
+                        if (
+                            request.status ===
+                            status
+                        ) {
+                            option.selected =
+                                true;
+                        }
+
+                        statusSelect.appendChild(
+                            option
+                        );
+                    }
+                );
+
+                statusSelect.addEventListener(
+                    "change",
+                    function () {
+
+                        updatePremiumRequestStatus(
+                            request._id,
+                            statusSelect.value
+                        );
+                    }
+                );
+
+                card.appendChild(title);
+                card.appendChild(details);
+                card.appendChild(email);
+                card.appendChild(reference);
+                card.appendChild(statusLabel);
+                card.appendChild(statusSelect);
+
+                premiumRequestInbox.appendChild(
+                    card
+                );
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "PREMIUM REQUEST INBOX ERROR:",
+            error
+        );
+
+        premiumRequestCount.textContent =
+            "0";
+
+        premiumRequestInbox.textContent =
+            "Unable to load Premium requests.";
+    }
+}
+// =========================================
+// UPDATE PREMIUM REQUEST STATUS
+// =========================================
+
+async function updatePremiumRequestStatus(
+    id,
+    newStatus
+) {
+
+    try {
+
+        if (newStatus === "confirmed") {
+
+            const confirmed =
+                await showMaynaConfirm(
+                    "Confirm Premium Payment",
+                    "Have you verified this EFT payment in your bank account? Confirming it will activate Premium for this business."
+                );
+
+            if (!confirmed) {
+
+                await loadPremiumRequestInbox();
+
+                return;
+            }
+        }
+
+        const response =
+            await fetch(
+                `/api/admin/premium-requests/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PATCH",
+
+                    credentials:
+                        "include",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            status:
+                                newStatus
+                        })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (response.status === 401) {
+
+            window.location.href =
+                "admin.html";
+
+            return;
+        }
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Could not update Premium request."
+            );
+        }
+
+        await showMaynaAlert(
+            "Premium Request Updated",
+            result.message
+        );
+
+        await loadPremiumRequestInbox();
+
+        // Refresh businesses so the
+        // Free/Premium badge also updates.
+        await loadBusinesses();
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE PREMIUM REQUEST ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            "Update Failed",
+            error.message ||
+            "Could not update Premium request."
+        );
+
+        await loadPremiumRequestInbox();
+    }
+}
+// =========================================
 // UPDATE DONATION STATUS
 // =========================================
 
@@ -2118,6 +2608,7 @@ This cannot be undone.`,
         await loadBusinesses();
         await loadSupportInbox();
         await loadDonationInbox();
+        await loadPremiumRequestInbox();
     }
 
 

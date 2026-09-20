@@ -172,6 +172,36 @@ ownerPasswordSalt: {
             type: Boolean,
             default: false
         },
+        // BUSINESS PLAN
+
+plan: {
+    type: String,
+    enum: [
+        "free",
+        "premium"
+    ],
+    default: "free"
+},
+
+planStatus: {
+    type: String,
+    enum: [
+        "active",
+        "pending",
+        "expired"
+    ],
+    default: "active"
+},
+
+planStartedAt: {
+    type: Date,
+    default: null
+},
+
+planExpiresAt: {
+    type: Date,
+    default: null
+},
 
         // BUSINESS OPENING HOURS
 

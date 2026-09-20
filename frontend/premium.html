@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MAYNA Premium</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 22px 20px;
+        }
+
+        .header-inner {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .brand span {
+            color: #ff7a00;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: auto;
+            padding: 55px 20px;
+        }
+
+        .intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        .intro .label {
+            color: #ff7a00;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 13px;
+        }
+
+        .intro h1 {
+            margin: 10px 0;
+            font-size: 38px;
+        }
+
+        .intro p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+.plans {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 25px;
+    align-items: start;
+}
+
+.plan {
+    min-width: 0;
+}
+
+        .plan {
+            position: relative;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .plan.premium {
+            border: 2px solid #ff7a00;
+        }
+
+        .popular {
+            position: absolute;
+            top: -14px;
+            right: 20px;
+            background: #ff7a00;
+            color: white;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .plan h2 {
+            margin-top: 0;
+            font-size: 27px;
+        }
+
+        .price {
+            margin: 18px 0;
+            font-size: 34px;
+            font-weight: 800;
+        }
+
+        .price span {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .yearly-price {
+            margin-top: -10px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .features {
+            padding: 0;
+            margin: 25px 0;
+            list-style: none;
+        }
+
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            line-height: 1.4;
+        }
+
+        .features li::before {
+            content: "✓";
+            margin-right: 10px;
+            color: #ff7a00;
+            font-weight: bold;
+        }
+
+        .current-button,
+        .upgrade-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .current-button {
+            border: 1px solid #d1d5db;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .upgrade-button {
+            border: none;
+            background: #ff7a00;
+            color: white;
+            cursor: pointer;
+        }
+
+        .upgrade-button:hover {
+            opacity: 0.9;
+        }
+
+        .notice {
+            margin-top: 30px;
+            padding: 18px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            color: #9a3412;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .billing-option {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 22px 0;
+}
+
+.billing-option {
+    position: relative;
+    padding: 15px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s ease;
+}
+
+.billing-option:hover {
+    border-color: #ff7a00;
+}
+
+.billing-option.active {
+    border-color: #ff7a00;
+    background: #fff7ed;
+}
+
+.billing-option strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+.billing-option span {
+    display: block;
+    color: #374151;
+    font-size: 13px;
+}
+
+.billing-option small {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 4px 7px;
+    border-radius: 12px;
+    background: #ff7a00;
+    color: white;
+    font-weight: 700;
+}
+
+.selected-price {
+    margin: 20px 0;
+}
+
+#billingMessage {
+    margin: -8px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+/* PREMIUM PAYMENT PANEL */
+
+.premium-payment-panel {
+    margin-top: 30px;
+    padding: 28px;
+    background: #ffffff;
+    border: 2px solid #ff7a00;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.premium-payment-panel h2 {
+    margin: 12px 0 8px;
+}
+
+.premium-payment-panel > p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.payment-status {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: #fff7ed;
+    color: #ff7a00;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.payment-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.payment-details div {
+    padding: 15px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    min-width: 0;
+}
+
+.payment-details span {
+    display: block;
+    margin-bottom: 5px;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.payment-details strong {
+    display: block;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+}
+
+.payment-warning {
+    margin-top: 18px !important;
+    padding: 13px;
+    background: #fff7ed;
+    border-radius: 9px;
+    color: #9a4a00 !important;
+    font-weight: 700;
+}
+
+@media (max-width: 650px) {
+
+    .payment-details {
+        grid-template-columns: 1fr;
+    }
+
+    .premium-payment-panel {
+        padding: 20px;
+    }
+}
+        @media (max-width: 700px) {
+
+            .plans {
+                grid-template-columns: 1fr;
+            }
+
+            .header-inner {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .intro h1 {
+                font-size: 30px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="header-inner">
+
+        <div class="brand">
+            MAYNA<span>.</span>
+        </div>
+
+        <a
+            href="dashboard.html"
+            class="back-link"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="intro">
+
+        <div class="label">
+            MAYNA BUSINESS PLANS
+        </div>
+
+        <h1>
+            Grow your business with MAYNA
+        </h1>
+
+        <p>
+            Start with a free business listing or upgrade
+            to MAYNA Premium for additional tools designed
+            to increase your business visibility.
+        </p>
+
+    </section>
+
+
+    <section class="plans">
+
+        <article class="plan">
+
+            <h2>
+                Free
+            </h2>
+
+            <div class="price">
+                N$0
+                <span>/ month</span>
+            </div>
+
+            <ul class="features">
+
+                <li>Business listing</li>
+
+                <li>Business description</li>
+
+                <li>Contact information</li>
+
+                <li>Business category and location</li>
+
+                <li>Services and prices</li>
+
+                <li>Standard MAYNA search visibility</li>
+
+            </ul>
+
+            <button
+                type="button"
+                class="current-button"
+            >
+                Free Plan
+            </button>
+
+</article>
+
+
+<article class="plan premium">
+
+    <div class="popular">
+        PREMIUM
+    </div>
+
+    <h2>
+        Premium
+    </h2>
+
+    <div class="billing-options">
+
+    <button
+        type="button"
+        class="billing-option active"
+        id="monthlyOption"
+    >
+        <strong>Monthly</strong>
+        <span>N$79.99/month</span>
+    </button>
+
+    <button
+        type="button"
+        class="billing-option"
+        id="yearlyOption"
+    >
+        <strong>Yearly</strong>
+        <span>N$863.89/year</span>
+        <small>Save 10%</small>
+    </button>
+
+</div>
+
+<div class="selected-price">
+
+    <div class="price" id="premiumPrice">
+        N$79.99
+        <span>/ month</span>
+    </div>
+
+    <p id="billingMessage">
+        Billed monthly.
+    </p>
+
+</div>
+
+
+            <ul class="features">
+
+                <li>Everything included in Free</li>
+
+                <li>Premium business badge</li>
+
+                <li>Higher search visibility</li>
+
+                <li>Featured business opportunities</li>
+
+                <li>Expanded business gallery</li>
+
+                <li>Business analytics</li>
+
+                <li>Social media links</li>
+
+                <li>Priority support</li>
+
+                <li>Promotions and special offers</li>
+
+            </ul>
+
+            <button
+                type="button"
+                class="upgrade-button"
+                id="startUpgradeButton"
+            >
+                Upgrade to Premium
+            </button>
+
+        </article>
+
+    </section>
+
+
+    <div class="notice">
+        Premium activation is not automatic yet.
+        MAYNA will only activate a Premium plan after
+        the applicable payment has been confirmed.
+    </div>
+    <section
+    class="premium-payment-panel"
+    id="premiumPaymentPanel"
+    style="display: none;"
+>
+    <div class="payment-status">
+        PENDING PAYMENT
+    </div>
+
+    <h2>
+        Complete Your Premium Payment
+    </h2>
+
+    <p>
+        Make an EFT payment using the details below.
+        Your Premium plan will only be activated after
+        MAYNA confirms the payment.
+    </p>
+
+    <div class="payment-details">
+
+        <div>
+            <span>Plan</span>
+            <strong id="paymentPlan">—</strong>
+        </div>
+
+        <div>
+            <span>Amount</span>
+            <strong id="paymentAmount">—</strong>
+        </div>
+
+        <div>
+            <span>Payment Reference</span>
+            <strong id="paymentReference">—</strong>
+        </div>
+
+        <div>
+            <span>Bank</span>
+            <strong>FNB Namibia</strong>
+        </div>
+
+        <div>
+            <span>Account Holder</span>
+            <strong>Chizungo Edward</strong>
+        </div>
+
+        <div>
+            <span>Account Type</span>
+            <strong>Current Account</strong>
+        </div>
+
+        <div>
+            <span>Account Number</span>
+            <strong>64282006484</strong>
+        </div>
+
+    </div>
+
+    <p class="payment-warning">
+        Use the exact MAYNA payment reference shown above
+        when making the EFT payment.
+    </p>
+
+</section>
+
+</main>
+
+<script>
+
+    const monthlyOption =
+        document.getElementById(
+            "monthlyOption"
+        );
+
+    const yearlyOption =
+        document.getElementById(
+            "yearlyOption"
+        );
+
+    const premiumPrice =
+        document.getElementById(
+            "premiumPrice"
+        );
+
+    const billingMessage =
+        document.getElementById(
+            "billingMessage"
+        );
+
+
+    let selectedBilling =
+        "monthly";
+
+
+    monthlyOption.addEventListener(
+        "click",
+        function () {
+
+            selectedBilling =
+                "monthly";
+
+            monthlyOption.classList.add(
+                "active"
+            );
+
+            yearlyOption.classList.remove(
+                "active"
+            );
+
+            premiumPrice.innerHTML =
+                'N$79.99 <span>/ month</span>';
+
+            billingMessage.textContent =
+                "Billed monthly.";
+        }
+    );
+
+
+    yearlyOption.addEventListener(
+        "click",
+        function () {
+
+            selectedBilling =
+                "yearly";
+
+            yearlyOption.classList.add(
+                "active"
+            );
+
+            monthlyOption.classList.remove(
+                "active"
+            );
+
+            premiumPrice.innerHTML =
+                'N$863.89 <span>/ year</span>';
+
+            billingMessage.textContent =
+                "Billed yearly. You save 10%.";
+        }
+    );
+
+const startUpgradeButton =
+    document.getElementById(
+        "startUpgradeButton"
+    );
+
+startUpgradeButton.addEventListener(
+    "click",
+    async function () {
+
+        startUpgradeButton.disabled =
+            true;
+
+        startUpgradeButton.textContent =
+            "Creating request...";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/businesses/premium/request",
+                    {
+                        method: "POST",
+
+                        credentials:
+                            "include",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                billingCycle:
+                                    selectedBilling
+                            })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (response.status === 401) {
+
+                window.location.href =
+                    "owner-login.html";
+
+                return;
+            }
+
+if (
+    response.status === 409 &&
+    data.request
+) {
+
+    paymentPlan.textContent =
+        data.request.billingCycle === "yearly"
+            ? "Premium — Yearly"
+            : "Premium — Monthly";
+
+    paymentAmount.textContent =
+        `N$${Number(
+            data.request.amount
+        ).toFixed(2)}`;
+
+    paymentReference.textContent =
+        data.request.reference;
+
+    premiumPaymentPanel.style.display =
+        "block";
+
+    premiumPaymentPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    return;
+}
+
+if (!response.ok) {
+
+    alert(
+        data.message ||
+        "Could not create Premium request."
+    );
+
+    return;
+}
+
+paymentPlan.textContent =
+    data.request.billingCycle === "yearly"
+        ? "Premium — Yearly"
+        : "Premium — Monthly";
+
+paymentAmount.textContent =
+    `N$${Number(
+        data.request.amount
+    ).toFixed(2)}`;
+
+paymentReference.textContent =
+    data.request.reference;
+
+premiumPaymentPanel.style.display =
+    "block";
+
+premiumPaymentPanel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+});
+
+        } catch (error) {
+
+            console.error(
+                "PREMIUM REQUEST ERROR:",
+                error
+            );
+
+            alert(
+                "Could not connect to MAYNA. Please try again."
+            );
+
+        } finally {
+
+            startUpgradeButton.disabled =
+                false;
+
+            startUpgradeButton.textContent =
+                "Upgrade to Premium";
+        }
+    }
+);
+</script>
+</body>
+
+</html>

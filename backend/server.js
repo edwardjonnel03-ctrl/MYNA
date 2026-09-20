@@ -28,6 +28,10 @@ const SupportRequest =
     require("./models/SupportRequest");
 const Donation =
     require("./models/Donation");
+const PremiumRequest =
+    require("./models/PremiumRequest");
+const Business =
+    require("./models/Business");    
 
 const resend = new Resend(
     process.env.RESEND_API_KEY
@@ -956,6 +960,7 @@ app.get(
     }
 );
 
+
 // =========================================
 // UPDATE DONATION STATUS
 // =========================================
@@ -1114,6 +1119,219 @@ app.delete(
                     message:
                         "Could not delete donation."
                 });
+        }
+    }
+);
+// =========================================
+// ADMIN PREMIUM REQUEST INBOX
+// =========================================
+
+app.get(
+    "/api/admin/premium-requests",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const requests =
+                await PremiumRequest
+                    .find()
+                    .select(
+                        "businessId businessName ownerEmail billingCycle amount reference paymentMethod status confirmedAt createdAt updatedAt"
+                    )
+                    .sort({
+                        createdAt: -1
+                    })
+                    .limit(100)
+                    .lean();
+
+            return res.json({
+                success: true,
+                requests
+            });
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN PREMIUM REQUESTS ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+                    success: false,
+                    message:
+                        "Could not load Premium requests."
+                });
+        }
+    }
+);
+// =========================================
+// UPDATE PREMIUM REQUEST STATUS
+// =========================================
+
+app.patch(
+    "/api/admin/premium-requests/:id/status",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid Premium request ID."
+                });
+            }
+
+            const status =
+                String(
+                    req.body.status || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                ![
+                    "pending",
+                    "confirmed",
+                    "rejected"
+                ].includes(status)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid Premium request status."
+                });
+            }
+
+            const premiumRequest =
+                await PremiumRequest.findById(
+                    req.params.id
+                );
+
+            if (!premiumRequest) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Premium request not found."
+                });
+            }
+
+            // Confirming payment activates Premium.
+            if (status === "confirmed") {
+
+                const business =
+                    await Business.findOne({
+                        id:
+                            premiumRequest.businessId
+                    });
+
+                if (!business) {
+                    return res.status(404).json({
+                        success: false,
+                        message:
+                            "Business linked to this Premium request was not found."
+                    });
+                }
+
+                const startedAt =
+                    new Date();
+
+                const expiresAt =
+                    new Date(startedAt);
+
+                if (
+                    premiumRequest.billingCycle ===
+                    "yearly"
+                ) {
+                    expiresAt.setFullYear(
+                        expiresAt.getFullYear() + 1
+                    );
+                } else {
+                    expiresAt.setMonth(
+                        expiresAt.getMonth() + 1
+                    );
+                }
+
+                business.plan =
+                    "premium";
+
+                business.planStatus =
+                    "active";
+
+                business.planStartedAt =
+                    startedAt;
+
+                business.planExpiresAt =
+                    expiresAt;
+
+                await business.save();
+
+                premiumRequest.confirmedAt =
+                    startedAt;
+            }
+
+            premiumRequest.status =
+                status;
+
+            if (status !== "confirmed") {
+                premiumRequest.confirmedAt =
+                    null;
+            }
+
+            await premiumRequest.save();
+
+            return res.json({
+                success: true,
+
+                message:
+                    status === "confirmed"
+                        ? "Premium payment confirmed and business activated."
+                        : `Premium request changed to ${status}.`,
+
+                request: {
+                    id:
+                        premiumRequest._id,
+
+                    businessId:
+                        premiumRequest.businessId,
+
+                    billingCycle:
+                        premiumRequest.billingCycle,
+
+                    amount:
+                        premiumRequest.amount,
+
+                    reference:
+                        premiumRequest.reference,
+
+                    status:
+                        premiumRequest.status,
+
+                    confirmedAt:
+                        premiumRequest.confirmedAt
+                }
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPDATE PREMIUM REQUEST ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not update Premium request."
+            });
         }
     }
 );

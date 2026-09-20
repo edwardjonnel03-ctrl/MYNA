@@ -176,6 +176,67 @@
             }
 
         }
+        /* MAYNA BUSINESS PLAN CARD */
+
+.plan-card {
+    background: white;
+    border: 2px solid #ff7a00;
+    border-radius: 14px;
+    padding: 22px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.plan-label {
+    margin: 0 0 7px;
+    color: #ff7a00;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.plan-card h2 {
+    margin: 0 0 7px;
+    font-size: 24px;
+}
+
+#ownerPlanStatus {
+    margin: 0;
+    color: #6b7280;
+}
+
+#upgradePlanButton {
+    border: none;
+    border-radius: 9px;
+    padding: 12px 20px;
+    background: #ff7a00;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#upgradePlanButton:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+
+    .plan-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #upgradePlanButton {
+        width: 100%;
+    }
+}
 /* MAYNA DASHBOARD MODAL */
 .mayna-dashboard-modal {
     position: fixed;
@@ -282,6 +343,31 @@
 
 
 <main>
+    <section class="plan-card" id="planCard">
+
+    <div>
+        <p class="plan-label">
+            YOUR MAYNA PLAN
+        </p>
+
+        <h2 id="ownerPlanName">
+            Loading plan...
+        </h2>
+
+        <p id="ownerPlanStatus">
+            Checking your plan status...
+        </p>
+    </div>
+
+    <button
+        type="button"
+        id="upgradePlanButton"
+        style="display: none;"
+    >
+        Upgrade to Premium
+    </button>
+
+</section>
 
 
     <div class="card">
@@ -788,6 +874,18 @@ const addServiceButton =
             document.getElementById(
                 "ownerBusinessName"
             );
+        const upgradePlanButton =
+    document.getElementById(
+        "upgradePlanButton"
+    );
+    upgradePlanButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            "premium.html";
+    }
+);   
 
 
         function showPhoto(imageSource) {
@@ -1378,6 +1476,68 @@ await showMaynaDashboardAlert(
                         business.businessName ||
                         "Your business"
                     );
+                    const ownerPlanName =
+    document.getElementById(
+        "ownerPlanName"
+    );
+
+const ownerPlanStatus =
+    document.getElementById(
+        "ownerPlanStatus"
+    );
+
+
+
+if (business.plan === "premium") {
+
+    ownerPlanName.textContent =
+        "Premium Plan";
+
+if (
+    business.planStatus === "active" &&
+    business.planExpiresAt
+) {
+
+    const expiryDate =
+        new Date(
+            business.planExpiresAt
+        );
+
+    ownerPlanStatus.textContent =
+        `Status: Active · Expires: ${
+            expiryDate.toLocaleDateString(
+                "en-NA",
+                {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            )
+        }`;
+
+} else {
+
+    ownerPlanStatus.textContent =
+        `Status: ${
+            business.planStatus ||
+            "Unknown"
+        }`;
+}
+
+    upgradePlanButton.style.display =
+        "none";
+
+} else {
+
+    ownerPlanName.textContent =
+        "Free Plan";
+
+    ownerPlanStatus.textContent =
+        "Status: Active";
+
+    upgradePlanButton.style.display =
+        "inline-block";
+}
 
 
                 document.getElementById(
