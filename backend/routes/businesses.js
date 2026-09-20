@@ -1163,21 +1163,16 @@ router.get(
             ) {
 
                 return res.status(401).json({
-
                     success: false,
-
-                    authenticated:
-                        false
-
+                    authenticated: false
                 });
             }
 
             const business =
                 await Business.findOne({
-                    id:
-                        Number(
-                            req.session.ownerBusinessId
-                        )
+                    id: Number(
+                        req.session.ownerBusinessId
+                    )
                 });
 
             if (!business) {
@@ -1186,26 +1181,27 @@ router.get(
                     null;
 
                 return res.status(401).json({
-
                     success: false,
-
-                    authenticated:
-                        false
-
+                    authenticated: false
                 });
             }
 
             return res.json({
 
                 success: true,
+                authenticated: true,
 
-                authenticated:
-                    true,
-
-                business:
-                    publicBusiness(
+                business: {
+                    ...publicBusiness(
                         business
-                    )
+                    ),
+
+                    planStartedAt:
+                        business.planStartedAt,
+
+                    planExpiresAt:
+                        business.planExpiresAt
+                }
 
             });
 
@@ -1217,16 +1213,13 @@ router.get(
             );
 
             return res.status(500).json({
-
                 success: false,
-
-                authenticated:
-                    false
-
+                authenticated: false
             });
         }
     }
 );
+
 // ========================================
 // CREATE PREMIUM REQUEST
 // OWNER ONLY
@@ -1245,7 +1238,7 @@ router.post(
                 return res.status(401).json({
                     success: false,
                     message:
-                        "Business owner authentication required."
+                        "Owner authentication required."
                 });
             }
 
@@ -1257,13 +1250,15 @@ router.post(
                     .toLowerCase();
 
             if (
-                billingCycle !== "monthly" &&
-                billingCycle !== "yearly"
+                ![
+                    "monthly",
+                    "yearly"
+                ].includes(billingCycle)
             ) {
                 return res.status(400).json({
                     success: false,
                     message:
-                        "Invalid billing cycle."
+                        "Please choose a valid Premium billing cycle."
                 });
             }
 
@@ -1295,8 +1290,10 @@ router.post(
 
             const existingRequest =
                 await PremiumRequest.findOne({
-                    businessId: business.id,
-                    status: "pending"
+                    businessId:
+                        business.id,
+                    status:
+                        "pending"
                 });
 
             if (existingRequest) {
@@ -1304,19 +1301,22 @@ router.post(
                     success: false,
                     message:
                         "This business already has a pending Premium request.",
+
                     request: {
                         billingCycle:
                             existingRequest.billingCycle,
+
                         amount:
                             existingRequest.amount,
+
                         reference:
                             existingRequest.reference,
+
                         status:
                             existingRequest.status
                     }
                 });
             }
-
             const amount =
                 billingCycle === "yearly"
                     ? 863.89
