@@ -1185,7 +1185,22 @@ router.get(
                     authenticated: false
                 });
             }
+            // Automatically expire Premium plan
+            if (
+                business.plan === "premium" &&
+                business.planStatus === "active" &&
+                business.planExpiresAt &&
+                new Date(business.planExpiresAt) <= new Date()
+            ) {
 
+                business.plan =
+                    "free";
+
+                business.planStatus =
+                    "expired";
+
+                await business.save();
+            }
             return res.json({
 
                 success: true,
