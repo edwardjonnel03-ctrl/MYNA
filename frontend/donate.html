@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Support MAYNA | Donate</title>
+
+    <style>
+        :root {
+            --orange: #ff7a00;
+            --orange-dark: #e96f00;
+            --dark: #151515;
+            --muted: #666;
+            --white: #ffffff;
+            --background: #f7f7f7;
+            --border: #e7e7e7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--dark);
+        }
+
+        /* HEADER */
+
+        .topbar {
+            background: #111;
+            color: white;
+        }
+
+        .nav {
+            max-width: 1100px;
+            margin: auto;
+            padding: 18px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: white;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .brand-circle {
+            width: 35px;
+            height: 35px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+            background: var(--orange);
+
+            color: white;
+            font-size: 14px;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: var(--orange);
+        }
+
+        /* HERO */
+
+        .hero {
+            padding: 75px 20px 120px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff7a00,
+                    #ff9d42
+                );
+
+            color: white;
+            text-align: center;
+        }
+
+        .hero-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+            background: rgba(255,255,255,.18);
+
+            font-size: 32px;
+        }
+
+        .hero h1 {
+            margin: 0 0 14px;
+
+            font-size: clamp(
+                36px,
+                6vw,
+                55px
+            );
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: auto;
+
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        /* DONATION CARD */
+
+        .donation-wrapper {
+            max-width: 720px;
+            margin: -70px auto 60px;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .donation-card {
+            background: white;
+
+            border: 1px solid var(--border);
+            border-radius: 20px;
+
+            padding: 40px;
+
+            box-shadow:
+                0 18px 50px
+                rgba(0,0,0,.10);
+        }
+
+        .donation-card h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 27px;
+        }
+
+        .intro {
+            max-width: 560px;
+            margin: 0 auto 30px;
+
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        /* AMOUNTS */
+
+        .amount-label {
+            display: block;
+
+            margin-bottom: 12px;
+
+            font-weight: 700;
+        }
+
+        .amount-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 18px;
+        }
+
+        .amount-button {
+            border: 2px solid var(--border);
+
+            background: white;
+            color: var(--dark);
+
+            padding: 15px 8px;
+
+            border-radius: 11px;
+
+            font-size: 16px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .amount-button:hover,
+        .amount-button.active {
+            border-color: var(--orange);
+            background: #fff4ea;
+            color: var(--orange-dark);
+        }
+
+        /* CUSTOM AMOUNT */
+
+        .custom-field {
+            display: flex;
+            align-items: center;
+
+            border: 2px solid var(--border);
+            border-radius: 11px;
+
+            overflow: hidden;
+
+            margin-bottom: 25px;
+        }
+
+        .currency {
+            padding: 14px 16px;
+
+            background: #f3f3f3;
+
+            font-weight: 800;
+        }
+
+        .custom-field input {
+            width: 100%;
+
+            border: none;
+            outline: none;
+
+            padding: 14px;
+
+            font-size: 17px;
+        }
+
+        /* BUTTON */
+
+        .continue-button {
+            width: 100%;
+
+            border: none;
+            border-radius: 11px;
+
+            padding: 16px;
+
+            background: var(--orange);
+            color: white;
+
+            font-size: 17px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .continue-button:hover {
+            background: var(--orange-dark);
+        }
+
+        /* MESSAGE */
+
+        .donation-message {
+            display: none;
+
+            margin-top: 20px;
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #fff4ea;
+            color: #8a4300;
+
+            line-height: 1.6;
+        }
+
+        /* INFO */
+
+        .support-info {
+            margin-top: 32px;
+            padding-top: 25px;
+
+            border-top: 1px solid var(--border);
+        }
+
+        .support-info h3 {
+            margin-top: 0;
+        }
+
+        .support-info ul {
+            padding-left: 20px;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .voluntary {
+            margin-top: 25px;
+
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
+
+        footer {
+            padding: 30px 20px;
+
+            background: #111;
+            color: #aaa;
+
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--orange);
+            text-decoration: none;
+        }
+
+        @media (max-width: 650px) {
+
+            .nav {
+                padding: 15px 18px;
+            }
+
+            .hero {
+                padding:
+                    55px 20px
+                    105px;
+            }
+
+            .donation-card {
+                padding: 27px 20px;
+            }
+
+            .amount-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+        /* EFT PAYMENT PANEL */
+
+.eft-panel {
+    display: none;
+    margin-top: 25px;
+    padding: 25px;
+
+    background: #fffaf5;
+    border: 1px solid #ffd5ad;
+    border-radius: 14px;
+}
+
+.eft-panel h3 {
+    margin: 0 0 8px;
+    color: #ff7a00;
+}
+
+.eft-intro {
+    margin-top: 0;
+    color: #666;
+}
+
+.bank-details {
+    margin-top: 20px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.bank-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.bank-row:last-child {
+    border-bottom: none;
+}
+
+.bank-row span {
+    color: #666;
+}
+
+.bank-row strong {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.eft-note {
+    margin-bottom: 0;
+    margin-top: 18px;
+
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+@media (max-width: 500px) {
+    .bank-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .bank-row strong {
+        text-align: left;
+    }
+}
+.bank-value {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.copy-button {
+    border: 1px solid #ff7a00;
+    background: white;
+    color: #ff7a00;
+
+    padding: 6px 10px;
+    border-radius: 7px;
+
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.copy-button:hover {
+    background: #ff7a00;
+    color: white;
+}
+
+@media (max-width: 500px) {
+    .bank-value {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <nav class="nav">
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+            <span class="brand-circle">
+                M
+            </span>
+
+            MAYNA
+        </a>
+
+        <a
+            href="index.html"
+            class="back-link"
+        >
+            Back to Home
+        </a>
+
+    </nav>
+
+</header>
+
+
+<section class="hero">
+
+    <div class="hero-icon">
+        ♥
+    </div>
+
+    <h1>Support MAYNA</h1>
+
+    <p>
+        Help us continue building a platform that
+        connects people with local businesses,
+        professionals and services.
+    </p>
+
+</section>
+
+
+<main class="donation-wrapper">
+
+    <section class="donation-card">
+
+        <h2>Make a Contribution</h2>
+
+        <p class="intro">
+            Every contribution can help MAYNA improve
+            its technology, maintain its services and
+            develop new features for our community.
+        </p>
+
+
+        <label class="amount-label">
+            Choose an amount
+        </label>
+
+        <div class="amount-grid">
+
+            <button
+                type="button"
+                class="amount-button"
+                data-amount="20"
+            >
+                N$20
+            </button>
+
+            <button
+                type="button"
+                class="amount-button"
+                data-amount="50"
+            >
+                N$50
+            </button>
+
+            <button
+                type="button"
+                class="amount-button"
+                data-amount="100"
+            >
+                N$100
+            </button>
+
+            <button
+                type="button"
+                class="amount-button"
+                data-amount="250"
+            >
+                N$250
+            </button>
+
+        </div>
+
+
+        <label
+            for="customAmount"
+            class="amount-label"
+        >
+            Or enter another amount
+        </label>
+
+        <div class="custom-field">
+
+            <span class="currency">
+                N$
+            </span>
+
+            <input
+                id="customAmount"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Enter amount"
+            >
+
+        </div>
+
+
+        <button
+            type="button"
+            id="continueButton"
+            class="continue-button"
+        >
+            Continue
+        </button>
+
+
+        <div
+            id="donationMessage"
+            class="donation-message"
+        ></div>
+        <div
+    id="eftPanel"
+    class="eft-panel"
+>
+
+    <h3>Bank / EFT Donation</h3>
+
+    <p class="eft-intro">
+        Transfer your selected contribution directly
+        to the MAYNA support account.
+    </p>
+
+    <div class="bank-details">
+
+        <div class="bank-row">
+            <span>Bank</span>
+            <strong>FNB Namibia</strong>
+        </div>
+
+        <div class="bank-row">
+            <span>Account Holder</span>
+            <strong>Chizungo Edward</strong>
+        </div>
+
+        <div class="bank-row">
+            <span>Account Type</span>
+            <strong>Current Account</strong>
+        </div>
+
+<div class="bank-row">
+    <span>Account Number</span>
+
+    <div class="bank-value">
+        <strong id="accountNumber">
+            64282006484
+        </strong>
+
+        <button
+            type="button"
+            class="copy-button"
+            id="copyAccountButton"
+        >
+            Copy
+        </button>
+    </div>
+</div>
+
+        <div class="bank-row">
+            <span>Amount</span>
+            <strong id="eftAmount">N$0</strong>
+        </div>
+
+<div class="bank-row">
+    <span>Payment Reference</span>
+
+    <div class="bank-value">
+        <strong id="eftReference">
+            MAYNA
+        </strong>
+
+        <button
+            type="button"
+            class="copy-button"
+            id="copyReferenceButton"
+        >
+            Copy
+        </button>
+    </div>
+</div>
+
+    </div>
+
+    <p class="eft-note">
+        Please use the payment reference shown above
+        when making your EFT. Never send your banking
+        password, PIN, card details or OTP to MAYNA.
+    </p>
+
+</div>
+
+
+        <div class="support-info">
+
+            <h3>What your support can help with</h3>
+
+            <ul>
+                <li>
+                    Website hosting and infrastructure
+                </li>
+
+                <li>
+                    Developing new MAYNA features
+                </li>
+
+                <li>
+                    Improving security and reliability
+                </li>
+
+                <li>
+                    Expanding MAYNA's business directory
+                </li>
+
+                <li>
+                    Supporting future mobile development
+                </li>
+            </ul>
+
+        </div>
+
+
+        <p class="voluntary">
+            Contributions are voluntary. You do not need
+            to contribute in order to search MAYNA,
+            contact businesses or use the platform's
+            public services.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    &copy; 2026 MAYNA.
+    All rights reserved.
+
+    &nbsp;|&nbsp;
+
+    <a href="privacy.html">
+        Privacy Policy
+    </a>
+
+    &nbsp;|&nbsp;
+
+    <a href="contact.html">
+        Contact & Support
+    </a>
+
+</footer>
+
+
+<script>
+    const amountButtons =
+        document.querySelectorAll(
+            ".amount-button"
+        );
+
+    const customAmount =
+        document.getElementById(
+            "customAmount"
+        );
+
+    const continueButton =
+        document.getElementById(
+            "continueButton"
+        );
+
+const donationMessage =
+    document.getElementById(
+        "donationMessage"
+    );
+
+const eftPanel =
+    document.getElementById(
+        "eftPanel"
+    );
+
+const eftAmount =
+    document.getElementById(
+        "eftAmount"
+    );
+
+const eftReference =
+    document.getElementById(
+        "eftReference"
+    );
+
+const copyAccountButton =
+    document.getElementById(
+        "copyAccountButton"
+    );
+
+const accountNumber =
+    document.getElementById(
+        "accountNumber"
+    );    
+
+let selectedAmount = 0;
+const donationReference =
+    "MAYNA-" +
+    Math.floor(
+        100000 +
+        Math.random() * 900000
+    );
+
+function showEftPanel(amount) {
+
+    if (
+        !Number.isFinite(amount) ||
+        amount < 1
+    ) {
+        return;
+    }
+
+
+    eftAmount.textContent =
+        `N$${amount.toLocaleString()}`;
+
+eftReference.textContent =
+    donationReference;
+
+    donationMessage.style.display =
+        "none";
+
+    eftPanel.style.display =
+        "block";
+}
+amountButtons.forEach(button => {
+
+    button.addEventListener("click", function () {
+
+        amountButtons.forEach(item => {
+            item.classList.remove("active");
+        });
+
+        this.classList.add("active");
+
+        selectedAmount = Number(
+            this.dataset.amount
+        );
+
+        customAmount.value = "";
+
+        showEftPanel(selectedAmount);
+    });
+
+});
+
+
+    customAmount.addEventListener(
+        "input",
+        () => {
+
+            amountButtons.forEach(
+                item =>
+                    item.classList.remove(
+                        "active"
+                    )
+            );
+
+            selectedAmount =
+                Number(customAmount.value);
+        }
+    );
+
+
+continueButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            !Number.isFinite(selectedAmount) ||
+            selectedAmount < 1
+        ) {
+
+            eftPanel.style.display = "none";
+
+            donationMessage.style.display =
+                "block";
+
+            donationMessage.textContent =
+                "Please choose or enter a valid contribution amount.";
+
+            return;
+        }
+
+        const reference =
+            "MAYNA" +
+            Math.floor(
+                100000 +
+                Math.random() * 900000
+            );
+
+        eftAmount.textContent =
+            `N$${selectedAmount.toLocaleString()}`;
+
+        eftReference.textContent =
+            reference;
+
+        donationMessage.style.display =
+            "none";
+
+        eftPanel.style.display =
+            "block";
+
+        eftPanel.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    }
+);
+copyAccountButton.addEventListener(
+    "click",
+    async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(
+                accountNumber.textContent.trim()
+            );
+
+            const originalText =
+                copyAccountButton.textContent;
+
+            copyAccountButton.textContent =
+                "Copied ✓";
+
+            setTimeout(() => {
+                copyAccountButton.textContent =
+                    originalText;
+            }, 1800);
+
+        } catch (error) {
+
+            console.error(
+                "COPY ACCOUNT ERROR:",
+                error
+            );
+        }
+    }
+);
+copyReferenceButton.addEventListener(
+    "click",
+    async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(
+                eftReference.textContent.trim()
+            );
+
+            const originalText =
+                copyReferenceButton.textContent;
+
+            copyReferenceButton.textContent =
+                "Copied ✓";
+
+            setTimeout(() => {
+                copyReferenceButton.textContent =
+                    originalText;
+            }, 1800);
+
+        } catch (error) {
+
+            console.error(
+                "COPY REFERENCE ERROR:",
+                error
+            );
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>
