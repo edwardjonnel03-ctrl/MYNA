@@ -422,8 +422,98 @@
 
 </main>
 
+<!-- MAYNA REGISTRATION MODAL -->
+<div
+    class="mayna-register-modal"
+    id="maynaRegisterModal"
+    aria-hidden="true"
+>
+    <div
+        class="mayna-register-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="maynaRegisterModalTitle"
+    >
+        <div
+            class="mayna-register-modal-icon"
+            id="maynaRegisterModalIcon"
+        >
+            &#10003;
+        </div>
 
+        <h2 id="maynaRegisterModalTitle">
+            MAYNA
+        </h2>
+
+        <p id="maynaRegisterModalMessage"></p>
+
+        <button
+            type="button"
+            class="mayna-register-modal-button"
+            id="maynaRegisterModalButton"
+        >
+            OK
+        </button>
+    </div>
+</div>
 <script>
+const maynaRegisterModal =
+    document.getElementById("maynaRegisterModal");
+
+const maynaRegisterModalTitle =
+    document.getElementById("maynaRegisterModalTitle");
+
+const maynaRegisterModalMessage =
+    document.getElementById("maynaRegisterModalMessage");
+
+const maynaRegisterModalIcon =
+    document.getElementById("maynaRegisterModalIcon");
+
+const maynaRegisterModalButton =
+    document.getElementById("maynaRegisterModalButton");
+
+
+function showMaynaRegisterAlert(
+    message,
+    title = "MAYNA",
+    type = "success"
+) {
+    return new Promise((resolve) => {
+
+        maynaRegisterModalTitle.textContent =
+            title;
+
+        maynaRegisterModalMessage.textContent =
+            message;
+
+        maynaRegisterModalIcon.textContent =
+            type === "error" ? "!" : "\u2713";
+
+        maynaRegisterModal.classList.add("show");
+
+        maynaRegisterModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        maynaRegisterModalButton.onclick =
+            function () {
+
+                maynaRegisterModal.classList.remove(
+                    "show"
+                );
+
+                maynaRegisterModal.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                resolve();
+            };
+
+        maynaRegisterModalButton.focus();
+    });
+}    
 
     const form =
         document.getElementById(
@@ -589,15 +679,15 @@ services:
                 }
 
 
-                alert(
-                    "🎉 " +
-                    business.businessName +
-                    " has been registered on MAYNA!"
-                );
+await showMaynaRegisterAlert(
+    business.businessName +
+    " has been registered on MAYNA!",
+    "Registration Successful",
+    "success"
+);
 
-
-                window.location.href =
-                    "dashboard.html";
+window.location.href =
+    "dashboard.html";
 
 
             } catch (error) {
@@ -607,10 +697,12 @@ services:
                     error
                 );
 
-                alert(
-                    "MAYNA could not register the business.\n\n" +
-                    error.message
-                );
+await showMaynaRegisterAlert(
+    "MAYNA could not register the business.\n\n" +
+    error.message,
+    "Registration Failed",
+    "error"
+);
 
 
             } finally {

@@ -116,18 +116,4 @@ const menuButton =
         "menuButton"
     );
 
-
-if (menuButton) {
-
-    menuButton.addEventListener(
-        "click",
-        function () {
-
-            alert(
-                "MAYNA mobile navigation is coming in the next build."
-            );
-
-        }
-    );
-
-}
+    

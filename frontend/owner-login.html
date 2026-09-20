@@ -4,7 +4,7 @@
 
 <head>
 
-```
+
 <meta charset="UTF-8">
 
 <meta
@@ -37,14 +37,90 @@
         transform: translateX(3px);
     }
 
+
+/* MAYNA OWNER LOGIN MODAL */
+.mayna-login-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 9999;
+}
+
+.mayna-login-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mayna-login-modal-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 25px;
+    background: #ffffff;
+    border: 2px solid #ff7a00;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.mayna-login-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ff7a00;
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.mayna-login-modal-card h2 {
+    margin: 0 0 10px;
+    color: #222222;
+    font-size: 25px;
+}
+
+.mayna-login-modal-card p {
+    margin: 0 0 24px;
+    color: #555555;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.mayna-login-modal-button {
+    min-width: 120px;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 10px;
+    background: #ff7a00;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mayna-login-modal-button:hover {
+    opacity: 0.9;
+}
 </style>
-```
+
 
 </head>
 
 <body>
 
-```
+
 <!-- NAVIGATION -->
 
 <nav class="navbar">
@@ -204,11 +280,80 @@
 
 </main>
 
+<!-- MAYNA OWNER LOGIN MODAL -->
+<div
+    class="mayna-login-modal"
+    id="maynaLoginModal"
+    aria-hidden="true"
+>
+    <div
+        class="mayna-login-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="maynaLoginModalTitle"
+    >
+        <div class="mayna-login-modal-icon">
+            !
+        </div>
 
+        <h2 id="maynaLoginModalTitle">
+            Login Failed
+        </h2>
 
-<!-- LOGIN SCRIPT -->
+        <p id="maynaLoginModalMessage"></p>
+
+        <button
+            type="button"
+            class="mayna-login-modal-button"
+            id="maynaLoginModalButton"
+        >
+            OK
+        </button>
+    </div>
+</div>
 
 <script>
+
+const maynaLoginModal =
+    document.getElementById("maynaLoginModal");
+
+const maynaLoginModalMessage =
+    document.getElementById("maynaLoginModalMessage");
+
+const maynaLoginModalButton =
+    document.getElementById("maynaLoginModalButton");
+
+function showMaynaLoginAlert(message) {
+    return new Promise((resolve) => {
+
+        maynaLoginModalMessage.textContent =
+            message;
+
+        maynaLoginModal.classList.add("show");
+
+        maynaLoginModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        maynaLoginModalButton.onclick =
+            function () {
+
+                maynaLoginModal.classList.remove(
+                    "show"
+                );
+
+                maynaLoginModal.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                resolve();
+            };
+
+        maynaLoginModalButton.focus();
+    });
+}
 
     const form =
         document.getElementById(
@@ -306,10 +451,10 @@
                 );
 
 
-                alert(
-                    "MAYNA login failed.\n\n" +
-                    error.message
-                );
+await showMaynaLoginAlert(
+    "MAYNA login failed.\n\n" +
+    error.message
+);
 
 
             } finally {
@@ -326,7 +471,7 @@
     );
 
 </script>
-```
+
 
 </body>
 

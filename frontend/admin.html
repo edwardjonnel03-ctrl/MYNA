@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en">
 
@@ -12,7 +12,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Admin Dashboard — MAYNA</title>
+<title>Admin Dashboard â€” MAYNA</title>
 
 <link
     rel="stylesheet"
@@ -213,6 +213,168 @@
 
     }
 
+/* =========================================
+   MAYNA ADMIN MODAL
+========================================= */
+
+.mayna-admin-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    background: rgba(8, 12, 18, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+
+    z-index: 9999;
+}
+
+.mayna-admin-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mayna-admin-modal-card {
+    width: min(430px, 100%);
+    padding: 42px 34px 30px;
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255, 143, 43, 0.12),
+            transparent 45%
+        ),
+        white;
+
+    border: 2px solid #ff6a00;
+    border-radius: 26px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.28),
+        0 0 35px rgba(255, 106, 0, 0.16);
+
+    transform:
+        translateY(20px)
+        scale(0.94);
+
+    transition: transform 0.3s ease;
+}
+
+.mayna-admin-modal.show
+.mayna-admin-modal-card {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+.mayna-admin-modal-icon {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9d00,
+            #ff5a00
+        );
+
+    color: white;
+    font-size: 44px;
+    font-weight: 800;
+
+    box-shadow:
+        0 0 0 12px rgba(255, 106, 0, 0.10),
+        0 12px 30px rgba(255, 90, 0, 0.25);
+}
+
+.mayna-admin-modal-card h2 {
+    margin: 0 0 12px;
+    font-size: 30px;
+    color: #111827;
+}
+
+.mayna-admin-modal-card p {
+    margin: 0 0 28px;
+    color: #667085;
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.mayna-admin-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.mayna-admin-modal-actions button {
+    flex: 1;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mayna-modal-confirm {
+    background:
+        linear-gradient(
+            135deg,
+            #ff9d00,
+            #ff5a00
+        );
+
+    color: white;
+
+    box-shadow:
+        0 10px 25px rgba(255, 90, 0, 0.22);
+}
+
+.mayna-modal-cancel {
+    background: #f1f3f5;
+    color: #344054;
+}
+
+.mayna-modal-confirm:hover,
+.mayna-modal-cancel:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+
+    .mayna-admin-modal-card {
+        padding: 36px 22px 24px;
+        border-radius: 22px;
+    }
+
+    .mayna-admin-modal-icon {
+        width: 76px;
+        height: 76px;
+        font-size: 38px;
+    }
+
+    .mayna-admin-modal-card h2 {
+        font-size: 26px;
+    }
+}
 </style>
 ```
 
@@ -311,9 +473,160 @@
 
 </main>
 
+<!-- MAYNA ADMIN MODAL -->
+<div
+    class="mayna-admin-modal"
+    id="maynaAdminModal"
+    aria-hidden="true"
+>
+    <div
+        class="mayna-admin-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="maynaAdminModalTitle"
+    >
 
+        <div
+            class="mayna-admin-modal-icon"
+            id="maynaAdminModalIcon"
+        >
+            &#10003;
+        </div>
+
+        <h2 id="maynaAdminModalTitle">
+            MAYNA
+        </h2>
+
+        <p id="maynaAdminModalMessage"></p>
+
+        <div class="mayna-admin-modal-actions">
+
+            <button
+                type="button"
+                class="mayna-modal-cancel"
+                id="maynaModalCancel"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                class="mayna-modal-confirm"
+                id="maynaModalConfirm"
+            >
+                OK
+            </button>
+
+        </div>
+
+    </div>
+</div>
 <script>
 
+// =========================================
+// MAYNA ADMIN MODAL CONTROLLER
+// =========================================
+
+const maynaAdminModal =
+    document.getElementById("maynaAdminModal");
+
+const maynaAdminModalTitle =
+    document.getElementById("maynaAdminModalTitle");
+
+const maynaAdminModalMessage =
+    document.getElementById("maynaAdminModalMessage");
+
+const maynaAdminModalIcon =
+    document.getElementById("maynaAdminModalIcon");
+
+const maynaModalCancel =
+    document.getElementById("maynaModalCancel");
+
+const maynaModalConfirm =
+    document.getElementById("maynaModalConfirm");
+
+
+function showMaynaAlert(
+    message,
+    title = "MAYNA",
+    type = "success"
+) {
+
+    return new Promise((resolve) => {
+
+        maynaAdminModalTitle.textContent = title;
+        maynaAdminModalMessage.textContent = message;
+
+        maynaAdminModalIcon.textContent =
+            type === "error" ? "!" : "âœ“";
+
+        maynaModalCancel.style.display = "none";
+        maynaModalConfirm.textContent = "OK";
+
+        maynaAdminModal.classList.add("show");
+
+        maynaAdminModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        maynaModalConfirm.onclick = function () {
+
+            closeMaynaAdminModal();
+
+            resolve();
+        };
+    });
+}
+
+
+function showMaynaConfirm(
+    message,
+    title = "Confirm Action"
+) {
+
+    return new Promise((resolve) => {
+
+        maynaAdminModalTitle.textContent = title;
+        maynaAdminModalMessage.textContent = message;
+        maynaAdminModalIcon.textContent = "!";
+
+        maynaModalCancel.style.display = "";
+        maynaModalConfirm.textContent = "Confirm";
+
+        maynaAdminModal.classList.add("show");
+
+        maynaAdminModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        maynaModalConfirm.onclick = function () {
+
+            closeMaynaAdminModal();
+
+            resolve(true);
+        };
+
+        maynaModalCancel.onclick = function () {
+
+            closeMaynaAdminModal();
+
+            resolve(false);
+        };
+    });
+}
+
+
+function closeMaynaAdminModal() {
+
+    maynaAdminModal.classList.remove("show");
+
+    maynaAdminModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
     // =========================================
     // CHECK BACKEND ADMIN SESSION
     // =========================================
@@ -423,10 +736,11 @@
                 error
             );
 
-            alert(
-                "Could not log out. Please try again."
-            );
-
+await showMaynaAlert(
+    "Could not log out. Please try again.",
+    "Logout Failed",
+    "error"
+);
         }
 
     }
@@ -459,10 +773,11 @@
                 : "unverify";
 
 
-        const confirmed =
-            confirm(
-                `Are you sure you want to ${action} this business?`
-            );
+const confirmed =
+    await showMaynaConfirm(
+        `Are you sure you want to ${action} this business?`,
+        "Update Verification"
+    );
 
 
         if (!confirmed) {
@@ -520,9 +835,11 @@
             }
 
 
-            alert(
-                result.message
-            );
+await showMaynaAlert(
+    result.message,
+    "Verification Updated",
+    "success"
+);
 
 
             loadBusinesses();
@@ -535,10 +852,12 @@
             );
 
 
-            alert(
-                error.message ||
-                "Could not update verification status."
-            );
+await showMaynaAlert(
+    error.message ||
+        "Could not update verification status.",
+    "Verification Failed",
+    "error"
+);
 
         }
 
@@ -553,10 +872,13 @@ async function deleteBusiness(
     businessName
 ) {
 
-    const confirmed =
-        confirm(
-            `Permanently delete "${businessName}"?\n\nThis cannot be undone.`
-        );
+const confirmed =
+    await showMaynaConfirm(
+        `Permanently delete "${businessName}"?
+
+This cannot be undone.`,
+        "Delete Business"
+    );
 
 
     if (!confirmed) {
@@ -604,9 +926,11 @@ async function deleteBusiness(
         }
 
 
-        alert(
-            result.message
-        );
+await showMaynaAlert(
+    result.message,
+    "Business Deleted",
+    "success"
+);
 
 
         loadBusinesses();
@@ -620,10 +944,12 @@ async function deleteBusiness(
         );
 
 
-        alert(
-            error.message ||
-            "Could not delete business."
-        );
+await showMaynaAlert(
+    error.message ||
+        "Could not delete business.",
+    "Delete Failed",
+    "error"
+);
     }
 
 }
@@ -756,7 +1082,7 @@ async function deleteBusiness(
 
                                 <div class="verified-status">
 
-                                    ✓ Verified
+                                    âœ“ Verified
 
                                 </div>
 
@@ -766,7 +1092,7 @@ async function deleteBusiness(
 
                                 <div class="unverified-status">
 
-                                    ○ Not Verified
+                                    â—‹ Not Verified
 
                                 </div>
 
@@ -967,8 +1293,6 @@ const town =
     startAdminDashboard();
 
 </script>
-```
 
 </body>
-
 </html>

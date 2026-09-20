@@ -176,7 +176,80 @@
             }
 
         }
+/* MAYNA DASHBOARD MODAL */
+.mayna-dashboard-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 9999;
+}
 
+.mayna-dashboard-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mayna-dashboard-modal-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 25px;
+    background: #ffffff;
+    border: 2px solid #ff7a00;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.mayna-dashboard-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ff7a00;
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.mayna-dashboard-modal-card h2 {
+    margin: 0 0 10px;
+    color: #222222;
+    font-size: 25px;
+}
+
+.mayna-dashboard-modal-card p {
+    margin: 0 0 24px;
+    color: #555555;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.mayna-dashboard-modal-button {
+    min-width: 120px;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 10px;
+    background: #ff7a00;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mayna-dashboard-modal-button:hover {
+    opacity: 0.9;
+}
     </style>
 
 </head>
@@ -563,8 +636,94 @@
 
 </main>
 
+<!-- MAYNA DASHBOARD MODAL -->
+<div
+    class="mayna-dashboard-modal"
+    id="maynaDashboardModal"
+    aria-hidden="true"
+>
+    <div
+        class="mayna-dashboard-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="maynaDashboardModalTitle"
+    >
+        <div
+            class="mayna-dashboard-modal-icon"
+            id="maynaDashboardModalIcon"
+        >
+            !
+        </div>
 
+        <h2 id="maynaDashboardModalTitle">
+            MAYNA
+        </h2>
+
+        <p id="maynaDashboardModalMessage"></p>
+
+        <button
+            type="button"
+            class="mayna-dashboard-modal-button"
+            id="maynaDashboardModalButton"
+        >
+            OK
+        </button>
+    </div>
+</div>
 <script>
+
+const maynaDashboardModal =
+    document.getElementById("maynaDashboardModal");
+
+const maynaDashboardModalTitle =
+    document.getElementById("maynaDashboardModalTitle");
+
+const maynaDashboardModalMessage =
+    document.getElementById("maynaDashboardModalMessage");
+
+const maynaDashboardModalButton =
+    document.getElementById("maynaDashboardModalButton");
+
+
+function showMaynaDashboardAlert(
+    message,
+    title = "MAYNA"
+) {
+    return new Promise((resolve) => {
+
+        maynaDashboardModalTitle.textContent =
+            title;
+
+        maynaDashboardModalMessage.textContent =
+            message;
+
+        maynaDashboardModal.classList.add(
+            "show"
+        );
+
+        maynaDashboardModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        maynaDashboardModalButton.onclick =
+            function () {
+
+                maynaDashboardModal.classList.remove(
+                    "show"
+                );
+
+                maynaDashboardModal.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                resolve();
+            };
+
+        maynaDashboardModalButton.focus();
+    });
+}
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -927,9 +1086,10 @@ addServiceButton.addEventListener(
                 "image/"
             )
         ) {
-            alert(
-                "Please select an image file."
-            );
+await showMaynaDashboardAlert(
+    "Please select an image file.",
+    "Invalid Image"
+);
 
             photoInput.value = "";
 
@@ -940,9 +1100,10 @@ addServiceButton.addEventListener(
             file.size >
             5 * 1024 * 1024
         ) {
-            alert(
-                "Image must be smaller than 5 MB."
-            );
+await showMaynaDashboardAlert(
+    "Image must be smaller than 5 MB.",
+    "Image Too Large"
+);
 
             photoInput.value = "";
 
@@ -1019,10 +1180,11 @@ addServiceButton.addEventListener(
 
         } catch (error) {
 
-            alert(
-                "Could not upload image: " +
-                error.message
-            );
+await showMaynaDashboardAlert(
+    "Could not upload image: " +
+    error.message,
+    "Upload Failed"
+);
         }
 
         photoInput.value = "";
@@ -1049,9 +1211,10 @@ galleryInput.addEventListener(
                     "image/"
                 )
             ) {
-                alert(
-                    "Please select image files only."
-                );
+await showMaynaDashboardAlert(
+    "Please select image files only.",
+    "Invalid Image"
+);
                 continue;
             }
 
@@ -1059,10 +1222,23 @@ galleryInput.addEventListener(
                 file.size >
                 5 * 1024 * 1024
             ) {
-                alert(
-                    file.name +
-                    " is larger than 5 MB."
-                );
+if (
+    file.size >
+    5 * 1024 * 1024
+) {
+    await showMaynaDashboardAlert(
+        file.name +
+        " is larger than 5 MB.",
+        "Image Too Large"
+    );
+
+    continue;
+}
+await showMaynaDashboardAlert(
+    file.name +
+    " is larger than 5 MB.",
+    "Image Too Large"
+);
                 continue;
             }
 
@@ -1135,12 +1311,13 @@ galleryInput.addEventListener(
 
             } catch (error) {
 
-                alert(
-                    "Could not upload " +
-                    file.name +
-                    ": " +
-                    error.message
-                );
+await showMaynaDashboardAlert(
+    "Could not upload " +
+    file.name +
+    ": " +
+    error.message,
+    "Upload Failed"
+);
             }
         }
 
@@ -1346,9 +1523,10 @@ showGallery();
 
                 if (!businessId) {
 
-                    alert(
-                        "Your business has not loaded yet."
-                    );
+await showMaynaDashboardAlert(
+    "Your business has not loaded yet.",
+    "Please Wait"
+);
 
                     return;
                 }

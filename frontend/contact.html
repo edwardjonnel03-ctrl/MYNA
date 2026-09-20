@@ -200,6 +200,218 @@
                 padding: 24px;
             }
         }
+        /* =========================================
+   MAYNA SUCCESS MODAL
+========================================= */
+
+.mayna-modal {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(8, 12, 18, 0.72);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+
+    z-index: 9999;
+}
+
+.mayna-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mayna-modal-card {
+    position: relative;
+
+    width: min(440px, 100%);
+
+    padding: 48px 38px 34px;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255, 143, 43, 0.12),
+            transparent 42%
+        ),
+        white;
+
+    border: 2px solid #ff6a00;
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.28),
+        0 0 35px rgba(255, 106, 0, 0.16);
+
+    transform:
+        translateY(20px)
+        scale(0.94);
+
+    transition:
+        transform 0.3s ease;
+}
+
+.mayna-modal.show .mayna-modal-card {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* Orange success circle */
+
+.success-icon {
+    width: 105px;
+    height: 105px;
+
+    margin:
+        0 auto
+        28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9d00,
+            #ff5a00
+        );
+
+    box-shadow:
+        0 0 0 14px rgba(255, 106, 0, 0.10),
+        0 12px 30px rgba(255, 90, 0, 0.25);
+}
+
+.success-icon span {
+    color: white;
+
+    font-size: 54px;
+    font-weight: 800;
+
+    line-height: 1;
+}
+
+
+/* Modal text */
+
+.mayna-modal-card h2 {
+    margin:
+        0 0
+        14px;
+
+    font-family:
+        "Space Grotesk",
+        sans-serif;
+
+    font-size: 34px;
+
+    color: #111827;
+}
+
+.mayna-modal-card p {
+    margin:
+        0 auto
+        30px;
+
+    color: #667085;
+
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+
+/* Orange OK button */
+
+.modal-ok-button {
+    width: 100%;
+
+    border: none;
+
+    padding: 15px 24px;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9d00,
+            #ff5a00
+        );
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px rgba(255, 90, 0, 0.24);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.modal-ok-button:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 14px 30px rgba(255, 90, 0, 0.32);
+}
+
+.modal-ok-button:active {
+    transform:
+        translateY(0);
+}
+
+
+/* Mobile */
+
+@media (max-width: 520px) {
+
+    .mayna-modal-card {
+        padding:
+            40px 24px
+            26px;
+
+        border-radius: 22px;
+    }
+
+    .success-icon {
+        width: 88px;
+        height: 88px;
+    }
+
+    .success-icon span {
+        font-size: 46px;
+    }
+
+    .mayna-modal-card h2 {
+        font-size: 28px;
+    }
+}
     </style>
 </head>
 
@@ -381,6 +593,46 @@
     </div>
 
 </main>
+<!-- =========================
+     MAYNA SUCCESS MODAL
+========================= -->
+
+<div
+    class="mayna-modal"
+    id="successModal"
+    aria-hidden="true"
+>
+    <div
+        class="mayna-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="successModalTitle"
+    >
+
+        <div class="success-icon">
+           <span>&#10003;</span>
+        </div>
+
+        <h2 id="successModalTitle">
+            Message Sent!
+        </h2>
+
+<p id="successModalMessage">
+            Your message has been received.
+            <br>
+            MAYNA support will review it.
+        </p>
+
+        <button
+            type="button"
+            class="modal-ok-button"
+            id="modalOkButton"
+        >
+            OK
+        </button>
+
+    </div>
+</div>
 
 <script>
     const supportForm =
@@ -390,7 +642,63 @@
         supportForm.querySelector(
             ".support-submit"
         );
+    
+        const successModal =
+    document.getElementById(
+        "successModal"
+    );
 
+const modalOkButton =
+    document.getElementById(
+        "modalOkButton"
+    );
+const successModalTitle =
+    document.getElementById(
+        "successModalTitle"
+    );
+
+const successModalMessage =
+    document.getElementById(
+        "successModalMessage"
+    );    
+    
+    const successModalTitle =
+    document.getElementById(
+        "successModalTitle"
+    );
+
+const successModalMessage =
+    document.getElementById(
+        "successModalMessage"
+    );
+
+
+function closeSuccessModal() {
+
+    successModal.classList.remove(
+        "show"
+    );
+
+    successModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+modalOkButton.addEventListener(
+    "click",
+    closeSuccessModal
+);
+
+successModal.addEventListener(
+    "click",
+    function (event) {
+
+        if (event.target === successModal) {
+            closeSuccessModal();
+        }
+    }
+);
     supportForm.addEventListener(
         "submit",
         async function (event) {
@@ -457,16 +765,33 @@
                     );
                 }
 
-                alert(result.message);
+supportForm.reset();
 
-                supportForm.reset();
+successModal.classList.add("show");
+successModal.setAttribute(
+    "aria-hidden",
+    "false"
+);
+
+modalOkButton.focus();
 
             } catch (error) {
 
-                alert(
-                    error.message ||
-                    "Something went wrong. Please try again."
-                );
+successModalTitle.textContent =
+    "Message Not Sent";
+
+successModalMessage.textContent =
+    error.message ||
+    "Something went wrong. Please try again.";
+
+successModal.classList.add("show");
+
+successModal.setAttribute(
+    "aria-hidden",
+    "false"
+);
+
+modalOkButton.focus();
 
             } finally {
 
