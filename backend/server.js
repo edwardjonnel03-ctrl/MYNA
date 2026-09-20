@@ -1288,18 +1288,38 @@ if (premiumRequest.status === "confirmed") {
                 const expiresAt =
                     new Date(startedAt);
 
-                if (
-                    premiumRequest.billingCycle ===
-                    "yearly"
-                ) {
-                    expiresAt.setFullYear(
-                        expiresAt.getFullYear() + 1
-                    );
-                } else {
-                    expiresAt.setMonth(
-                        expiresAt.getMonth() + 1
-                    );
-                }
+if (
+    premiumRequest.billingCycle ===
+    "yearly"
+) {
+    expiresAt.setFullYear(
+        expiresAt.getFullYear() + 1
+    );
+} else {
+
+    const originalDay =
+        expiresAt.getDate();
+
+    expiresAt.setDate(1);
+
+    expiresAt.setMonth(
+        expiresAt.getMonth() + 1
+    );
+
+    const lastDayOfTargetMonth =
+        new Date(
+            expiresAt.getFullYear(),
+            expiresAt.getMonth() + 1,
+            0
+        ).getDate();
+
+    expiresAt.setDate(
+        Math.min(
+            originalDay,
+            lastDayOfTargetMonth
+        )
+    );
+}
 
                 business.plan =
                     "premium";
@@ -1376,7 +1396,7 @@ if (premiumRequest.status === "confirmed") {
         }
     }
 );
-// =========================================
+
 // =========================================
 // BUSINESS ROUTES
 // =========================================
