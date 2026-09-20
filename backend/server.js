@@ -1223,6 +1223,47 @@ app.patch(
                         "Premium request not found."
                 });
             }
+            // A confirmed payment is final.
+// Do not allow it to be confirmed again or reversed.
+if (premiumRequest.status === "confirmed") {
+
+    if (status === "confirmed") {
+
+        return res.json({
+            success: true,
+            message:
+                "This Premium payment is already confirmed.",
+            request: {
+                id:
+                    premiumRequest._id,
+
+                businessId:
+                    premiumRequest.businessId,
+
+                billingCycle:
+                    premiumRequest.billingCycle,
+
+                amount:
+                    premiumRequest.amount,
+
+                reference:
+                    premiumRequest.reference,
+
+                status:
+                    premiumRequest.status,
+
+                confirmedAt:
+                    premiumRequest.confirmedAt
+            }
+        });
+    }
+
+    return res.status(409).json({
+        success: false,
+        message:
+            "A confirmed Premium payment cannot be changed back to pending or rejected."
+    });
+}
 
             // Confirming payment activates Premium.
             if (status === "confirmed") {

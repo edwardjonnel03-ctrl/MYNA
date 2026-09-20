@@ -2317,6 +2317,13 @@ async function loadPremiumRequestInbox() {
                         );
                     }
                 );
+                if (request.status === "confirmed") {
+
+    statusSelect.disabled = true;
+
+    statusSelect.title =
+        "Confirmed Premium payments are final.";
+}
 
                 statusSelect.addEventListener(
                     "change",
