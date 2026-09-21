@@ -452,7 +452,7 @@
 
 <option value="Recreational Center">
     Recreational Center
-</option>                    
+</option>
 
                 </select>
 
@@ -576,12 +576,16 @@
             multiple
         >
 
-        <p>
-            You can select multiple photos.
-            Maximum 5 MB per image.
-        </p>
+<p>
+    You can select multiple photos.
+    Maximum 5 MB per image.
+</p>
 
-        <div id="galleryPreview"></div>
+<p id="galleryPlanMessage">
+    Checking your gallery allowance...
+</p>
+
+<div id="galleryPreview"></div>
 
     </div>
 
@@ -845,6 +849,9 @@ const galleryPreview =
 
 let galleryImages = [];
 let businessServices = [];
+
+let ownerHasActivePremium = false;
+let ownerGalleryLimit = 3;
 const servicesList =
     document.getElementById(
         "servicesList"
@@ -885,7 +892,7 @@ const addServiceButton =
         window.location.href =
             "premium.html";
     }
-);   
+);
 
 
         function showPhoto(imageSource) {
@@ -1301,6 +1308,21 @@ galleryInput.addEventListener(
         if (files.length === 0) {
             return;
         }
+        if (
+    galleryImages.length +
+    files.length >
+    ownerGalleryLimit
+) {
+    await showMaynaDashboardAlert(
+        ownerHasActivePremium
+            ? "Premium businesses can have up to 20 gallery photos."
+            : "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos.",
+        "Gallery Limit"
+    );
+
+    galleryInput.value = "";
+    return;
+}
 
         for (const file of files) {
 
@@ -1316,10 +1338,6 @@ await showMaynaDashboardAlert(
                 continue;
             }
 
-            if (
-                file.size >
-                5 * 1024 * 1024
-            ) {
 if (
     file.size >
     5 * 1024 * 1024
@@ -1332,13 +1350,6 @@ if (
 
     continue;
 }
-await showMaynaDashboardAlert(
-    file.name +
-    " is larger than 5 MB.",
-    "Image Too Large"
-);
-                continue;
-            }
 
             const imageData =
                 await new Promise(
@@ -1468,6 +1479,35 @@ await showMaynaDashboardAlert(
 
                 businessId =
                     business.id;
+
+                const premiumExpiry =
+    business.planExpiresAt
+        ? new Date(
+            business.planExpiresAt
+        )
+        : null;
+
+ownerHasActivePremium =
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    premiumExpiry &&
+    premiumExpiry > new Date();
+
+ownerGalleryLimit =
+    ownerHasActivePremium
+        ? 20
+        : 3;
+        const galleryPlanMessage =
+    document.getElementById(
+        "galleryPlanMessage"
+    );
+
+if (galleryPlanMessage) {
+    galleryPlanMessage.textContent =
+        ownerHasActivePremium
+            ? "Premium Plan: You can add up to 20 gallery photos."
+            : "Free Plan: You can add up to 3 gallery photos. Upgrade to Premium for up to 20.";
+}
 
 
                 ownerBusinessName.textContent =

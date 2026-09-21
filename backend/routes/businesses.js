@@ -2123,15 +2123,40 @@ if (validationError) {
                     req.body.image;
             }
 
-            if (
-                req.body.gallery !==
-                undefined
-            ) {
-                business.gallery =
-                    Array.isArray(req.body.gallery)
-                        ? req.body.gallery
-                        : [];
-            }
+if (
+    req.body.gallery !==
+    undefined
+) {
+    const requestedGallery =
+        Array.isArray(req.body.gallery)
+            ? req.body.gallery
+            : [];
+
+    const hasActivePremium =
+        business.plan === "premium" &&
+        business.planStatus === "active" &&
+        business.planExpiresAt &&
+        business.planExpiresAt > new Date();
+
+    const galleryLimit =
+        hasActivePremium ? 20 : 3;
+
+    if (
+        requestedGallery.length >
+        galleryLimit
+    ) {
+        return res.status(403).json({
+            success: false,
+            message:
+                hasActivePremium
+                    ? "Premium businesses can have up to 20 gallery photos."
+                    : "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos."
+        });
+    }
+
+    business.gallery =
+        requestedGallery;
+}
 
             if (
                 req.body.services !==
