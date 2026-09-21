@@ -397,6 +397,12 @@ router.get(
                         .trim()
                         .slice(0, 80)
                     : "";
+                    const town =
+    typeof req.query.town === "string"
+        ? req.query.town
+            .trim()
+            .slice(0, 100)
+        : "";
 
             const filter = {};
 
@@ -413,6 +419,11 @@ router.get(
                 filter.category =
                     category;
             }
+            if (town) {
+
+    filter.town =
+        town;
+}
 
             if (search) {
 

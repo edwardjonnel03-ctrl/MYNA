@@ -294,8 +294,35 @@
 
 <option value="Recreational Center">
     Recreational Center
+</option>
+<option value="Freelancers">
+    Freelancers
 </option>               
             </select>
+            <select
+    id="townFilter"
+    class="category-filter"
+>
+    <option value="">
+        All towns
+    </option>
+
+    <option value="Windhoek">Windhoek</option>
+    <option value="Rundu">Rundu</option>
+    <option value="Walvis Bay">Walvis Bay</option>
+    <option value="Swakopmund">Swakopmund</option>
+    <option value="Oshakati">Oshakati</option>
+    <option value="Ondangwa">Ondangwa</option>
+    <option value="Ongwediva">Ongwediva</option>
+    <option value="Katima Mulilo">Katima Mulilo</option>
+    <option value="Otjiwarongo">Otjiwarongo</option>
+    <option value="Keetmanshoop">Keetmanshoop</option>
+    <option value="Grootfontein">Grootfontein</option>
+    <option value="Tsumeb">Tsumeb</option>
+    <option value="Gobabis">Gobabis</option>
+    <option value="Mariental">Mariental</option>
+    <option value="Nkurenkuru">Nkurenkuru</option>
+</select>
 
         </div>
 
@@ -358,6 +385,11 @@
             document.getElementById(
                 "categoryFilter"
             );
+            const townFilter =
+    document.getElementById(
+        "townFilter"
+    );
+            
                     const pagination =
             document.getElementById(
                 "pagination"
@@ -431,6 +463,8 @@
 
                 const category =
                     categoryFilter.value;
+                    const town =
+    townFilter.value;
 
                 const params =
                     new URLSearchParams();
@@ -464,6 +498,13 @@
                         category
                     );
                 }
+                if (town) {
+
+    params.set(
+        "town",
+        town
+    );
+}
 
                 const response =
                     await fetch(
@@ -787,7 +828,15 @@ categoryFilter.addEventListener(
         loadBusinesses();
     }
 );
+townFilter.addEventListener(
+    "change",
+    function() {
 
+        currentPage = 1;
+
+        loadBusinesses();
+    }
+);
 
         /*
         ========================================
