@@ -6,6 +6,7 @@ const { Resend } = require("resend");
 const Business = require("../models/Business");
 const PremiumRequest =
     require("../models/PremiumRequest");
+const Review = require("../models/Review");
 
 const router = express.Router();
 
@@ -2270,6 +2271,279 @@ if (validationError) {
 );
 
 
+// ========================================
+// CUSTOMER REVIEWS
+// ========================================
+
+const reviewLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message:
+            "Too many review attempts. Please try again later."
+    }
+});
+
+router.post(
+    "/:id/reviews",
+    reviewLimiter,
+    async (req, res) => {
+
+        try {
+
+            const businessId =
+                Number(req.params.id);
+
+            if (
+                !Number.isSafeInteger(businessId) ||
+                businessId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid business ID."
+                });
+            }
+
+const business =
+    await Business.findOne({
+        id: businessId
+    }).select(
+        "_id plan planStatus planExpiresAt"
+    );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+            const premiumIsActive =
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    business.planExpiresAt &&
+    business.planExpiresAt > new Date();
+
+if (!premiumIsActive) {
+    return res.status(403).json({
+        success: false,
+        message:
+            "Ratings and reviews are available for Premium businesses only."
+    });
+}
+
+            const customerName =
+                typeof req.body.customerName === "string"
+                    ? req.body.customerName.trim()
+                    : "";
+
+            const comment =
+                typeof req.body.comment === "string"
+                    ? req.body.comment.trim()
+                    : "";
+
+            const rating =
+                Number(req.body.rating);
+
+            if (
+                customerName.length < 2 ||
+                customerName.length > 60
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Name must be between 2 and 60 characters."
+                });
+            }
+
+            if (
+                !Number.isInteger(rating) ||
+                rating < 1 ||
+                rating > 5
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Rating must be between 1 and 5 stars."
+                });
+            }
+
+            if (
+                comment.length < 2 ||
+                comment.length > 300
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Comment must be between 2 and 300 characters."
+                });
+            }
+
+            await Review.create({
+                businessId:
+                    business._id,
+
+                customerName,
+                rating,
+                comment,
+
+                status:
+                    "pending"
+            });
+
+            return res.status(201).json({
+                success: true,
+                message:
+                    "Thank you. Your review was submitted for approval."
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Review submission error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not submit review."
+            });
+        }
+    }
+);
+// ========================================
+// GET APPROVED BUSINESS REVIEWS
+// ========================================
+
+router.get(
+    "/:id/reviews",
+    async (req, res) => {
+
+        try {
+
+            const businessId =
+                Number(req.params.id);
+
+            if (
+                !Number.isSafeInteger(businessId) ||
+                businessId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid business ID."
+                });
+            }
+
+const business =
+    await Business.findOne({
+        id: businessId
+    }).select(
+        "_id plan planStatus planExpiresAt"
+    );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+            const premiumIsActive =
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    business.planExpiresAt &&
+    business.planExpiresAt > new Date();
+
+if (!premiumIsActive) {
+    return res.status(403).json({
+        success: false,
+        message:
+            "Ratings and reviews are available for Premium businesses only."
+    });
+}
+
+            const reviews =
+                await Review.find({
+                    businessId:
+                        business._id,
+
+                    status:
+                        "approved"
+                })
+                    .select(
+                        "customerName rating comment createdAt"
+                    )
+                    .sort({
+                        createdAt: -1
+                    })
+                    .limit(20)
+                    .lean();
+
+            const ratingSummary =
+                await Review.aggregate([
+                    {
+                        $match: {
+                            businessId:
+                                business._id,
+                            status:
+                                "approved"
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: "$rating"
+                            },
+                            reviewCount: {
+                                $sum: 1
+                            }
+                        }
+                    }
+                ]);
+
+            const summary =
+                ratingSummary[0];
+
+            return res.json({
+                success: true,
+
+                averageRating:
+                    summary
+                        ? Number(
+                            summary.averageRating.toFixed(1)
+                        )
+                        : 0,
+
+                reviewCount:
+                    summary
+                        ? summary.reviewCount
+                        : 0,
+
+                reviews
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Review loading error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not load reviews."
+            });
+        }
+    }
+);
 // ========================================
 // GET ONE BUSINESS
 // Keep this near the bottom because /:id

@@ -26,6 +26,7 @@ const connectDatabase =
     require("./config/database");
 const SupportRequest =
     require("./models/SupportRequest");
+    const Review = require("./models/Review");
 const Donation =
     require("./models/Donation");
 const PremiumRequest =
@@ -1393,6 +1394,133 @@ expiresAt.setDate(
     }
 );
 
+// =========================================
+// ADMIN REVIEWS
+// =========================================
+
+app.get(
+    "/api/admin/reviews",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const reviews =
+                await Review.find()
+                    .populate(
+                        "businessId",
+                        "businessName id"
+                    )
+                    .sort({
+                        createdAt: -1
+                    })
+                    .limit(100)
+                    .lean();
+
+            return res.json({
+                success: true,
+                reviews
+            });
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN REVIEWS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not load reviews."
+            });
+        }
+    }
+);
+// =========================================
+// UPDATE REVIEW STATUS
+// =========================================
+
+app.patch(
+    "/api/admin/reviews/:id/status",
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            if (
+                !mongoose.Types.ObjectId.isValid(
+                    req.params.id
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid review ID."
+                });
+            }
+
+            const status =
+                String(req.body.status || "")
+                    .trim()
+                    .toLowerCase();
+
+            if (
+                ![
+                    "pending",
+                    "approved",
+                    "rejected"
+                ].includes(status)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid review status."
+                });
+            }
+
+            const review =
+                await Review.findById(
+                    req.params.id
+                );
+
+            if (!review) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Review not found."
+                });
+            }
+
+            review.status = status;
+
+            await review.save();
+
+            return res.json({
+                success: true,
+                message:
+                    `Review ${status} successfully.`,
+                review: {
+                    id: review._id,
+                    status: review.status
+                }
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPDATE REVIEW STATUS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not update review."
+            });
+        }
+    }
+);
 // =========================================
 // BUSINESS ROUTES
 // =========================================

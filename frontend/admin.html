@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en">
 
@@ -645,6 +645,38 @@
 
 </section>
 
+<!-- CUSTOMER REVIEWS INBOX -->
+
+<section class="support-inbox-section">
+
+    <div class="support-inbox-header">
+
+        <div>
+            <h2>Customer Reviews</h2>
+
+            <p>
+                Moderate ratings and comments submitted
+                to Premium businesses.
+            </p>
+        </div>
+
+        <span
+            id="reviewCount"
+            class="support-count"
+        >
+            0
+        </span>
+
+    </div>
+
+    <div
+        id="reviewInbox"
+        class="support-inbox"
+    >
+        Loading customer reviews...
+    </div>
+
+</section>
 </main>
 
 <!-- MAYNA ADMIN MODAL -->
@@ -1475,6 +1507,15 @@ const premiumRequestInbox =
 const premiumRequestCount =
     document.getElementById(
         "premiumRequestCount"
+    );
+    const reviewInbox =
+    document.getElementById(
+        "reviewInbox"
+    );
+
+const reviewCount =
+    document.getElementById(
+        "reviewCount"
     );
 // =========================================
 // LOAD SUPPORT INBOX
@@ -2465,6 +2506,271 @@ This cannot be undone.`,
         );
     }
 }
+async function updateReviewStatus(
+    id,
+    newStatus
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/reviews/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not update review."
+            );
+        }
+
+        await showMaynaAlert(
+            newStatus === "approved"
+                ? "Review approved and is now visible on the business profile."
+                : newStatus === "rejected"
+                    ? "Review rejected."
+                    : "Review returned to pending.",
+            "Review Updated",
+            "success"
+        );
+
+        await loadReviewInbox();
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE REVIEW STATUS ERROR:",
+            error
+        );
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not update review.",
+            "Update Failed",
+            "error"
+        );
+
+        await loadReviewInbox();
+    }
+}
+async function loadReviewInbox() {
+
+    if (!reviewInbox || !reviewCount) {
+        return;
+    }
+
+    reviewInbox.textContent =
+        "Loading customer reviews...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/reviews",
+                {
+                    credentials: "include"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not load reviews."
+            );
+        }
+
+        const reviews =
+            Array.isArray(result.reviews)
+                ? result.reviews
+                : [];
+
+        reviewCount.textContent =
+            reviews.filter(
+                review =>
+                    review.status === "pending"
+            ).length;
+
+        reviewInbox.textContent = "";
+
+        if (reviews.length === 0) {
+
+            const emptyMessage =
+                document.createElement("p");
+
+            emptyMessage.textContent =
+                "No customer reviews yet.";
+
+            reviewInbox.appendChild(
+                emptyMessage
+            );
+
+            return;
+        }
+
+        reviews.forEach(review => {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+            card.className =
+                "support-message-card";
+
+            const business =
+                document.createElement("h3");
+
+            business.textContent =
+                review.businessId?.businessName ||
+                "Business";
+
+            const customer =
+                document.createElement("p");
+
+            customer.textContent =
+                `Customer: ${
+                    review.customerName ||
+                    "Unknown"
+                }`;
+
+            const rating =
+                document.createElement("p");
+
+            const safeRating =
+                Math.max(
+                    1,
+                    Math.min(
+                        5,
+                        Number(review.rating) || 1
+                    )
+                );
+
+            rating.textContent =
+                `Rating: ${
+                    "★".repeat(safeRating)
+                }${
+                    "☆".repeat(5 - safeRating)
+                }`;
+
+            const comment =
+                document.createElement("p");
+
+            comment.className =
+                "support-message-text";
+
+            comment.textContent =
+                review.comment || "";
+
+            const status =
+                document.createElement("p");
+
+            status.textContent =
+                `Status: ${
+                    review.status ||
+                    "pending"
+                }`;
+
+            const actions =
+                document.createElement("div");
+
+            actions.className =
+                "support-actions";
+
+            const statusSelect =
+                document.createElement(
+                    "select"
+                );
+
+            statusSelect.className =
+                "support-status-select";
+
+            [
+                ["pending", "Pending"],
+                ["approved", "Approve"],
+                ["rejected", "Reject"]
+            ].forEach(
+                ([value, label]) => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value = value;
+                    option.textContent = label;
+
+                    if (
+                        review.status === value
+                    ) {
+                        option.selected = true;
+                    }
+
+                    statusSelect.appendChild(
+                        option
+                    );
+                }
+            );
+
+            statusSelect.addEventListener(
+                "change",
+                async () => {
+
+                    await updateReviewStatus(
+                        review._id,
+                        statusSelect.value
+                    );
+                }
+            );
+
+            actions.appendChild(
+                statusSelect
+            );
+
+            card.append(
+                business,
+                customer,
+                rating,
+                comment,
+                status,
+                actions
+            );
+
+            reviewInbox.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(
+            "REVIEW INBOX ERROR:",
+            error
+        );
+
+        reviewCount.textContent = "0";
+
+        reviewInbox.textContent =
+            "Unable to load customer reviews.";
+    }
+}
     // =========================================
     // START ADMIN DASHBOARD
     // =========================================
@@ -2481,11 +2787,11 @@ This cannot be undone.`,
         }
 
 
-        await loadBusinesses();
-        await loadSupportInbox();
-        await loadDonationInbox();
-        await loadPremiumRequestInbox();
-    }
+await loadBusinesses();
+await loadSupportInbox();
+await loadDonationInbox();
+await loadPremiumRequestInbox();
+await loadReviewInbox();
 
 
 

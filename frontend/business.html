@@ -328,7 +328,104 @@
                 grid-template-columns: 1fr;
             }
         }
+/* ========================================
+   PREMIUM CUSTOMER REVIEWS
+======================================== */
 
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.rating-stars {
+    color: #f5a623;
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+.customer-reviews {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.customer-review {
+    padding: 14px 16px;
+    background: #f8f8f8;
+    border-radius: 12px;
+}
+
+.customer-review strong {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.customer-review-stars {
+    color: #f5a623;
+    font-size: 14px;
+}
+
+.customer-review p {
+    margin: 7px 0 0;
+    color: #555555;
+    line-height: 1.5;
+}
+
+.reviews-empty {
+    color: #777777;
+}
+
+.review-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeee;
+}
+
+.review-form h3 {
+    margin: 0 0 4px;
+}
+
+.review-form input,
+.review-form select,
+.review-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.review-form textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.review-form button {
+    width: fit-content;
+    padding: 11px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: #111111;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.review-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.review-message {
+    margin: 0;
+    font-size: 14px;
+}
     </style>
 </head>
 
@@ -458,6 +555,291 @@ function safeImageURL(value) {
 }
 
 
+async function loadReviews(id) {
+
+    const reviewsContent =
+        document.getElementById(
+            "reviewsContent"
+        );
+
+    if (!reviewsContent) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/businesses/${encodeURIComponent(id)}/reviews`
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Could not load reviews."
+            );
+        }
+
+        const averageRating =
+            Number(result.averageRating) || 0;
+
+        const reviewCount =
+            Number(result.reviewCount) || 0;
+
+        const reviews =
+            Array.isArray(result.reviews)
+                ? result.reviews
+                : [];
+
+        const stars =
+            reviewCount > 0
+                ? "★".repeat(
+                    Math.round(averageRating)
+                ) +
+                  "☆".repeat(
+                    5 -
+                    Math.round(averageRating)
+                  )
+                : "☆☆☆☆☆";
+
+        const reviewList =
+            reviews.length
+                ? reviews
+                    .slice(0, 5)
+                    .map(
+                        review => `
+                            <div class="customer-review">
+                                <strong>
+                                    ${escapeHTML(
+                                        review.customerName ||
+                                        "Customer"
+                                    )}
+                                </strong>
+
+                                <span class="customer-review-stars">
+                                    ${"★".repeat(
+                                        Number(review.rating)
+                                    )}
+                                </span>
+
+                                <p>
+                                    ${escapeHTML(
+                                        review.comment ||
+                                        ""
+                                    )}
+                                </p>
+                            </div>
+                        `
+                    )
+                    .join("")
+                : `
+                    <p class="reviews-empty">
+                        No reviews yet. Be the first to leave one.
+                    </p>
+                `;
+
+        reviewsContent.innerHTML = `
+            <div class="rating-summary">
+                <span class="rating-stars">
+                    ${stars}
+                </span>
+
+                <strong>
+                    ${
+                        reviewCount > 0
+                            ? averageRating.toFixed(1)
+                            : "New"
+                    }
+                </strong>
+
+                <span>
+                    · ${reviewCount}
+                    ${
+                        reviewCount === 1
+                            ? "review"
+                            : "reviews"
+                    }
+                </span>
+            </div>
+
+            <div class="customer-reviews">
+                ${reviewList}
+            </div>
+
+            <form id="reviewForm" class="review-form">
+
+                <h3>
+                    Leave a review
+                </h3>
+
+                <input
+                    id="reviewCustomerName"
+                    type="text"
+                    maxlength="60"
+                    placeholder="Your name"
+                    required
+                >
+
+                <select
+                    id="reviewRating"
+                    required
+                >
+                    <option value="">
+                        Select rating
+                    </option>
+                    <option value="5">
+                        ★★★★★ 5
+                    </option>
+                    <option value="4">
+                        ★★★★☆ 4
+                    </option>
+                    <option value="3">
+                        ★★★☆☆ 3
+                    </option>
+                    <option value="2">
+                        ★★☆☆☆ 2
+                    </option>
+                    <option value="1">
+                        ★☆☆☆☆ 1
+                    </option>
+                </select>
+
+                <textarea
+                    id="reviewComment"
+                    maxlength="300"
+                    placeholder="Write a short comment"
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Submit Review
+                </button>
+
+                <p
+                    id="reviewMessage"
+                    class="review-message"
+                ></p>
+
+            </form>
+        `;
+
+    } catch (error) {
+
+        console.error(
+            "Review loading error:",
+            error
+        );
+
+        reviewsContent.innerHTML = `
+            <p class="reviews-empty">
+                Reviews are currently unavailable.
+            </p>
+        `;
+        const reviewForm =
+    document.getElementById(
+        "reviewForm"
+    );
+
+reviewForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+        const reviewMessage =
+            document.getElementById(
+                "reviewMessage"
+            );
+
+        const submitButton =
+            reviewForm.querySelector(
+                'button[type="submit"]'
+            );
+
+        const customerName =
+            document.getElementById(
+                "reviewCustomerName"
+            ).value.trim();
+
+        const rating =
+            Number(
+                document.getElementById(
+                    "reviewRating"
+                ).value
+            );
+
+        const comment =
+            document.getElementById(
+                "reviewComment"
+            ).value.trim();
+
+        reviewMessage.textContent =
+            "Submitting review...";
+
+        submitButton.disabled = true;
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/businesses/${encodeURIComponent(id)}/reviews`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            customerName,
+                            rating,
+                            comment
+                        })
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+                throw new Error(
+                    result.message ||
+                    "Could not submit review."
+                );
+            }
+
+            reviewForm.reset();
+
+            reviewMessage.textContent =
+                result.message ||
+                "Your review was submitted for approval.";
+
+        } catch (error) {
+
+            console.error(
+                "Review submission error:",
+                error
+            );
+
+            reviewMessage.textContent =
+                error.message ||
+                "Could not submit review.";
+
+        } finally {
+
+            submitButton.disabled = false;
+        }
+    }
+);
+    }
+}
         async function loadBusiness() {
 
             try {
@@ -564,12 +946,6 @@ const description =
         business.description ||
         "No description available yet."
     );
-
-
-                const rating =
-                    business.rating ||
-                    null;
-
 
                 const services =
     Array.isArray(
@@ -700,20 +1076,6 @@ const safeEmail =
                             </div>
 
 
-                            ${
-                                rating
-                                ? `
-                                    <div class="new-rating">
-                                        ★ ${rating}
-                                    </div>
-                                `
-                                : `
-                                    <div class="new-rating">
-                                        ★ New business
-                                    </div>
-                                `
-                            }
-
                         </div>
 
 
@@ -733,7 +1095,28 @@ const safeEmail =
                             </section>
 
 
-                            ${
+${
+    business.plan === "premium" &&
+    business.planStatus === "active"
+        ? `
+            <section
+                class="profile-section"
+                id="premiumReviewsSection"
+            >
+                <h2>
+                    Customer Reviews
+                </h2>
+
+                <div id="reviewsContent">
+                    Loading reviews...
+                </div>
+            </section>
+        `
+        : ""
+}
+
+
+${
     services.length
     ? `
         <section class="profile-section">
@@ -895,6 +1278,13 @@ const safeEmail =
                     </div>
                 `;
 
+                if (
+    business.plan === "premium" &&
+    business.planStatus === "active"
+) {
+    await loadReviews(id);
+}
+
 
             } catch (error) {
 
@@ -1038,4 +1428,4 @@ const safeEmail =
 
 </body>
 
-</html> 
+</html>
