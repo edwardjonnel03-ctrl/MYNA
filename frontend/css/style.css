@@ -2063,4 +2063,28 @@ background-repeat: no-repeat;
 .mayna-register-modal-button:hover {
     opacity: 0.9;
 }
+/* ========================================
+   MAYNA VERIFIED BADGE
+======================================== */
+
+.mayna-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #1687ff;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    vertical-align: middle;
+    cursor: help;
+}
 
