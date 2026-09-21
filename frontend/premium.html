@@ -351,6 +351,62 @@
                 font-size: 30px;
             }
         }
+        /* MAYNA MESSAGE MODAL */
+
+.mayna-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.mayna-modal-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    color: #111111;
+    border-radius: 18px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.mayna-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #ff7a00;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.mayna-modal-card h2 {
+    margin: 0 0 10px;
+}
+
+.mayna-modal-card p {
+    margin: 0 0 22px;
+    line-height: 1.6;
+}
+
+.mayna-modal-card button {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 28px;
+    background: #ff7a00;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+}
 
     </style>
 
@@ -593,7 +649,74 @@
 
 </main>
 
+<!-- MAYNA MESSAGE MODAL -->
+<div
+    id="maynaModal"
+    class="mayna-modal"
+    style="display: none;"
+>
+    <div class="mayna-modal-card">
+        <div class="mayna-modal-icon">!</div>
+
+        <h2 id="maynaModalTitle">
+            MAYNA
+        </h2>
+
+        <p id="maynaModalMessage"></p>
+
+        <button
+            type="button"
+            id="maynaModalClose"
+        >
+            OK
+        </button>
+    </div>
+</div>
 <script>
+const maynaModal =
+    document.getElementById("maynaModal");
+
+const maynaModalTitle =
+    document.getElementById("maynaModalTitle");
+
+const maynaModalMessage =
+    document.getElementById("maynaModalMessage");
+
+const maynaModalClose =
+    document.getElementById("maynaModalClose");
+
+function showMaynaModal(
+    message,
+    title = "MAYNA"
+) {
+    maynaModalTitle.textContent =
+        title;
+
+    maynaModalMessage.textContent =
+        message;
+
+    maynaModal.style.display =
+        "flex";
+}
+
+function closeMaynaModal() {
+    maynaModal.style.display =
+        "none";
+}
+
+maynaModalClose.addEventListener(
+    "click",
+    closeMaynaModal
+);
+
+maynaModal.addEventListener(
+    "click",
+    (event) => {
+        if (event.target === maynaModal) {
+            closeMaynaModal();
+        }
+    }
+);
 
     const monthlyOption =
         document.getElementById(
@@ -748,10 +871,11 @@ if (
 
 if (!response.ok) {
 
-    alert(
-        data.message ||
-        "Could not create Premium request."
-    );
+showMaynaModal(
+    data.message ||
+    "Could not create Premium request.",
+    "Premium Request"
+);
 
     return;
 }
@@ -784,9 +908,10 @@ premiumPaymentPanel.scrollIntoView({
                 error
             );
 
-            alert(
-                "Could not connect to MAYNA. Please try again."
-            );
+showMaynaModal(
+    "Could not connect to MAYNA. Please try again.",
+    "Connection Error"
+);
 
         } finally {
 
@@ -798,6 +923,7 @@ premiumPaymentPanel.scrollIntoView({
         }
     }
 );
+
 </script>
 </body>
 
