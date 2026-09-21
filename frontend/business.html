@@ -726,19 +726,7 @@ async function loadReviews(id) {
             </form>
         `;
 
-    } catch (error) {
-
-        console.error(
-            "Review loading error:",
-            error
-        );
-
-        reviewsContent.innerHTML = `
-            <p class="reviews-empty">
-                Reviews are currently unavailable.
-            </p>
-        `;
-        const reviewForm =
+            const reviewForm =
     document.getElementById(
         "reviewForm"
     );
@@ -838,6 +826,19 @@ reviewForm.addEventListener(
         }
     }
 );
+    } catch (error) {
+
+        console.error(
+            "Review loading error:",
+            error
+        );
+
+        reviewsContent.innerHTML = `
+            <p class="reviews-empty">
+                Reviews are currently unavailable.
+            </p>
+        `;
+
     }
 }
         async function loadBusiness() {
