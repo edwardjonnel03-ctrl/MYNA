@@ -1236,12 +1236,34 @@ router.get(
 );
 
 // ========================================
+// PREMIUM REQUEST RATE LIMIT
+// ========================================
+
+const premiumRequestLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
+
+        limit: 5,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+            message:
+                "Too many Premium requests. Please try again in 15 minutes."
+        }
+    });
+// ========================================
 // CREATE PREMIUM REQUEST
 // OWNER ONLY
 // ========================================
 
 router.post(
     "/premium/request",
+    premiumRequestLimiter,
     async (req, res) => {
 
         try {
