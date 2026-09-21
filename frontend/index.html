@@ -527,13 +527,15 @@
 
             }
 
-            const verifiedBusinesses =
-                result.businesses
-                    .filter(
-                        business =>
-                            business.verified === true
-                    )
-                    .slice(0, 3);
+const verifiedBusinesses =
+    result.businesses
+        .filter(
+            business =>
+                business.verified === true &&
+                business.plan === "premium" &&
+                business.planStatus === "active"
+        )
+        .slice(0, 3);
 
             if (
                 verifiedBusinesses.length === 0
