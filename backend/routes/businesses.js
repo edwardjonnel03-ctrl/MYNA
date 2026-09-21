@@ -384,6 +384,23 @@ router.get(
 
         try {
 
+            await Business.updateMany(
+    {
+        plan: "premium",
+        planStatus: "active",
+        planExpiresAt: {
+            $ne: null,
+            $lte: new Date()
+        }
+    },
+    {
+        $set: {
+            plan: "free",
+            planStatus: "expired"
+        }
+    }
+);
+
             const search =
                 typeof req.query.search === "string"
                     ? req.query.search
@@ -502,12 +519,14 @@ router.get(
                     )
                     : 20;
 
-            let query =
-                Business
-                    .find(filter)
-                    .sort({
-                        createdAt: -1
-                    });
+let query =
+    Business
+        .find(filter)
+        .sort({
+            planStatus: 1,
+            plan: -1,
+            createdAt: -1
+        });
 
             if (paginationRequested) {
 
@@ -2007,156 +2026,7 @@ router.delete(
         }
     }
 );
-// ========================================
-// CHANGE BUSINESS PLAN
-// ADMIN ONLY
-// ========================================
 
-router.put(
-    "/:id/plan",
-
-    async (req, res) => {
-
-        try {
-
-            if (
-                !req.session ||
-                req.session.isAdmin !== true
-            ) {
-
-                return res.status(401).json({
-
-                    success: false,
-
-                    message:
-                        "Admin authentication required."
-
-                });
-            }
-
-            const id =
-                Number(
-                    req.params.id
-                );
-
-            if (
-                !Number.isFinite(id)
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Invalid business ID."
-
-                });
-            }
-
-            const plan =
-                String(
-                    req.body.plan || ""
-                )
-                    .trim()
-                    .toLowerCase();
-
-            if (
-                plan !== "free" &&
-                plan !== "premium"
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    message:
-                        "Invalid business plan."
-
-                });
-            }
-
-            const business =
-                await Business.findOne({
-                    id: id
-                });
-
-            if (!business) {
-
-                return res.status(404).json({
-
-                    success: false,
-
-                    message:
-                        "Business not found."
-
-                });
-            }
-
-            if (plan === "premium") {
-
-                business.plan =
-                    "premium";
-
-                business.planStatus =
-                    "active";
-
-                business.planStartedAt =
-                    new Date();
-
-                business.planExpiresAt =
-                    null;
-
-            } else {
-
-                business.plan =
-                    "free";
-
-                business.planStatus =
-                    "active";
-
-                business.planStartedAt =
-                    null;
-
-                business.planExpiresAt =
-                    null;
-            }
-
-            await business.save();
-
-            return res.json({
-
-                success: true,
-
-                message:
-                    plan === "premium"
-                        ? "Business upgraded to Premium."
-                        : "Business changed to Free plan.",
-
-                business:
-                    publicBusiness(
-                        business
-                    )
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "BUSINESS PLAN ERROR:",
-                error
-            );
-
-            return res.status(500).json({
-
-                success: false,
-
-                message:
-                    "Server error while changing business plan."
-
-            });
-        }
-    }
-);
 // ========================================
 // UPDATE BUSINESS
 // OWNER ONLY
@@ -2180,7 +2050,7 @@ if (validationError) {
             validationError
     });
 }
-            
+
 
             if (
                 !req.session ||

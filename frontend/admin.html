@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 
@@ -12,7 +12,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Admin Dashboard â€” MAYNA</title>
+<title>Admin Dashboard — MAYNA</title>
 
 <link
     rel="stylesheet"
@@ -732,7 +732,7 @@ function showMaynaAlert(
         maynaAdminModalMessage.textContent = message;
 
         maynaAdminModalIcon.textContent =
-            type === "error" ? "!" : "âœ“";
+            type === "error" ? "!" : "✓";
 
         maynaModalCancel.style.display = "none";
         maynaModalConfirm.textContent = "OK";
@@ -1036,99 +1036,7 @@ await showMaynaAlert(
         }
 
     }
-    async function togglePlan(
-    id,
-    currentPlan
-) {
 
-    const newPlan =
-        currentPlan === "premium"
-            ? "free"
-            : "premium";
-
-    const action =
-        newPlan === "premium"
-            ? "upgrade this business to Premium"
-            : "change this business to the Free plan";
-
-    const confirmed =
-        await showMaynaConfirm(
-            `Are you sure you want to ${action}?`,
-            "Change Business Plan"
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                `/api/businesses/${id}/plan`,
-                {
-                    method: "PUT",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    credentials:
-                        "include",
-
-                    body:
-                        JSON.stringify({
-                            plan:
-                                newPlan
-                        })
-                }
-            );
-
-        const result =
-            await response.json();
-
-        if (!response.ok) {
-
-            if (
-                response.status === 401
-            ) {
-
-                window.location.href =
-                    "admin-login.html";
-
-                return;
-            }
-
-            throw new Error(
-                result.message ||
-                "Business plan update failed."
-            );
-        }
-
-        await showMaynaAlert(
-            result.message,
-            "Plan Updated",
-            "success"
-        );
-
-        loadBusinesses();
-
-    } catch (error) {
-
-        console.error(
-            "PLAN UPDATE ERROR:",
-            error
-        );
-
-        await showMaynaAlert(
-            error.message ||
-            "Could not update the business plan.",
-            "Plan Update Failed",
-            "error"
-        );
-    }
-}
 
 // =========================================
 // DELETE BUSINESS
@@ -1349,7 +1257,7 @@ await showMaynaAlert(
 
                                 <div class="verified-status">
 
-                                    âœ“ Verified
+                                    ✓ Verified
 
                                 </div>
 
@@ -1359,7 +1267,7 @@ await showMaynaAlert(
 
                                 <div class="unverified-status">
 
-                                    â—‹ Not Verified
+                                    ○ Not Verified
 
                                 </div>
 
@@ -1394,7 +1302,7 @@ const town =
         business.town ||
         "Not specified"
     );
-    
+
     const businessId =
     encodeURIComponent(
         String(
@@ -1418,7 +1326,7 @@ const town =
 
                                         Category:
                                         ${category}
-                                        
+
 
                                     </p>
 
@@ -1452,19 +1360,7 @@ ${planStatus}
         }
 
     </button>
-    <button
-    class="admin-button plan-button"
-    data-business-id="${businessId}"
-    data-plan="${business.plan || "free"}"
->
 
-    ${
-        business.plan === "premium"
-            ? "Change to Free"
-            : "Upgrade to Premium"
-    }
-
-</button>
 
 
     <button
@@ -1510,34 +1406,7 @@ ${planStatus}
             );
         }
     );
-    businessList
-    .querySelectorAll(
-        ".plan-button"
-    )
-    .forEach(
-        button => {
 
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const id =
-                        decodeURIComponent(
-                            button.dataset.businessId
-                        );
-
-                    const currentPlan =
-                        button.dataset.plan ||
-                        "free";
-
-                    togglePlan(
-                        id,
-                        currentPlan
-                    );
-                }
-            );
-        }
-    ); 
        businessList
     .querySelectorAll(
         ".delete-button"
@@ -1565,7 +1434,7 @@ ${planStatus}
                 }
             );
         }
-    );    
+    );
 
 
         } catch (error) {
@@ -2245,7 +2114,7 @@ async function loadPremiumRequestInbox() {
                         : "Monthly";
 
                 details.textContent =
-                    `${billingLabel} Premium · N$${Number(
+                    `${billingLabel} Premium � N$${Number(
                         request.amount
                     ).toFixed(2)}`;
 
