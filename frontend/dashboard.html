@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -613,6 +613,97 @@
 
     <div class="card">
 
+            <div class="card" id="socialLinksCard">
+
+        <h2>Social Media Links</h2>
+
+        <p id="socialLinksPlanMessage">
+            Premium businesses can connect their website
+            and social media profiles.
+        </p>
+
+        <div class="grid">
+
+            <div>
+                <label for="socialWebsite">
+                    Website
+                </label>
+                <input
+                    id="socialWebsite"
+                    type="url"
+                    placeholder="https://yourwebsite.com"
+                >
+            </div>
+
+            <div>
+                <label for="socialFacebook">
+                    Facebook
+                </label>
+                <input
+                    id="socialFacebook"
+                    type="url"
+                    placeholder="https://facebook.com/yourbusiness"
+                >
+            </div>
+
+            <div>
+                <label for="socialInstagram">
+                    Instagram
+                </label>
+                <input
+                    id="socialInstagram"
+                    type="url"
+                    placeholder="https://instagram.com/yourbusiness"
+                >
+            </div>
+
+            <div>
+                <label for="socialTiktok">
+                    TikTok
+                </label>
+                <input
+                    id="socialTiktok"
+                    type="url"
+                    placeholder="https://tiktok.com/@yourbusiness"
+                >
+            </div>
+
+            <div>
+                <label for="socialTwitter">
+                    X / Twitter
+                </label>
+                <input
+                    id="socialTwitter"
+                    type="url"
+                    placeholder="https://x.com/yourbusiness"
+                >
+            </div>
+
+            <div>
+                <label for="socialLinkedin">
+                    LinkedIn
+                </label>
+                <input
+                    id="socialLinkedin"
+                    type="url"
+                    placeholder="https://linkedin.com/company/yourbusiness"
+                >
+            </div>
+
+            <div>
+                <label for="socialYoutube">
+                    YouTube
+                </label>
+                <input
+                    id="socialYoutube"
+                    type="url"
+                    placeholder="https://youtube.com/@yourbusiness"
+                >
+            </div>
+
+        </div>
+
+    </div>
         <h2>Opening Hours</h2>
         <div class="grid">
 
@@ -1509,6 +1600,39 @@ if (galleryPlanMessage) {
             : "Free Plan: You can add up to 3 gallery photos. Upgrade to Premium for up to 20.";
 }
 
+                const socialFieldIds = [
+                    "socialWebsite",
+                    "socialFacebook",
+                    "socialInstagram",
+                    "socialTiktok",
+                    "socialTwitter",
+                    "socialLinkedin",
+                    "socialYoutube"
+                ];
+
+                for (const fieldId of socialFieldIds) {
+                    const field =
+                        document.getElementById(
+                            fieldId
+                        );
+
+                    if (field) {
+                        field.disabled =
+                            !ownerHasActivePremium;
+                    }
+                }
+
+                const socialLinksPlanMessage =
+                    document.getElementById(
+                        "socialLinksPlanMessage"
+                    );
+
+                if (socialLinksPlanMessage) {
+                    socialLinksPlanMessage.textContent =
+                        ownerHasActivePremium
+                            ? "Premium Plan: Add your website and social media profiles."
+                            : "Premium feature: Upgrade to Premium to add website and social media links.";
+                }
 
                 ownerBusinessName.textContent =
                     "Managing: " +
@@ -1620,6 +1744,43 @@ if (
                     "description"
                 ).value =
                     business.description || "";
+                                    const socialLinks =
+                    business.socialLinks || {};
+
+                document.getElementById(
+                    "socialWebsite"
+                ).value =
+                    socialLinks.website || "";
+
+                document.getElementById(
+                    "socialFacebook"
+                ).value =
+                    socialLinks.facebook || "";
+
+                document.getElementById(
+                    "socialInstagram"
+                ).value =
+                    socialLinks.instagram || "";
+
+                document.getElementById(
+                    "socialTiktok"
+                ).value =
+                    socialLinks.tiktok || "";
+
+                document.getElementById(
+                    "socialTwitter"
+                ).value =
+                    socialLinks.twitter || "";
+
+                document.getElementById(
+                    "socialLinkedin"
+                ).value =
+                    socialLinks.linkedin || "";
+
+                document.getElementById(
+                    "socialYoutube"
+                ).value =
+                    socialLinks.youtube || "";
 
 
                 businessServices =
@@ -1861,7 +2022,44 @@ description:
                     }
                 };
 
+                if (ownerHasActivePremium) {
+                    updatedBusiness.socialLinks = {
+                        website:
+                            document.getElementById(
+                                "socialWebsite"
+                            ).value.trim(),
 
+                        facebook:
+                            document.getElementById(
+                                "socialFacebook"
+                            ).value.trim(),
+
+                        instagram:
+                            document.getElementById(
+                                "socialInstagram"
+                            ).value.trim(),
+
+                        tiktok:
+                            document.getElementById(
+                                "socialTiktok"
+                            ).value.trim(),
+
+                        twitter:
+                            document.getElementById(
+                                "socialTwitter"
+                            ).value.trim(),
+
+                        linkedin:
+                            document.getElementById(
+                                "socialLinkedin"
+                            ).value.trim(),
+
+                        youtube:
+                            document.getElementById(
+                                "socialYoutube"
+                            ).value.trim()
+                    };
+                }
                 try {
 
                     const response =

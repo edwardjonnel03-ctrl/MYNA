@@ -203,6 +203,59 @@ planExpiresAt: {
     default: null
 },
 
+        // PREMIUM SOCIAL LINKS
+
+        socialLinks: {
+            website: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            facebook: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            instagram: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            tiktok: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            twitter: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            linkedin: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            },
+
+            youtube: {
+                type: String,
+                default: "",
+                trim: true,
+                maxlength: 500
+            }
+        },
+
         // BUSINESS OPENING HOURS
 
         hours: {

@@ -1034,6 +1034,70 @@ const safeEmail =
             email
         )
         : "";
+        const hasActivePremium =
+    business.plan === "premium" &&
+    business.planStatus === "active";
+
+const socialLinks =
+    hasActivePremium &&
+    business.socialLinks &&
+    typeof business.socialLinks === "object"
+        ? business.socialLinks
+        : {};
+
+function safeSocialURL(value) {
+    if (
+        typeof value !== "string" ||
+        value.trim() === ""
+    ) {
+        return "";
+    }
+
+    try {
+        const parsedUrl =
+            new URL(value.trim());
+
+        if (
+            parsedUrl.protocol !== "https:" &&
+            parsedUrl.protocol !== "http:"
+        ) {
+            return "";
+        }
+
+        return parsedUrl.href;
+    } catch {
+        return "";
+    }
+}
+
+const safeSocialLinks = {
+    website: safeSocialURL(
+        socialLinks.website
+    ),
+    facebook: safeSocialURL(
+        socialLinks.facebook
+    ),
+    instagram: safeSocialURL(
+        socialLinks.instagram
+    ),
+    tiktok: safeSocialURL(
+        socialLinks.tiktok
+    ),
+    twitter: safeSocialURL(
+        socialLinks.twitter
+    ),
+    linkedin: safeSocialURL(
+        socialLinks.linkedin
+    ),
+    youtube: safeSocialURL(
+        socialLinks.youtube
+    )
+};
+
+const hasSocialLinks =
+    Object.values(
+        safeSocialLinks
+    ).some(Boolean);
                     const profileImage =
     safeImageURL(
         business.image
@@ -1227,9 +1291,71 @@ ${
 
 
                             ${
-                                safePhone ||
-                                safeWhatsapp ||
-                                safeEmail
+                                hasSocialLinks
+                                ? `
+                                    <section class="profile-section">
+
+                                        <h2>
+                                            Connect With Us
+                                        </h2>
+
+                                        <div class="contact-grid">
+
+                                            ${safeSocialLinks.website ? `
+                                                <a href="${safeSocialLinks.website}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    Website
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.facebook ? `
+                                                <a href="${safeSocialLinks.facebook}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    Facebook
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.instagram ? `
+                                                <a href="${safeSocialLinks.instagram}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    Instagram
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.tiktok ? `
+                                                <a href="${safeSocialLinks.tiktok}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    TikTok
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.twitter ? `
+                                                <a href="${safeSocialLinks.twitter}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    X / Twitter
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.linkedin ? `
+                                                <a href="${safeSocialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    LinkedIn
+                                                </a>
+                                            ` : ""}
+
+                                            ${safeSocialLinks.youtube ? `
+                                                <a href="${safeSocialLinks.youtube}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                    YouTube
+                                                </a>
+                                            ` : ""}
+
+                                        </div>
+
+                                    </section>
+                                `
+                                : ""
+                                                        }
+
+                            ${
+                                (
+                                    safePhone ||
+                                    safeWhatsapp ||
+                                    safeEmail
+                                )
                                 ? `
                                     <section class="profile-section">
 

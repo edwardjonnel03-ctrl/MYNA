@@ -165,6 +165,64 @@ function validateBusinessInput(body) {
         }
     }
 
+        // PREMIUM SOCIAL LINKS
+    if (
+        body.socialLinks !== undefined
+    ) {
+        if (
+            !body.socialLinks ||
+            typeof body.socialLinks !== "object" ||
+            Array.isArray(body.socialLinks)
+        ) {
+            return "Social links must be an object.";
+        }
+
+        const allowedSocialLinks = [
+            "website",
+            "facebook",
+            "instagram",
+            "tiktok",
+            "twitter",
+            "linkedin",
+            "youtube"
+        ];
+
+        for (const platform of allowedSocialLinks) {
+            const value =
+                body.socialLinks[platform];
+
+            if (value === undefined) {
+                continue;
+            }
+
+            if (typeof value !== "string") {
+                return `${platform} link must be text.`;
+            }
+
+            if (value.length > 500) {
+                return `${platform} link is too long.`;
+            }
+
+            if (value.trim() === "") {
+                continue;
+            }
+
+            try {
+                const parsedUrl =
+                    new URL(value.trim());
+
+                if (
+                    parsedUrl.protocol !== "https:" &&
+                    parsedUrl.protocol !== "http:"
+                ) {
+                    return `${platform} link must use http or https.`;
+                }
+            } catch {
+                return `Please enter a valid ${platform} URL.`;
+            }
+        }
+    }
+
     // SERVICES
     if (
         body.services !== undefined &&
@@ -2157,6 +2215,52 @@ if (
     business.gallery =
         requestedGallery;
 }
+
+            if (
+                req.body.socialLinks !==
+                undefined
+            ) {
+                const hasActivePremium =
+                    business.plan === "premium" &&
+                    business.planStatus === "active" &&
+                    business.planExpiresAt &&
+                    business.planExpiresAt > new Date();
+
+                if (!hasActivePremium) {
+                    return res.status(403).json({
+                        success: false,
+                        message:
+                            "Social media links are available to active Premium businesses only."
+                    });
+                }
+
+                const allowedSocialLinks = [
+                    "website",
+                    "facebook",
+                    "instagram",
+                    "tiktok",
+                    "twitter",
+                    "linkedin",
+                    "youtube"
+                ];
+
+                const socialLinks = {};
+
+                for (const platform of allowedSocialLinks) {
+                    const value =
+                        req.body.socialLinks[
+                            platform
+                        ];
+
+                    socialLinks[platform] =
+                        typeof value === "string"
+                            ? value.trim()
+                            : "";
+                }
+
+                business.socialLinks =
+                    socialLinks;
+            }
 
             if (
                 req.body.services !==
