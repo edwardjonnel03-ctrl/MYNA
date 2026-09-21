@@ -134,13 +134,44 @@
             font-size: 14px;
         }
 
-        .verified-badge {
-            display: inline-block;
-            margin-top: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #16803c;
-        }
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    margin-left: 6px;
+
+    border-radius: 50%;
+
+    background: #1687ff;
+    color: white;
+
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    vertical-align: middle;
+    cursor: help;
+}
+.premium-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-bottom: 10px;
+    padding: 6px 11px;
+
+    border-radius: 999px;
+
+    background: #fff0bd;
+    color: #805500;
+
+    font-size: 12px;
+    font-weight: 800;
+}
 
         .empty-state {
             display: none;
@@ -694,13 +725,32 @@ const initials =
                             ${initials}
                         </div>
 
+                        ${
+    business.plan === "premium" &&
+    business.planStatus === "active"
+        ? `<div class="premium-badge">
+            ★ Premium
+           </div>`
+        : ""
+}
                         <div class="business-category">
                             ${category}
                         </div>
 
-                        <h3>
-                            ${name}
-                        </h3>
+
+<h3>
+    ${name}
+    ${
+        business.verified
+            ? `<span
+                class="verified-badge"
+                title="Verified by MAYNA"
+                aria-label="Verified by MAYNA"
+            >✓</span>`
+            : ""
+    }
+</h3>
+
 
                         <div class="business-location">
                             📍 ${town}
@@ -710,9 +760,7 @@ const initials =
                             ${description}
                         </p>
 
-                        <div class="verified-badge">
-                            ✓ Verified business
-                        </div>
+
 
                         <div class="view-business">
                             View business →
