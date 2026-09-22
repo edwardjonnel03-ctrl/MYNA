@@ -1324,11 +1324,31 @@ router.get(
                     planStartedAt:
                         business.planStartedAt,
 
-                    planExpiresAt:
-                        business.planExpiresAt
-                }
+planExpiresAt:
+    business.planExpiresAt,
 
-            });
+analytics:
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    business.planExpiresAt &&
+    new Date(business.planExpiresAt) > new Date()
+        ? {
+            profileViews:
+                business.analytics?.profileViews || 0,
+
+            phoneClicks:
+                business.analytics?.phoneClicks || 0,
+
+            whatsappClicks:
+                business.analytics?.whatsappClicks || 0,
+
+            socialClicks:
+                business.analytics?.socialClicks || 0
+        }
+        : null
+}
+
+});
 
         } catch (error) {
 
