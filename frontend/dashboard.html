@@ -1399,15 +1399,32 @@ galleryInput.addEventListener(
         if (files.length === 0) {
             return;
         }
-        if (
-    galleryImages.length +
-    files.length >
-    ownerGalleryLimit
-) {
+        const remainingGallerySlots =
+    ownerGalleryLimit -
+    galleryImages.length;
+
+if (remainingGallerySlots <= 0) {
     await showMaynaDashboardAlert(
         ownerHasActivePremium
-            ? "Premium businesses can have up to 20 gallery photos."
-            : "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos.",
+            ? "Your Premium gallery is full. You can have up to 20 photos."
+            : "Your Free gallery is full. Upgrade to Premium for up to 20 photos.",
+        "Gallery Limit"
+    );
+
+    galleryInput.value = "";
+    return;
+}
+
+if (
+    files.length >
+    remainingGallerySlots
+) {
+    await showMaynaDashboardAlert(
+        `You can add only ${remainingGallerySlots} more ${
+            remainingGallerySlots === 1
+                ? "photo"
+                : "photos"
+        }.`,
         "Gallery Limit"
     );
 

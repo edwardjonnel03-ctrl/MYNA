@@ -1625,6 +1625,19 @@ if (validationError) {
             validationError
     });
 }
+const registrationGallery =
+    Array.isArray(req.body.gallery)
+        ? req.body.gallery
+        : [];
+
+if (registrationGallery.length > 3) {
+
+    return res.status(403).json({
+        success: false,
+        message:
+            "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos."
+    });
+}
 
             const ownerEmail =
                 String(
@@ -1704,9 +1717,7 @@ if (validationError) {
                         req.body.image || "",
 
                     gallery:
-                        Array.isArray(req.body.gallery)
-                            ? req.body.gallery
-                            : [],
+                        registrationGallery,
 
                     services:
                         Array.isArray(req.body.services)
@@ -2196,21 +2207,34 @@ if (
         business.planExpiresAt &&
         business.planExpiresAt > new Date();
 
-    const galleryLimit =
-        hasActivePremium ? 20 : 3;
+const existingGalleryLength =
+    Array.isArray(business.gallery)
+        ? business.gallery.length
+        : 0;
 
-    if (
-        requestedGallery.length >
-        galleryLimit
-    ) {
-        return res.status(403).json({
-            success: false,
-            message:
-                hasActivePremium
-                    ? "Premium businesses can have up to 20 gallery photos."
-                    : "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos."
-        });
-    }
+if (
+    hasActivePremium &&
+    requestedGallery.length > 20
+) {
+    return res.status(403).json({
+        success: false,
+        message:
+            "Premium businesses can have up to 20 gallery photos."
+    });
+}
+
+if (
+    !hasActivePremium &&
+    requestedGallery.length > 3 &&
+    requestedGallery.length >
+        existingGalleryLength
+) {
+    return res.status(403).json({
+        success: false,
+        message:
+            "Free businesses can have up to 3 gallery photos. Upgrade to Premium for up to 20 photos."
+    });
+}
 
     business.gallery =
         requestedGallery;
