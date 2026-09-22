@@ -1218,9 +1218,7 @@ analytics:
     business.plan === "premium" &&
     business.planStatus === "active" &&
     business.planExpiresAt &&
-    new Date(
-        business.planExpiresAt
-    ) > new Date()
+    new Date(business.planExpiresAt) > new Date()
         ? {
             profileViews:
                 business.analytics?.profileViews || 0,
