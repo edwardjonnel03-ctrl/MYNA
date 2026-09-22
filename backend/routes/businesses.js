@@ -1445,16 +1445,19 @@ router.post(
                 });
             }
 
-            if (
-                business.plan === "premium" &&
-                business.planStatus === "active"
-            ) {
-                return res.status(409).json({
-                    success: false,
-                    message:
-                        "This business already has an active Premium plan."
-                });
-            }
+const premiumIsActive =
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    business.planExpiresAt &&
+    business.planExpiresAt > new Date();
+
+if (premiumIsActive) {
+    return res.status(409).json({
+        success: false,
+        message:
+            "This business already has an active Premium plan."
+    });
+}
 
             const existingRequest =
                 await PremiumRequest.findOne({
