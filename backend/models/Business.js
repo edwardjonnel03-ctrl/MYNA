@@ -301,6 +301,33 @@ planExpiresAt: {
                 maxlength: 50
             }
         },
+        // BUSINESS ANALYTICS
+
+        analytics: {
+            profileViews: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            phoneClicks: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            whatsappClicks: {
+                type: Number,
+                default: 0,
+                min: 0
+            },
+
+            socialClicks: {
+                type: Number,
+                default: 0,
+                min: 0
+            }
+        },
 
         // PASSWORD RESET
 

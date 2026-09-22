@@ -788,9 +788,9 @@ reviewForm.addEventListener(
                 await fetch(
                     `/api/businesses/${encodeURIComponent(id)}/reviews`,
                     {
-                        method: "POST",
-
-                        headers: {
+                       method: "POST",
+                        keepalive: true,
+                            headers: {
                             "Content-Type":
                                 "application/json"
                         },
@@ -935,7 +935,10 @@ reviewForm.addEventListener(
 
                 }
 
-
+trackBusinessEvent(
+    business.id,
+    "profileView"
+);
                 const name =
     escapeHTML(
         business.businessName ||
@@ -1302,43 +1305,43 @@ ${
                                         <div class="contact-grid">
 
                                             ${safeSocialLinks.website ? `
-                                                <a href="${safeSocialLinks.website}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.website}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     Website
-                                                </a>
+                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.facebook ? `
-                                                <a href="${safeSocialLinks.facebook}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.facebook}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     Facebook
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.instagram ? `
-                                                <a href="${safeSocialLinks.instagram}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.instagram}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     Instagram
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.tiktok ? `
-                                                <a href="${safeSocialLinks.tiktok}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.tiktok}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     TikTok
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.twitter ? `
-                                                <a href="${safeSocialLinks.twitter}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.twitter}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     X / Twitter
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.linkedin ? `
-                                                <a href="${safeSocialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     LinkedIn
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.youtube ? `
-                                                <a href="${safeSocialLinks.youtube}" target="_blank" rel="noopener noreferrer" class="contact-button">
+                                                <a href="${safeSocialLinks.youtube}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
                                                     YouTube
                                                 </a>
                                             ` : ""}
@@ -1371,6 +1374,7 @@ ${
                                                     <a
                                                         href="tel:${safePhone}"
                                                         class="contact-button"
+                                                        onclick="trackBusinessEvent(${business.id}, 'phoneClick')"
                                                     >
                                                         Call
                                                     </a>
@@ -1386,6 +1390,7 @@ ${
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         class="contact-button"
+                                                        onclick="trackBusinessEvent(${business.id}, 'whatsappClick')"
                                                     >
                                                         WhatsApp
                                                     </a>

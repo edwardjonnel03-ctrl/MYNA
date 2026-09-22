@@ -33,6 +33,7 @@ delete safeBusiness.resetTokenHash;
 delete safeBusiness.resetTokenExpires;
 delete safeBusiness.planStartedAt;
 delete safeBusiness.planExpiresAt;
+delete safeBusiness.analytics;
 
     return safeBusiness;
 }
@@ -1210,8 +1211,30 @@ business: {
     planStartedAt:
         business.planStartedAt,
 
-    planExpiresAt:
+planExpiresAt:
+    business.planExpiresAt,
+
+analytics:
+    business.plan === "premium" &&
+    business.planStatus === "active" &&
+    business.planExpiresAt &&
+    new Date(
         business.planExpiresAt
+    ) > new Date()
+        ? {
+            profileViews:
+                business.analytics?.profileViews || 0,
+
+            phoneClicks:
+                business.analytics?.phoneClicks || 0,
+
+            whatsappClicks:
+                business.analytics?.whatsappClicks || 0,
+
+            socialClicks:
+                business.analytics?.socialClicks || 0
+        }
+        : null
 }
                 });
             }
@@ -2693,6 +2716,116 @@ if (!premiumIsActive) {
                 success: false,
                 message:
                     "Could not load reviews."
+            });
+        }
+    }
+);
+// ========================================
+// BUSINESS ANALYTICS RATE LIMIT
+// ========================================
+
+const analyticsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message:
+            "Too many analytics requests. Please try again later."
+    }
+});
+// ========================================
+// RECORD BUSINESS ANALYTICS EVENT
+// ========================================
+
+router.post(
+    "/:id/analytics",
+    analyticsLimiter,
+    async (req, res) => {
+
+        try {
+
+            const businessId =
+                Number(req.params.id);
+
+            if (
+                !Number.isFinite(
+                    businessId
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid business ID."
+                });
+            }
+
+            const event =
+                typeof req.body.event === "string"
+                    ? req.body.event.trim()
+                    : "";
+
+            const eventFields = {
+                profileView:
+                    "analytics.profileViews",
+                phoneClick:
+                    "analytics.phoneClicks",
+                whatsappClick:
+                    "analytics.whatsappClicks",
+                socialClick:
+                    "analytics.socialClicks"
+            };
+
+            const analyticsField =
+                eventFields[event];
+
+            if (!analyticsField) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid analytics event."
+                });
+            }
+
+            const business =
+                await Business.findOneAndUpdate(
+                    {
+                        id: businessId
+                    },
+                    {
+                        $inc: {
+                            [analyticsField]: 1
+                        }
+                    },
+                    {
+                        new: false
+                    }
+                );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            return res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(
+                "BUSINESS ANALYTICS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not record analytics."
             });
         }
     }

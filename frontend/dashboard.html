@@ -368,7 +368,41 @@
     </button>
 
 </section>
+<section
+    class="card"
+    id="analyticsCard"
+    style="display: none;"
+>
+    <h2>Business Analytics</h2>
 
+    <p id="analyticsMessage">
+        See how customers interact with your business on MAYNA.
+    </p>
+
+    <div class="grid">
+
+        <div>
+            <strong id="analyticsProfileViews">0</strong>
+            <p>Profile Views</p>
+        </div>
+
+        <div>
+            <strong id="analyticsPhoneClicks">0</strong>
+            <p>Call Clicks</p>
+        </div>
+
+        <div>
+            <strong id="analyticsWhatsappClicks">0</strong>
+            <p>WhatsApp Clicks</p>
+        </div>
+
+        <div>
+            <strong id="analyticsSocialClicks">0</strong>
+            <p>Social Link Clicks</p>
+        </div>
+
+    </div>
+</section>
 
     <div class="card">
 
@@ -1605,6 +1639,37 @@ ownerGalleryLimit =
     ownerHasActivePremium
         ? 20
         : 3;
+        const analyticsCard =
+    document.getElementById("analyticsCard");
+
+if (
+    ownerHasActivePremium &&
+    business.analytics
+) {
+    analyticsCard.style.display = "block";
+
+    document.getElementById(
+        "analyticsProfileViews"
+    ).textContent =
+        business.analytics.profileViews || 0;
+
+    document.getElementById(
+        "analyticsPhoneClicks"
+    ).textContent =
+        business.analytics.phoneClicks || 0;
+
+    document.getElementById(
+        "analyticsWhatsappClicks"
+    ).textContent =
+        business.analytics.whatsappClicks || 0;
+
+    document.getElementById(
+        "analyticsSocialClicks"
+    ).textContent =
+        business.analytics.socialClicks || 0;
+} else {
+    analyticsCard.style.display = "none";
+}
         const galleryPlanMessage =
     document.getElementById(
         "galleryPlanMessage"
