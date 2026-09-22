@@ -494,6 +494,22 @@
         }
     );
 }
+function getSafeImageURL(value) {
+    try {
+        const url = new URL(
+            String(value || ""),
+            window.location.origin
+        );
+
+        if (url.protocol !== "https:") {
+            return "";
+        }
+
+        return url.href;
+    } catch (error) {
+        return "";
+    }
+}
     async function loadFeaturedBusinesses() {
 
         const container =
@@ -615,6 +631,10 @@ const businessId =
     encodeURIComponent(
         business.id
     );
+    const businessImage =
+    getSafeImageURL(
+        business.image
+    );
 
                             return `
 
@@ -626,6 +646,13 @@ const businessId =
 
 <div
     class="business-card-top"
+    ${businessImage
+        ? `style="background-image: linear-gradient(
+            rgba(0,0,0,0.1),
+            rgba(0,0,0,0.35)
+        ), url('${businessImage}');"`
+        : ""
+    }
 >
     <div
         class="business-logo"
