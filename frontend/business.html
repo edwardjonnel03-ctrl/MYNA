@@ -854,6 +854,28 @@ reviewForm.addEventListener(
 
     }
 }
+async function trackBusinessEvent(businessId, eventName) {
+    try {
+        await fetch(
+            `/api/businesses/${businessId}/analytics`,
+            {
+                method: "POST",
+                keepalive: true,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    event: eventName
+                })
+            }
+        );
+    } catch (error) {
+        console.warn(
+            "Analytics tracking failed:",
+            error
+        );
+    }
+}
         async function loadBusiness() {
 
             try {
