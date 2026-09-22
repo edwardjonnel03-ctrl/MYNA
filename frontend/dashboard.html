@@ -77,6 +77,50 @@
         .card h2 {
             margin-top: 0;
         }
+        /* ========================================
+   PREMIUM PROMOTIONS
+======================================== */
+
+#promotionsList {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.promotion-dashboard-item {
+    padding: 18px;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.promotion-dashboard-item h3 {
+    margin: 0 0 8px;
+}
+
+.promotion-dashboard-item strong {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #fff3ef;
+    color: #e84825;
+}
+
+.promotion-dashboard-item p {
+    margin: 7px 0;
+    line-height: 1.5;
+}
+
+.promotion-dashboard-item button {
+    margin-top: 12px;
+}
+
+#promotionImageMessage {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #777777;
+}
 
         .grid {
             display: grid;
@@ -367,6 +411,106 @@
         Upgrade to Premium
     </button>
 
+</section>
+<section
+    class="card"
+    id="promotionsCard"
+>
+    <h2>Promotions & Special Offers</h2>
+
+    <p id="promotionsPlanMessage">
+        Premium businesses can create promotions and special offers for customers.
+    </p>
+
+    <div id="promotionFormArea">
+        <div class="grid">
+
+            <div>
+                <label for="promotionTitle">
+                    Promotion Title
+                </label>
+
+                <input
+                    type="text"
+                    id="promotionTitle"
+                    maxlength="120"
+                    placeholder="Weekend Repair Special"
+                >
+            </div>
+
+            <div>
+                <label for="promotionOffer">
+                    Offer
+                </label>
+
+                <input
+                    type="text"
+                    id="promotionOffer"
+                    maxlength="100"
+                    placeholder="20% OFF"
+                >
+            </div>
+
+            <div>
+                <label for="promotionStartsAt">
+                    Start Date
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="promotionStartsAt"
+                >
+            </div>
+
+            <div>
+                <label for="promotionExpiresAt">
+                    Expiry Date
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="promotionExpiresAt"
+                >
+            </div>
+
+        </div>
+
+        <div>
+            <label for="promotionDescription">
+                Description
+            </label>
+
+            <textarea
+                id="promotionDescription"
+                maxlength="1000"
+                placeholder="Describe the promotion or special offer..."
+            ></textarea>
+            <div>
+    <label for="promotionImage">
+        Promotion Image (Optional)
+    </label>
+
+    <input
+        type="file"
+        id="promotionImage"
+        accept="image/*"
+    >
+
+    <p id="promotionImageMessage">
+        Add one image for your promotion. Maximum 5 MB.
+    </p>
+</div>
+        </div>
+
+        <button
+            type="button"
+            id="createPromotionButton"
+        >
+            Create Promotion
+        </button>
+    </div>
+
+    <div id="promotionsList"></div>
 </section>
 <section
     class="card"
@@ -877,6 +1021,14 @@
         <p id="maynaDashboardModalMessage"></p>
 
         <button
+    type="button"
+    class="mayna-dashboard-modal-button"
+    id="maynaDashboardModalCancelButton"
+    hidden
+>
+    Cancel
+</button>
+        <button
             type="button"
             class="mayna-dashboard-modal-button"
             id="maynaDashboardModalButton"
@@ -898,7 +1050,76 @@ const maynaDashboardModalMessage =
 
 const maynaDashboardModalButton =
     document.getElementById("maynaDashboardModalButton");
+    const maynaDashboardModalCancelButton =
+    document.getElementById(
+        "maynaDashboardModalCancelButton"
+    );
+function showMaynaDashboardConfirm(
+    message,
+    title = "Confirm"
+) {
+    return new Promise((resolve) => {
+        maynaDashboardModalCancelButton.hidden = true;
+maynaDashboardModalButton.textContent = "OK";
+maynaDashboardModalCancelButton.onclick = null;
 
+        maynaDashboardModalTitle.textContent =
+            title;
+
+        maynaDashboardModalMessage.textContent =
+            message;
+
+        maynaDashboardModalCancelButton.hidden =
+            false;
+
+        maynaDashboardModalButton.textContent =
+            "Confirm";
+
+        maynaDashboardModal.classList.add(
+            "show"
+        );
+
+        maynaDashboardModal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        function closeModal(result) {
+            maynaDashboardModal.classList.remove(
+                "show"
+            );
+
+            maynaDashboardModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            maynaDashboardModalCancelButton.hidden =
+                true;
+
+            maynaDashboardModalButton.textContent =
+                "OK";
+
+            maynaDashboardModalButton.onclick = null;
+            maynaDashboardModalCancelButton.onclick =
+                null;
+
+            resolve(result);
+        }
+
+        maynaDashboardModalButton.onclick =
+            function () {
+                closeModal(true);
+            };
+
+        maynaDashboardModalCancelButton.onclick =
+            function () {
+                closeModal(false);
+            };
+
+        maynaDashboardModalCancelButton.focus();
+    });
+}
 
 function showMaynaDashboardAlert(
     message,
@@ -1575,6 +1796,260 @@ await showMaynaDashboardAlert(
         galleryInput.value = "";
     }
 );
+async function loadOwnerPromotions() {
+    const promotionsList =
+        document.getElementById("promotionsList");
+
+    const promotionsPlanMessage =
+        document.getElementById(
+            "promotionsPlanMessage"
+        );
+
+    const createPromotionButton =
+        document.getElementById(
+            "createPromotionButton"
+        );
+
+    if (
+        !promotionsList ||
+        !promotionsPlanMessage ||
+        !createPromotionButton
+    ) {
+        return;
+    }
+
+    createPromotionButton.disabled =
+        !ownerHasActivePremium;
+
+    promotionsPlanMessage.textContent =
+        ownerHasActivePremium
+            ? "Premium Plan: Create up to 10 active promotions and special offers."
+            : "Premium feature: Upgrade to Premium to create promotions and special offers.";
+
+    promotionsList.textContent =
+        "Loading promotions...";
+
+    try {
+        const response = await fetch(
+            "/api/businesses/owner/promotions",
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        if (response.status === 401) {
+            window.location.href =
+                "owner-login.html";
+            return;
+        }
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message ||
+                "Could not load promotions."
+            );
+        }
+
+        promotionsList.innerHTML = "";
+
+        const promotions =
+            Array.isArray(result.promotions)
+                ? result.promotions
+                : [];
+
+        if (promotions.length === 0) {
+            const emptyMessage =
+                document.createElement("p");
+
+            emptyMessage.textContent =
+                "You have not created any promotions yet.";
+
+            promotionsList.appendChild(
+                emptyMessage
+            );
+
+            return;
+        }
+
+        promotions.forEach(function (promotion) {
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "promotion-dashboard-item";
+
+            const title =
+                document.createElement("h3");
+
+            title.textContent =
+                promotion.title || "Promotion";
+
+            const offer =
+                document.createElement("strong");
+
+            offer.textContent =
+                promotion.offer || "";
+
+            const description =
+                document.createElement("p");
+
+            description.textContent =
+                promotion.description || "";
+
+            const dates =
+                document.createElement("p");
+
+            const startsAt =
+                promotion.startsAt
+                    ? new Date(
+                        promotion.startsAt
+                    ).toLocaleString()
+                    : "Not set";
+
+            const expiresAt =
+                promotion.expiresAt
+                    ? new Date(
+                        promotion.expiresAt
+                    ).toLocaleString()
+                    : "Not set";
+
+            dates.textContent =
+                "Starts: " +
+                startsAt +
+                " | Expires: " +
+                expiresAt;
+                const status =
+    document.createElement("p");
+
+const now = new Date();
+
+const promotionStart =
+    promotion.startsAt
+        ? new Date(promotion.startsAt)
+        : null;
+
+const promotionExpiry =
+    promotion.expiresAt
+        ? new Date(promotion.expiresAt)
+        : null;
+
+let statusText = "Inactive";
+
+if (promotion.status === "inactive") {
+    statusText = "Inactive";
+} else if (
+    promotionExpiry &&
+    now >= promotionExpiry
+) {
+    statusText = "Expired";
+} else if (
+    promotionStart &&
+    now < promotionStart
+) {
+    statusText = "Scheduled";
+} else {
+    statusText = "Live";
+}
+
+status.textContent =
+    "Status: " + statusText;
+
+            card.appendChild(title);
+
+            if (promotion.offer) {
+                card.appendChild(offer);
+            }
+
+card.appendChild(description);
+card.appendChild(status);
+card.appendChild(dates);
+
+const deleteButton =
+    document.createElement("button");
+
+deleteButton.type = "button";
+deleteButton.textContent =
+    "Delete Promotion";
+
+deleteButton.addEventListener(
+    "click",
+    async function () {
+
+const confirmed =
+    await showMaynaDashboardConfirm(
+        "Are you sure you want to delete this promotion? This action cannot be undone.",
+        "Delete Promotion"
+    );
+
+        if (!confirmed) {
+            return;
+        }
+
+        deleteButton.disabled = true;
+        deleteButton.textContent =
+            "Deleting...";
+
+        try {
+            const response = await fetch(
+                "/api/businesses/owner/promotions/" +
+                    encodeURIComponent(
+                        promotion._id
+                    ),
+                {
+                    method: "DELETE",
+                    credentials: "include"
+                }
+            );
+
+            const result =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    "Could not delete promotion."
+                );
+            }
+
+            await loadOwnerPromotions();
+
+        } catch (error) {
+            console.error(
+                "DELETE PROMOTION ERROR:",
+                error
+            );
+
+            deleteButton.disabled = false;
+            deleteButton.textContent =
+                "Delete Promotion";
+
+            await showMaynaDashboardAlert(
+                error.message,
+                "Could Not Delete Promotion"
+            );
+        }
+    }
+);
+
+card.appendChild(deleteButton);
+
+promotionsList.appendChild(card);
+
+});
+
+} catch (error) {
+        console.error(
+            "PROMOTIONS LOAD ERROR:",
+            error
+        );
+
+        promotionsList.textContent =
+            "Could not load promotions.";
+    }
+}
         async function loadOwnerSession() {
 
             try {
@@ -1639,6 +2114,7 @@ ownerGalleryLimit =
     ownerHasActivePremium
         ? 20
         : 3;
+        await loadOwnerPromotions();
         const analyticsCard =
     document.getElementById("analyticsCard");
 
@@ -2238,6 +2714,247 @@ showGallery();
         );
 
 
+        const createPromotionButton =
+    document.getElementById(
+        "createPromotionButton"
+    );
+
+createPromotionButton.addEventListener(
+    "click",
+    async function () {
+
+        if (!ownerHasActivePremium) {
+            await showMaynaDashboardAlert(
+                "Promotions are available to active Premium businesses.",
+                "Premium Feature"
+            );
+            return;
+        }
+
+        const title =
+            document.getElementById(
+                "promotionTitle"
+            ).value.trim();
+
+        const offer =
+            document.getElementById(
+                "promotionOffer"
+            ).value.trim();
+
+        const description =
+            document.getElementById(
+                "promotionDescription"
+            ).value.trim();
+
+        const startsAt =
+            document.getElementById(
+                "promotionStartsAt"
+            ).value;
+
+        const expiresAt =
+            document.getElementById(
+                "promotionExpiresAt"
+            ).value;
+            const promotionImageInput =
+    document.getElementById(
+        "promotionImage"
+    );
+
+const promotionImageFile =
+    promotionImageInput.files[0] || null;
+
+        if (!title || !description) {
+            await showMaynaDashboardAlert(
+                "Enter a promotion title and description.",
+                "Promotion Details"
+            );
+            return;
+        }
+
+        if (!startsAt || !expiresAt) {
+            await showMaynaDashboardAlert(
+                "Choose a start date and expiry date.",
+                "Promotion Dates"
+            );
+            return;
+        }
+
+        if (
+            new Date(expiresAt) <=
+            new Date(startsAt)
+        ) {
+            await showMaynaDashboardAlert(
+                "The expiry date must be after the start date.",
+                "Promotion Dates"
+            );
+            return;
+        }
+
+        createPromotionButton.disabled = true;
+        createPromotionButton.textContent =
+            "Creating...";
+
+        try {
+            let promotionImageUrl = "";
+
+if (promotionImageFile) {
+    if (
+        !promotionImageFile.type.startsWith(
+            "image/"
+        )
+    ) {
+        throw new Error(
+            "Please select an image file only."
+        );
+    }
+
+    if (
+        promotionImageFile.size >
+        5 * 1024 * 1024
+    ) {
+        throw new Error(
+            "Promotion image must be 5 MB or smaller."
+        );
+    }
+
+    const imageData =
+        await new Promise(
+            function (resolve, reject) {
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    function (event) {
+                        resolve(
+                            event.target.result
+                        );
+                    };
+
+                reader.onerror = reject;
+
+                reader.readAsDataURL(
+                    promotionImageFile
+                );
+            }
+        );
+
+    const uploadResponse =
+        await fetch(
+            "/api/upload",
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    image: imageData
+                })
+            }
+        );
+
+    const uploadResult =
+        await uploadResponse.json();
+
+    if (
+        !uploadResponse.ok ||
+        !uploadResult.success
+    ) {
+        throw new Error(
+            uploadResult.message ||
+            "Promotion image upload failed."
+        );
+    }
+
+    promotionImageUrl =
+        uploadResult.url;
+}
+            const response = await fetch(
+                "/api/businesses/promotions",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+body: JSON.stringify({
+    title,
+    offer,
+    description,
+    image: promotionImageUrl,
+    startsAt:
+                            new Date(
+                                startsAt
+                            ).toISOString(),
+                        expiresAt:
+                            new Date(
+                                expiresAt
+                            ).toISOString()
+                    })
+                }
+            );
+
+            const result =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    "Could not create promotion."
+                );
+            }
+
+            document.getElementById(
+                "promotionTitle"
+            ).value = "";
+
+            document.getElementById(
+                "promotionOffer"
+            ).value = "";
+
+            document.getElementById(
+                "promotionDescription"
+            ).value = "";
+
+            document.getElementById(
+                "promotionStartsAt"
+            ).value = "";
+
+document.getElementById(
+    "promotionExpiresAt"
+).value = "";
+
+promotionImageInput.value = "";
+
+await loadOwnerPromotions();
+
+            await showMaynaDashboardAlert(
+                "Your promotion was created successfully.",
+                "Promotion Created"
+            );
+
+        } catch (error) {
+            console.error(
+                "CREATE PROMOTION ERROR:",
+                error
+            );
+
+            await showMaynaDashboardAlert(
+                error.message,
+                "Could Not Create Promotion"
+            );
+
+        } finally {
+            createPromotionButton.disabled =
+                !ownerHasActivePremium;
+
+            createPromotionButton.textContent =
+                "Create Promotion";
+        }
+    }
+);
         logoutButton.addEventListener(
             "click",
             async function () {
