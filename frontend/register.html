@@ -633,8 +633,14 @@ services:
                 service.trim()
         )
         .filter(Boolean)
-
-            };
+        .map(
+            service => ({
+                name: service,
+                price: "",
+                description: ""
+            })
+        )
+                    };
 
 
             try {
