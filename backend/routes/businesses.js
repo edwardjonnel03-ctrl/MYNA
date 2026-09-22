@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const { Resend } = require("resend");
@@ -7,6 +7,7 @@ const Business = require("../models/Business");
 const PremiumRequest =
     require("../models/PremiumRequest");
 const Review = require("../models/Review");
+const Promotion = require("../models/Promotion");
 
 const router = express.Router();
 
@@ -785,7 +786,7 @@ router.post(
                         [email],
 
                     subject:
-                        "MAYNA — Reset your password",
+                        "MAYNA â€” Reset your password",
 
                     html: `
                         <div style="
@@ -856,7 +857,7 @@ router.post(
                                 color: #777;
                                 font-size: 13px;
                             ">
-                                MAYNA — Discover. Connect. Grow.
+                                MAYNA â€” Discover. Connect. Grow.
                             </p>
 
                         </div>
@@ -2926,5 +2927,462 @@ router.get(
     }
 );
 
+// ========================================
+// CREATE PREMIUM PROMOTION
+// OWNER ONLY
+// ========================================
 
+const promotionLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message:
+            "Too many promotion requests. Please try again later."
+    }
+});
+
+router.post(
+    "/promotions",
+    promotionLimiter,
+    async (req, res) => {
+        try {
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Owner authentication required."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: Number(
+                        req.session.ownerBusinessId
+                    )
+                });
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            const premiumIsActive =
+                business.plan === "premium" &&
+                business.planStatus === "active" &&
+                business.planExpiresAt &&
+                business.planExpiresAt > new Date();
+
+            if (!premiumIsActive) {
+                return res.status(403).json({
+                    success: false,
+                    message:
+                        "Promotions and special offers are available to active Premium businesses only."
+                });
+            }
+
+            const title =
+                typeof req.body.title === "string"
+                    ? req.body.title.trim()
+                    : "";
+
+            const description =
+                typeof req.body.description === "string"
+                    ? req.body.description.trim()
+                    : "";
+
+            const offer =
+                typeof req.body.offer === "string"
+                    ? req.body.offer.trim()
+                    : "";
+
+            const image =
+                typeof req.body.image === "string"
+                    ? req.body.image.trim()
+                    : "";
+
+            if (!title || title.length > 120) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Promotion title is required and must be 120 characters or less."
+                });
+            }
+
+            if (
+                !description ||
+                description.length > 1000
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Promotion description is required and must be 1000 characters or less."
+                });
+            }
+
+            if (offer.length > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Offer must be 100 characters or less."
+                });
+            }
+
+            if (
+                image &&
+                !image.startsWith(
+                    "https://res.cloudinary.com/"
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Promotion image must be a valid Cloudinary image."
+                });
+            }
+
+            const startsAt =
+                new Date(req.body.startsAt);
+
+            const expiresAt =
+                new Date(req.body.expiresAt);
+
+            if (
+                Number.isNaN(startsAt.getTime()) ||
+                Number.isNaN(expiresAt.getTime())
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Please provide valid promotion dates."
+                });
+            }
+
+            if (expiresAt <= startsAt) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Promotion expiry must be after its start date."
+                });
+            }
+
+            const promotionCount =
+    await Promotion.countDocuments({
+        businessId: business.id,
+        status: "active",
+        expiresAt: {
+            $gt: new Date()
+        }
+    });
+
+if (promotionCount >= 10) {
+    return res.status(409).json({
+        success: false,
+        message:
+            "You can have up to 10 active promotions at a time."
+    });
+}
+            const promotion =
+                await Promotion.create({
+                    businessId:
+                        business.id,
+                    title,
+                    description,
+                    offer,
+                    image,
+                    startsAt,
+                    expiresAt,
+                    status:
+                        "active"
+                });
+
+            return res.status(201).json({
+                success: true,
+                message:
+                    "Promotion created successfully.",
+                promotion
+            });
+
+        } catch (error) {
+            console.error(
+                "CREATE PROMOTION ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not create promotion."
+            });
+        }
+    }
+);
+// ========================================
+// GET ACTIVE BUSINESS PROMOTIONS
+// PUBLIC
+// ========================================
+
+router.get(
+    "/:id/promotions",
+    async (req, res) => {
+        try {
+            const businessId =
+                Number(req.params.id);
+
+            if (
+                !Number.isSafeInteger(businessId) ||
+                businessId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid business ID."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: businessId
+                }).select(
+                    "id plan planStatus planExpiresAt"
+                );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            const now = new Date();
+
+            const premiumIsActive =
+                business.plan === "premium" &&
+                business.planStatus === "active" &&
+                business.planExpiresAt &&
+                business.planExpiresAt > now;
+
+            if (!premiumIsActive) {
+                return res.json({
+                    success: true,
+                    promotions: []
+                });
+            }
+
+            const promotions =
+                await Promotion.find({
+                    businessId:
+                        business.id,
+
+                    status:
+                        "active",
+
+                    startsAt: {
+                        $lte: now
+                    },
+
+                    expiresAt: {
+                        $gt: now
+                    }
+                })
+                    .sort({
+                        createdAt: -1
+                    })
+                    .limit(10)
+                    .select(
+                        "title description offer image startsAt expiresAt createdAt"
+                    )
+                    .lean();
+
+            return res.json({
+                success: true,
+                promotions
+            });
+
+        } catch (error) {
+            console.error(
+                "GET PROMOTIONS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not load promotions."
+            });
+        }
+    }
+    );
+    // ========================================
+// GET OWNER PROMOTIONS
+// OWNER ONLY
+// ========================================
+
+router.get(
+    "/owner/promotions",
+    async (req, res) => {
+        try {
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Owner authentication required."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: Number(
+                        req.session.ownerBusinessId
+                    )
+                }).select(
+                    "id plan planStatus planExpiresAt"
+                );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            const premiumIsActive =
+                business.plan === "premium" &&
+                business.planStatus === "active" &&
+                business.planExpiresAt &&
+                business.planExpiresAt > new Date();
+
+            const promotions =
+                await Promotion.find({
+                    businessId:
+                        business.id
+                })
+                    .sort({
+                        createdAt: -1
+                    })
+                    .select(
+                        "title description offer image startsAt expiresAt status createdAt"
+                    )
+                    .lean();
+
+            return res.json({
+                success: true,
+                premiumIsActive:
+                    Boolean(premiumIsActive),
+                promotions
+            });
+
+        } catch (error) {
+            console.error(
+                "GET OWNER PROMOTIONS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not load promotions."
+            });
+        }
+    }
+    );
+// ========================================
+// DELETE OWNER PROMOTION
+// OWNER ONLY
+// ========================================
+
+router.delete(
+    "/owner/promotions/:promotionId",
+    async (req, res) => {
+        try {
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Owner authentication required."
+                });
+            }
+
+            const promotionId =
+                req.params.promotionId;
+
+            if (
+                !promotionId ||
+                !promotionId.match(
+                    /^[a-f\d]{24}$/i
+                )
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid promotion ID."
+                });
+            }
+
+            const businessId =
+                Number(
+                    req.session.ownerBusinessId
+                );
+
+            if (
+                !Number.isSafeInteger(businessId) ||
+                businessId <= 0
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Invalid owner session."
+                });
+            }
+
+            const promotion =
+                await Promotion.findOneAndDelete({
+                    _id: promotionId,
+                    businessId
+                });
+
+            if (!promotion) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Promotion not found."
+                });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Promotion deleted successfully."
+            });
+
+        } catch (error) {
+            console.error(
+                "DELETE PROMOTION ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not delete promotion."
+            });
+        }
+    }
+);
 module.exports = router;
