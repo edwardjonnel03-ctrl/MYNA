@@ -1327,43 +1327,43 @@ ${
                                         <div class="contact-grid">
 
                                             ${safeSocialLinks.website ? `
-                                                <a href="${safeSocialLinks.website}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.website}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     Website
                                                  </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.facebook ? `
-                                                <a href="${safeSocialLinks.facebook}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.facebook}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     Facebook
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.instagram ? `
-                                                <a href="${safeSocialLinks.instagram}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.instagram}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     Instagram
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.tiktok ? `
-                                                <a href="${safeSocialLinks.tiktok}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.tiktok}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     TikTok
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.twitter ? `
-                                                <a href="${safeSocialLinks.twitter}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.twitter}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     X / Twitter
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.linkedin ? `
-                                                <a href="${safeSocialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     LinkedIn
                                                 </a>
                                             ` : ""}
 
                                             ${safeSocialLinks.youtube ? `
-                                                <a href="${safeSocialLinks.youtube}" target="_blank" rel="noopener noreferrer" class="contact-button" onclick="trackBusinessEvent(${business.id}, 'socialClick')">
+                                                <a href="${safeSocialLinks.youtube}" target="_blank" rel="noopener noreferrer" class="contact-button" data-analytics-event="socialClick"
                                                     YouTube
                                                 </a>
                                             ` : ""}
@@ -1396,7 +1396,7 @@ ${
                                                     <a
                                                         href="tel:${safePhone}"
                                                         class="contact-button"
-                                                        onclick="trackBusinessEvent(${business.id}, 'phoneClick')"
+                                                        data-analytics-event="phoneClick"
                                                     >
                                                         Call
                                                     </a>
@@ -1412,7 +1412,7 @@ ${
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         class="contact-button"
-                                                        onclick="trackBusinessEvent(${business.id}, 'whatsappClick')"
+                                                        data-analytics-event="whatsappClick"
                                                     >
                                                         WhatsApp
                                                     </a>
@@ -1426,6 +1426,7 @@ ${
                                                     <a
                                                         href="mailto:${safeEmail}"
                                                         class="contact-button"
+                                                        data-analytics-event="EmailClick"
                                                     >
                                                         Email
                                                     </a>
@@ -1445,6 +1446,16 @@ ${
                     </div>
                 `;
 
+                document
+    .querySelectorAll("[data-analytics-event]")
+    .forEach((element) => {
+        element.addEventListener("click", () => {
+            trackBusinessEvent(
+                business.id,
+                element.dataset.analyticsEvent
+            );
+        });
+    });
                 if (
     business.plan === "premium" &&
     business.planStatus === "active"
