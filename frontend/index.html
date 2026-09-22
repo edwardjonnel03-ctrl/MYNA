@@ -543,19 +543,20 @@ function getSafeImageURL(value) {
 
             }
 
-const verifiedBusinesses =
+const featuredBusinessesList =
     result.businesses
         .filter(
             business =>
+                business.featured === true &&
                 business.verified === true &&
                 business.plan === "premium" &&
                 business.planStatus === "active"
         )
         .slice(0, 3);
 
-            if (
-                verifiedBusinesses.length === 0
-            ) {
+if (
+    featuredBusinessesList.length === 0
+) {
 
                 container.innerHTML = `
 
@@ -563,14 +564,14 @@ const verifiedBusinesses =
 
                         <div class="business-info">
 
-                            <h3>
-                                No verified businesses yet
-                            </h3>
+<h3>
+    No featured businesses yet
+</h3>
 
-                            <p>
-                                Businesses will appear here
-                                after they are verified.
-                            </p>
+<p>
+    Featured Premium businesses
+    will appear here.
+</p>
 
                         </div>
 
@@ -582,8 +583,8 @@ const verifiedBusinesses =
             }
 
             container.innerHTML =
-                verifiedBusinesses
-                    .map(
+                featuredBusinessesList
+    .map(
                         business => {
 
                             const rawName =

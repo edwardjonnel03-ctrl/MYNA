@@ -2042,6 +2042,122 @@ router.put(
 );
 
 // ========================================
+// FEATURE / UNFEATURE BUSINESS
+// ADMIN ONLY
+// ========================================
+
+router.put(
+    "/:id/featured",
+
+    (req, res, next) => {
+        if (
+            req.session &&
+            req.session.isAdmin === true
+        ) {
+            next();
+            return;
+        }
+
+        return res.status(401).json({
+            success: false,
+            message:
+                "Admin authentication required."
+        });
+    },
+
+    async (req, res) => {
+        try {
+            const id =
+                Number(req.params.id);
+
+            if (
+                !Number.isSafeInteger(id) ||
+                id <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid business ID."
+                });
+            }
+
+            if (
+                typeof req.body.featured !==
+                "boolean"
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Featured status must be true or false."
+                });
+            }
+
+            const featured =
+                req.body.featured;
+
+            const business =
+                await Business.findOne({
+                    id: id
+                });
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            if (featured) {
+                const hasActivePremium =
+                    business.verified === true &&
+                    business.plan === "premium" &&
+                    business.planStatus === "active" &&
+                    business.planExpiresAt &&
+                    business.planExpiresAt >
+                        new Date();
+
+                if (!hasActivePremium) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            "Only verified businesses with an active Premium plan can be featured."
+                    });
+                }
+            }
+
+            business.featured =
+                featured;
+
+            await business.save();
+
+            return res.json({
+                success: true,
+
+                message:
+                    featured
+                        ? "Business featured successfully."
+                        : "Business removed from Featured.",
+
+                business:
+                    publicBusiness(business)
+            });
+
+        } catch (error) {
+            console.error(
+                "FEATURED BUSINESS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Server error while changing featured status."
+            });
+        }
+    }
+);
+// ========================================
 // DELETE BUSINESS
 // ADMIN ONLY
 // ========================================

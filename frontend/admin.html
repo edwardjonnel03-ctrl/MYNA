@@ -1070,6 +1070,93 @@ await showMaynaAlert(
     }
 
 
+    // =========================================
+// FEATURE / UNFEATURE BUSINESS
+// =========================================
+
+async function toggleFeatured(
+    id,
+    currentStatus
+) {
+    const newStatus =
+        !currentStatus;
+
+    const action =
+        newStatus
+            ? "feature"
+            : "remove from Featured";
+
+    const confirmed =
+        await showMaynaConfirm(
+            `Are you sure you want to ${action} this business?`,
+            "Update Featured Business"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const response =
+            await fetch(
+                `/api/businesses/${encodeURIComponent(id)}/featured`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    credentials:
+                        "include",
+
+                    body:
+                        JSON.stringify({
+                            featured:
+                                newStatus
+                        })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            if (
+                response.status === 401
+            ) {
+                window.location.href =
+                    "admin-login.html";
+
+                return;
+            }
+
+            throw new Error(
+                result.message ||
+                "Featured status update failed."
+            );
+        }
+
+        await showMaynaAlert(
+            result.message,
+            "Featured Status Updated",
+            "success"
+        );
+
+        loadBusinesses();
+
+    } catch (error) {
+        console.error(error);
+
+        await showMaynaAlert(
+            error.message ||
+                "Could not update Featured status.",
+            "Featured Update Failed",
+            "error"
+        );
+    }
+}
 // =========================================
 // DELETE BUSINESS
 // =========================================
@@ -1392,6 +1479,17 @@ ${planStatus}
         }
 
     </button>
+    <button
+    class="admin-button featured-button"
+    data-business-id="${businessId}"
+    data-featured="${business.featured === true}"
+>
+    ${
+        business.featured === true
+            ? "Remove Featured"
+            : "Feature"
+    }
+</button>
 
 
 
@@ -1410,7 +1508,7 @@ ${planStatus}
                         `;
                     }
                 ).join("");
-       businessList
+businessList
     .querySelectorAll(
         ".verification-button"
     )
@@ -1431,6 +1529,35 @@ ${planStatus}
                         "true";
 
                     toggleVerification(
+                        id,
+                        currentStatus
+                    );
+                }
+            );
+        }
+    );
+
+businessList
+    .querySelectorAll(
+        ".featured-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        decodeURIComponent(
+                            button.dataset.businessId
+                        );
+
+                    const currentStatus =
+                        button.dataset.featured ===
+                        "true";
+
+                    toggleFeatured(
                         id,
                         currentStatus
                     );

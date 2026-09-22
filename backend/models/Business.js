@@ -172,6 +172,12 @@ ownerPasswordSalt: {
             type: Boolean,
             default: false
         },
+        // HOMEPAGE FEATURED BUSINESS
+
+featured: {
+    type: Boolean,
+    default: false
+},
         // BUSINESS PLAN
 
 plan: {
