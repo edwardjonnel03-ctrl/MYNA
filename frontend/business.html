@@ -1446,15 +1446,38 @@ ${
                     </div>
                 `;
 
-                document
+document
     .querySelectorAll("[data-analytics-event]")
     .forEach((element) => {
-        element.addEventListener("click", () => {
-            trackBusinessEvent(
-                business.id,
-                element.dataset.analyticsEvent
-            );
-        });
+        element.addEventListener(
+            "click",
+            async (event) => {
+                const analyticsEvent =
+                    element.dataset.analyticsEvent;
+
+                if (analyticsEvent === "phoneClick") {
+                    event.preventDefault();
+
+                    const phoneLink =
+                        element.href;
+
+                    await trackBusinessEvent(
+                        business.id,
+                        analyticsEvent
+                    );
+
+                    window.location.href =
+                        phoneLink;
+
+                    return;
+                }
+
+                trackBusinessEvent(
+                    business.id,
+                    analyticsEvent
+                );
+            }
+        );
     });
                 if (
     business.plan === "premium" &&
