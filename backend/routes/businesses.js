@@ -3125,6 +3125,83 @@ if (promotionCount >= 10) {
         }
     }
 );
+    // ========================================
+// GET OWNER PROMOTIONS
+// OWNER ONLY
+// ========================================
+
+router.get(
+    "/owner/promotions",
+    async (req, res) => {
+        try {
+            if (
+                !req.session ||
+                !req.session.ownerBusinessId
+            ) {
+                return res.status(401).json({
+                    success: false,
+                    message:
+                        "Owner authentication required."
+                });
+            }
+
+            const business =
+                await Business.findOne({
+                    id: Number(
+                        req.session.ownerBusinessId
+                    )
+                }).select(
+                    "id plan planStatus planExpiresAt"
+                );
+
+            if (!business) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "Business not found."
+                });
+            }
+
+            const premiumIsActive =
+                business.plan === "premium" &&
+                business.planStatus === "active" &&
+                business.planExpiresAt &&
+                business.planExpiresAt > new Date();
+
+            const promotions =
+                await Promotion.find({
+                    businessId:
+                        business.id
+                })
+                    .sort({
+                        createdAt: -1
+                    })
+                    .select(
+                        "title description offer image startsAt expiresAt status createdAt"
+                    )
+                    .lean();
+
+            return res.json({
+                success: true,
+                premiumIsActive:
+                    Boolean(premiumIsActive),
+                promotions
+            });
+
+        } catch (error) {
+            console.error(
+                "GET OWNER PROMOTIONS ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not load promotions."
+            });
+        }
+    }
+    );
 // ========================================
 // GET ACTIVE BUSINESS PROMOTIONS
 // PUBLIC
@@ -3211,83 +3288,6 @@ router.get(
         } catch (error) {
             console.error(
                 "GET PROMOTIONS ERROR:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Could not load promotions."
-            });
-        }
-    }
-    );
-    // ========================================
-// GET OWNER PROMOTIONS
-// OWNER ONLY
-// ========================================
-
-router.get(
-    "/owner/promotions",
-    async (req, res) => {
-        try {
-            if (
-                !req.session ||
-                !req.session.ownerBusinessId
-            ) {
-                return res.status(401).json({
-                    success: false,
-                    message:
-                        "Owner authentication required."
-                });
-            }
-
-            const business =
-                await Business.findOne({
-                    id: Number(
-                        req.session.ownerBusinessId
-                    )
-                }).select(
-                    "id plan planStatus planExpiresAt"
-                );
-
-            if (!business) {
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Business not found."
-                });
-            }
-
-            const premiumIsActive =
-                business.plan === "premium" &&
-                business.planStatus === "active" &&
-                business.planExpiresAt &&
-                business.planExpiresAt > new Date();
-
-            const promotions =
-                await Promotion.find({
-                    businessId:
-                        business.id
-                })
-                    .sort({
-                        createdAt: -1
-                    })
-                    .select(
-                        "title description offer image startsAt expiresAt status createdAt"
-                    )
-                    .lean();
-
-            return res.json({
-                success: true,
-                premiumIsActive:
-                    Boolean(premiumIsActive),
-                promotions
-            });
-
-        } catch (error) {
-            console.error(
-                "GET OWNER PROMOTIONS ERROR:",
                 error
             );
 
