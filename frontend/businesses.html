@@ -109,12 +109,16 @@
             font-size: 20px;
         }
 
-        .business-card h3 .verified-badge {
-            display: inline-flex;
-            vertical-align: middle;
-            margin-left: 7px;
-            transform: translateY(-1px);
-        }
+.business-name-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.business-name-line .verified-badge {
+    margin-left: 0;
+    flex: 0 0 20px;
+}
 
         .business-category {
             color: var(--accent);
@@ -751,18 +755,20 @@ const initials =
 
 
 <h3>
-    ${name}
-    ${
-business.verified === true &&
-business.plan === "premium" &&
-business.planStatus === "active"
-    ? `<span
-                class="verified-badge"
-                title="Verified by MAYNA"
-                aria-label="Verified by MAYNA"
-            >✓</span>`
-            : ""
-    }
+    <span class="business-name-line">
+        <span>${name}</span>
+        ${
+            business.verified === true &&
+            business.plan === "premium" &&
+            business.planStatus === "active"
+                ? `<span
+                    class="verified-badge"
+                    title="Verified by MAYNA"
+                    aria-label="Verified by MAYNA"
+                >✓</span>`
+                : ""
+        }
+    </span>
 </h3>
 
 
