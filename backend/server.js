@@ -1123,6 +1123,88 @@ app.delete(
         }
     }
 );
+
+// =========================================
+// CONFIRMED PREMIUM REVENUE
+// =========================================
+
+app.get(
+    "/api/admin/premium-revenue",
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const configured =
+                process.env.MAYNA_REVENUE_START_AT;
+
+            // No launch date = zero revenue.
+            if (!configured) {
+                return res.json({
+                    success: true,
+                    launchDate: null,
+                    revenue: 0,
+                    confirmedPayments: 0
+                });
+            }
+
+            const launchDate = new Date(configured);
+
+            if (
+                !configured.trim() ||
+                !Number.isFinite(launchDate.getTime())
+            ) {
+                return res.status(503).json({
+                    success: false,
+                    message: "Invalid revenue launch date."
+                });
+            }
+
+            const summary =
+                await PremiumRequest.aggregate([
+                    {
+                        $match: {
+                            status: "confirmed",
+                            confirmedAt: {
+                                $gte: launchDate
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            revenue: {
+                                $sum: "$amount"
+                            },
+                            confirmedPayments: {
+                                $sum: 1
+                            }
+                        }
+                    }
+                ]);
+
+            return res.json({
+                success: true,
+                launchDate:
+                    launchDate.toISOString(),
+                revenue:
+                    summary[0]?.revenue || 0,
+                confirmedPayments:
+                    summary[0]?.confirmedPayments || 0
+            });
+
+        } catch (error) {
+            console.error(
+                "PREMIUM REVENUE ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not calculate revenue."
+            });
+        }
+    }
+);
 // =========================================
 // ADMIN PREMIUM REQUEST INBOX
 // =========================================
@@ -1165,6 +1247,73 @@ app.get(
                     message:
                         "Could not load Premium requests."
                 });
+        }
+    }
+);
+
+// =========================================
+// DELETE PREMIUM REQUEST
+// =========================================
+
+app.delete(
+    "/api/admin/premium-requests/:id",
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const id = req.params.id;
+
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Premium request ID."
+                });
+            }
+
+            // Only pending and rejected requests
+            // can be deleted.
+            const deletedRequest =
+                await PremiumRequest.findOneAndDelete({
+                    _id: id,
+                    status: {
+                        $in: ["pending", "rejected"]
+                    }
+                });
+
+            if (!deletedRequest) {
+                const existingRequest =
+                    await PremiumRequest.findById(id);
+
+                if (existingRequest) {
+                    return res.status(403).json({
+                        success: false,
+                        message:
+                            "Confirmed Premium payments cannot be deleted."
+                    });
+                }
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Premium request not found."
+                });
+            }
+
+            return res.json({
+                success: true,
+                message:
+                    "Premium request deleted successfully."
+            });
+
+        } catch (error) {
+            console.error(
+                "DELETE PREMIUM REQUEST ERROR:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not delete Premium request."
+            });
         }
     }
 );
