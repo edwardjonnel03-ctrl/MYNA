@@ -170,6 +170,9 @@
     }
 
     .admin-button:hover {
+        background: var(--orange-dark);
+    }
+
     .delete-button {
     border: none;
     background: #c62828;
@@ -189,8 +192,6 @@
     gap: 10px;
     flex-wrap: wrap;
 }
-        background: var(--orange-dark);
-    }
 
     @media (max-width: 700px) {
     .business-list {
@@ -454,6 +455,23 @@
         padding: 18px;
     }
 }
+
+/* Premium revenue planning — estimates, not confirmed receipts */
+.premium-planner { margin: 0 0 36px; padding: 26px; background: #101010; color: #fff; border-radius: 18px; }
+.premium-planner * { box-sizing: border-box; }
+.premium-planner h2 { color: #fff; margin: 0 0 8px; }
+.premium-planner .planner-muted { color: #bcbcbc; font-size: 13px; margin: 0 0 22px; }
+.planner-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-weight: 700; }
+.planner-heading output { font-size: 24px; }
+.premium-planner input[type="range"] { display: block; width: 100%; margin: 14px 0 6px; accent-color: #ff7900; cursor: pointer; }
+.planner-scale { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 18px; }
+.planner-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.planner-tile { background: #232323; border: 1px solid #383838; border-radius: 12px; padding: 18px; }
+.planner-tile.partner { background: #141414; border-color: #505050; }
+.planner-tile span { display: block; font-size: 13px; color: #dedede; margin-bottom: 8px; }
+.planner-tile strong { display: block; font-size: clamp(22px,3vw,32px); overflow-wrap: anywhere; }
+.planner-tile small { color: #bcbcbc; display: block; margin-top: 6px; }
+@media (max-width: 650px) { .premium-planner { padding: 18px; } .planner-grid { grid-template-columns: 1fr; } }
 </style>
 
 
@@ -534,6 +552,24 @@
 
     </section>
 
+
+
+    <section class="premium-planner" aria-labelledby="premiumPlannerTitle">
+        <h2 id="premiumPlannerTitle">Premium Revenue Calculator</h2>
+        <p class="planner-muted">Planning estimates only · N$79 per business/month · 6% partner revenue share before expenses. Not actual payments or amounts owed.</p>
+        <label class="planner-heading" for="payingPremiumSlider">
+            <span>Paying Premium businesses (scenario)</span>
+            <output id="payingPremiumValue" for="payingPremiumSlider">100</output>
+        </label>
+        <input id="payingPremiumSlider" type="range" min="0" max="1000" step="1" value="100" />
+        <div class="planner-scale" aria-hidden="true"><span>0</span><span>500</span><span>1,000</span></div>
+        <div class="planner-grid" aria-live="polite">
+            <div class="planner-tile"><span>Projected monthly Premium revenue</span><strong id="plannerMonthlyRevenue">N$7,900.00</strong></div>
+            <div class="planner-tile partner"><span>Partner receives monthly (6%)</span><strong id="plannerPartnerShare">N$474.00</strong><small>Before expenses, subject to the signed agreement.</small></div>
+            <div class="planner-tile"><span>MAYNA retains monthly (94%)</span><strong id="plannerMaynaShare">N$7,426.00</strong><small>Before expenses and taxes.</small></div>
+            <div class="planner-tile"><span>Projected annual Premium revenue</span><strong id="plannerAnnualRevenue">N$94,800.00</strong><small>Assumes the selected number pays for all 12 months.</small></div>
+        </div>
+    </section>
 
     <section>
 
@@ -728,6 +764,22 @@
     </div>
 </div>
 <script>
+
+
+// Premium revenue calculator: scenario-only, never interpreted as confirmed payments.
+const payingPremiumSlider = document.getElementById("payingPremiumSlider");
+const premiumMoney = amount => "N$" + amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function updatePremiumPlanner() {
+    const count = Number(payingPremiumSlider.value);
+    const monthly = count * 79;
+    document.getElementById("payingPremiumValue").textContent = count.toLocaleString("en-US");
+    document.getElementById("plannerMonthlyRevenue").textContent = premiumMoney(monthly);
+    document.getElementById("plannerPartnerShare").textContent = premiumMoney(monthly * 0.06);
+    document.getElementById("plannerMaynaShare").textContent = premiumMoney(monthly * 0.94);
+    document.getElementById("plannerAnnualRevenue").textContent = premiumMoney(monthly * 12);
+}
+payingPremiumSlider.addEventListener("input", updatePremiumPlanner);
+updatePremiumPlanner();
 
 // =========================================
 // MAYNA ADMIN MODAL CONTROLLER
