@@ -456,15 +456,11 @@
     }
 }
 
-/* Premium revenue planning — estimates, not confirmed receipts */
+/* Premium confirmed revenue — figures from authenticated backend */
 .premium-planner { margin: 0 0 36px; padding: 26px; background: #101010; color: #fff; border-radius: 18px; }
 .premium-planner * { box-sizing: border-box; }
 .premium-planner h2 { color: #fff; margin: 0 0 8px; }
 .premium-planner .planner-muted { color: #bcbcbc; font-size: 13px; margin: 0 0 22px; }
-.planner-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-weight: 700; }
-.planner-heading output { font-size: 24px; }
-.premium-planner input[type="range"] { display: block; width: 100%; margin: 14px 0 6px; accent-color: #ff7900; cursor: pointer; }
-.planner-scale { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 18px; }
 .planner-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
 .planner-tile { background: #232323; border: 1px solid #383838; border-radius: 12px; padding: 18px; }
 .planner-tile.partner { background: #141414; border-color: #505050; }
@@ -555,19 +551,13 @@
 
 
     <section class="premium-planner" aria-labelledby="premiumPlannerTitle">
-        <h2 id="premiumPlannerTitle">Premium Revenue Calculator</h2>
-        <p class="planner-muted">Planning estimates only · N$79 per business/month · 6% partner revenue share before expenses. Not actual payments or amounts owed.</p>
-        <label class="planner-heading" for="payingPremiumSlider">
-            <span>Paying Premium businesses (scenario)</span>
-            <output id="payingPremiumValue" for="payingPremiumSlider">100</output>
-        </label>
-        <input id="payingPremiumSlider" type="range" min="0" max="1000" step="1" value="100" />
-        <div class="planner-scale" aria-hidden="true"><span>0</span><span>500</span><span>1,000</span></div>
+        <h2 id="premiumPlannerTitle">Confirmed Premium Revenue</h2>
+        <p class="planner-muted" id="plannerStatus">Loading confirmed payments...</p>
         <div class="planner-grid" aria-live="polite">
-            <div class="planner-tile"><span>Projected monthly Premium revenue</span><strong id="plannerMonthlyRevenue">N$7,900.00</strong></div>
-            <div class="planner-tile partner"><span>Partner receives monthly (6%)</span><strong id="plannerPartnerShare">N$474.00</strong><small>Before expenses, subject to the signed agreement.</small></div>
-            <div class="planner-tile"><span>MAYNA retains monthly (94%)</span><strong id="plannerMaynaShare">N$7,426.00</strong><small>Before expenses and taxes.</small></div>
-            <div class="planner-tile"><span>Projected annual Premium revenue</span><strong id="plannerAnnualRevenue">N$94,800.00</strong><small>Assumes the selected number pays for all 12 months.</small></div>
+            <div class="planner-tile"><span>Confirmed Premium revenue since launch</span><strong id="plannerMonthlyRevenue">N$0.00</strong></div>
+            <div class="planner-tile partner"><span>Partner share (6%)</span><strong id="plannerPartnerShare">N$0.00</strong><small>Estimated allocation before expenses, subject to the signed agreement.</small></div>
+            <div class="planner-tile"><span>MAYNA share (94%)</span><strong id="plannerMaynaShare">N$0.00</strong><small>Before expenses and taxes.</small></div>
+            <div class="planner-tile"><span>Confirmed payments since launch</span><strong id="plannerConfirmedCount">0</strong></div>
         </div>
     </section>
 
@@ -766,20 +756,39 @@
 <script>
 
 
-// Premium revenue calculator: scenario-only, never interpreted as confirmed payments.
-const payingPremiumSlider = document.getElementById("payingPremiumSlider");
+// Confirmed payment totals come from the admin-only backend endpoint.
 const premiumMoney = amount => "N$" + amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-function updatePremiumPlanner() {
-    const count = Number(payingPremiumSlider.value);
-    const monthly = count * 79;
-    document.getElementById("payingPremiumValue").textContent = count.toLocaleString("en-US");
-    document.getElementById("plannerMonthlyRevenue").textContent = premiumMoney(monthly);
-    document.getElementById("plannerPartnerShare").textContent = premiumMoney(monthly * 0.06);
-    document.getElementById("plannerMaynaShare").textContent = premiumMoney(monthly * 0.94);
-    document.getElementById("plannerAnnualRevenue").textContent = premiumMoney(monthly * 12);
+async function loadConfirmedPremiumRevenue() {
+    const status = document.getElementById("plannerStatus");
+    try {
+        const response = await fetch("/api/admin/premium-revenue", { credentials: "include" });
+        if (response.status === 401) {
+            window.location.href = "admin-login.html";
+            return;
+        }
+        const result = await response.json();
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.message || "Revenue could not be verified.");
+        }
+        const revenue = Number(result.revenue);
+        const count = Number(result.confirmedPayments);
+        if (!Number.isFinite(revenue) || !Number.isFinite(count) || revenue < 0 || count < 0) {
+            throw new Error("Invalid revenue response.");
+        }
+        document.getElementById("plannerMonthlyRevenue").textContent = premiumMoney(revenue);
+        document.getElementById("plannerPartnerShare").textContent = premiumMoney(revenue * 0.06);
+        document.getElementById("plannerMaynaShare").textContent = premiumMoney(revenue * 0.94);
+        document.getElementById("plannerConfirmedCount").textContent = count.toLocaleString("en-US");
+        status.textContent = result.launchDate
+            ? "Cumulative confirmed payments since " + new Date(result.launchDate).toLocaleDateString("en-NA") + ". Not monthly recurring revenue."
+            : "Launch date not set yet. Revenue remains zero until MAYNA_REVENUE_START_AT is configured.";
+    } catch (error) {
+        console.error("CONFIRMED REVENUE ERROR:", error);
+        status.textContent = "Could not verify revenue. Figures are unavailable; retry after checking the backend.";
+        ["plannerMonthlyRevenue", "plannerPartnerShare", "plannerMaynaShare", "plannerConfirmedCount"]
+            .forEach(id => document.getElementById(id).textContent = "—");
+    }
 }
-payingPremiumSlider.addEventListener("input", updatePremiumPlanner);
-updatePremiumPlanner();
 
 // =========================================
 // MAYNA ADMIN MODAL CONTROLLER
@@ -2432,6 +2441,19 @@ async function loadPremiumRequestInbox() {
                 card.appendChild(statusLabel);
                 card.appendChild(statusSelect);
 
+                // Keep confirmed payment records for financial reporting.
+                if (request.status !== "confirmed") {
+                    const deleteButton = document.createElement("button");
+                    deleteButton.type = "button";
+                    deleteButton.className = "delete-button";
+                    deleteButton.textContent = "Delete request";
+                    deleteButton.style.marginTop = "12px";
+                    deleteButton.addEventListener("click", () => {
+                        deletePremiumRequest(request._id, request.businessName || "this request");
+                    });
+                    card.appendChild(deleteButton);
+                }
+
                 premiumRequestInbox.appendChild(
                     card
                 );
@@ -2452,6 +2474,34 @@ async function loadPremiumRequestInbox() {
             "Unable to load Premium requests.";
     }
 }
+// Delete unconfirmed Premium requests only. Admin session is checked by the backend.
+async function deletePremiumRequest(id, businessName) {
+    const approved = await showMaynaConfirm(
+        `Permanently delete the Premium request for "${businessName}"?\nThis cannot be undone.`,
+        "Delete Premium Request"
+    );
+    if (!approved) return;
+    try {
+        const response = await fetch(
+            `/api/admin/premium-requests/${encodeURIComponent(id)}`,
+            { method: "DELETE", credentials: "include" }
+        );
+        if (response.status === 401) {
+            window.location.href = "admin-login.html";
+            return;
+        }
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Could not delete Premium request.");
+        }
+        await showMaynaAlert("Premium request deleted.", "Request Deleted");
+        await loadPremiumRequestInbox();
+        await loadConfirmedPremiumRevenue();
+    } catch (error) {
+        await showMaynaAlert(error.message || "Could not delete request.", "Delete Failed", "error");
+    }
+}
+
 // =========================================
 // UPDATE PREMIUM REQUEST STATUS
 // =========================================
@@ -2529,6 +2579,7 @@ async function updatePremiumRequestStatus(
         );
 
         await loadPremiumRequestInbox();
+        await loadConfirmedPremiumRevenue();
 
         // Refresh businesses so the
         // Free/Premium badge also updates.
@@ -2970,6 +3021,7 @@ await loadBusinesses();
 await loadSupportInbox();
 await loadDonationInbox();
 await loadPremiumRequestInbox();
+await loadConfirmedPremiumRevenue();
 await loadReviewInbox();
 
 }
