@@ -468,6 +468,28 @@
 .planner-tile strong { display: block; font-size: clamp(22px,3vw,32px); overflow-wrap: anywhere; }
 .planner-tile small { color: #bcbcbc; display: block; margin-top: 6px; }
 @media (max-width: 650px) { .premium-planner { padding: 18px; } .planner-grid { grid-template-columns: 1fr; } }
+
+/* MAYNA Admin dashboard refresh — presentation only; existing IDs and actions remain unchanged. */
+body { background: #f5f7fb; }
+.admin-shell { min-height: 100vh; }
+.admin-sidebar { position: fixed; inset: 0 auto 0 0; width: 254px; padding: 27px 16px; background: linear-gradient(180deg,#1650c7 0%,#0d3a9e 100%); color:#fff; z-index:100; box-shadow: 12px 0 34px rgba(16,61,153,.18); }
+.admin-brand { display:flex; align-items:center; gap:10px; padding: 0 12px 29px; color:#fff; font-weight:800; font-size:22px; letter-spacing:-.8px; }
+.admin-brand-mark { width:31px; height:31px; border-radius:10px; display:grid; place-items:center; background:#ff6a3d; color:#fff; font-size:15px; box-shadow:0 8px 18px rgba(255,106,61,.35); }
+.admin-brand small { display:block; margin-top:1px; color:#bcd0ff; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.admin-menu { display:grid; gap:7px; }
+.admin-menu a { display:flex; align-items:center; gap:11px; padding:12px 13px; border-radius:10px; color:#dce8ff; font-size:14px; font-weight:700; transition:.2s ease; }
+.admin-menu a:hover,.admin-menu a.active { color:#fff; background:rgba(255,255,255,.16); }
+.admin-menu .menu-icon { width:20px; text-align:center; font-size:16px; }
+.admin-sidebar-footer { position:absolute; right:17px; bottom:23px; left:17px; padding-top:18px; border-top:1px solid rgba(255,255,255,.16); color:#bcd0ff; font-size:12px; }
+.admin-page { max-width:none; margin-left:254px; padding:31px 38px 70px; }
+.admin-header { margin-bottom:27px; }.admin-header-top { min-height:52px; }.admin-header h1 { color:#182233; font-size:30px; letter-spacing:-1.1px; }.admin-header p { color:#728096; }
+.admin-header-actions { display:flex; gap:10px; align-items:center; }.admin-header .nav-button,.logout-button { padding:11px 15px !important; border-radius:10px; box-shadow:none; }.admin-header .nav-button { background:#1650c7; }.admin-header .nav-button:hover { background:#0d3a9e; }.logout-button { background:#fff; border:1px solid #dbe2ee; color:#334155; }.logout-button:hover { background:#f1f5f9; opacity:1; }
+.admin-stats { grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-bottom:25px; }.stat-card { position:relative; overflow:hidden; padding:20px; border:1px solid #e5eaf2; border-radius:15px; box-shadow:0 5px 18px rgba(19,43,84,.06); }.stat-card::after { content:""; position:absolute; right:-25px; bottom:-28px; width:95px; height:95px; border-radius:50%; background:rgba(22,80,199,.07); }.stat-card:nth-child(2)::after { background:rgba(12,150,91,.08); }.stat-card:nth-child(3)::after { background:rgba(255,106,61,.10); }.stat-card span { font-size:13px; font-weight:700; color:#718096; }.stat-card strong { position:relative; z-index:1; color:#19263a; font-size:32px; }
+.premium-planner { background:linear-gradient(120deg,#142f72,#1650c7); border-radius:16px; box-shadow:0 10px 24px rgba(22,80,199,.22); }.planner-tile { background:rgba(255,255,255,.11); border-color:rgba(255,255,255,.15); }.planner-tile.partner { background:rgba(7,27,81,.34); border-color:rgba(255,255,255,.18); }
+.admin-page section > h2,.support-inbox-header h2 { color:#1c293b; font-size:20px; letter-spacing:-.4px; }.business-list { grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:14px; }.business-card { border-color:#e5eaf2; border-radius:15px; box-shadow:0 5px 18px rgba(19,43,84,.06); min-height:0; }.business-card:hover { border-color:#b9cbee; transform:translateY(-2px); transition:.2s ease; }.admin-button { background:#1650c7; border-radius:9px; }.admin-button:hover { background:#0d3a9e; }.verified-status { background:#e7f8ee; color:#087443; }
+.support-inbox-section { border:1px solid #e5eaf2; border-radius:16px; background:#fff; padding:23px; box-shadow:0 5px 18px rgba(19,43,84,.06); }.support-count { background:#1650c7; }.support-inbox { border-top-color:#e6ebf3; }.mayna-admin-modal-card { border-color:#1650c7; }.mayna-admin-modal-icon,.mayna-modal-confirm { background:linear-gradient(135deg,#1650c7,#0d3a9e); }
+@media (max-width: 900px) { .admin-sidebar { width:72px; padding:23px 10px; } .admin-brand { justify-content:center; padding:0 0 28px; } .admin-brand span:not(.admin-brand-mark),.admin-menu a span:not(.menu-icon),.admin-sidebar-footer { display:none; } .admin-menu a { justify-content:center; padding:12px; } .admin-menu .menu-icon { font-size:18px; } .admin-page { margin-left:72px; padding:26px 24px 60px; } .business-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 700px) { .admin-sidebar { position:static; width:auto; height:auto; padding:13px 14px; display:flex; align-items:center; gap:10px; } .admin-brand { padding:0; } .admin-brand span:not(.admin-brand-mark) { display:block; } .admin-menu { display:flex; overflow-x:auto; gap:5px; flex:1; } .admin-menu a { min-width:44px; padding:9px; } .admin-page { margin-left:0; padding:23px 16px 50px; } .admin-header-top { align-items:stretch; } .admin-header-actions { width:100%; } .admin-header-actions > * { flex:1; text-align:center; } .business-list { grid-template-columns:1fr; } }
 </style>
 
 
@@ -475,6 +497,19 @@
 
 <body>
 
+<div class="admin-shell">
+<aside class="admin-sidebar" aria-label="Admin navigation">
+    <a class="admin-brand" href="admin.html"><span class="admin-brand-mark">M</span><span>MAYNA<small>Admin portal</small></span></a>
+    <nav class="admin-menu">
+        <a class="active" href="admin.html"><span class="menu-icon">⌂</span><span>Overview</span></a>
+        <a href="#businesses"><span class="menu-icon">▦</span><span>Businesses</span></a>
+        <a href="admin-properties.html"><span class="menu-icon">⌂</span><span>Property review</span></a>
+        <a href="#support"><span class="menu-icon">✉</span><span>Support inbox</span></a>
+        <a href="#payments"><span class="menu-icon">◈</span><span>Payments</span></a>
+        <a href="#reviews"><span class="menu-icon">★</span><span>Reviews</span></a>
+    </nav>
+    <div class="admin-sidebar-footer">MAYNA Management<br>Namibia</div>
+</aside>
 
 <main class="admin-page">
 
@@ -494,12 +529,22 @@
 
             </div>
 
-            <button
-                id="logoutButton"
-                class="logout-button"
-            >
-                Logout
-            </button>
+<div class="admin-header-actions">
+    <a
+        href="admin-properties.html"
+        class="nav-button"
+        style="padding: 11px 16px;"
+    >
+        Property Review
+    </a>
+
+    <button
+        class="logout-button"
+        id="logoutButton"
+    >
+        Logout
+    </button>
+</div>
 
         </div>
 
@@ -561,7 +606,7 @@
         </div>
     </section>
 
-    <section>
+    <section id="businesses">
 
         <h2>
             Registered Businesses
@@ -576,7 +621,7 @@
 
     </section>
         <!-- SUPPORT INBOX -->
-    <section class="support-inbox-section">
+    <section class="support-inbox-section" id="support">
 
         <div class="support-inbox-header">
             <div>
@@ -606,7 +651,7 @@
 
     <!-- DONATION INBOX -->
 
-<section class="support-inbox-section">
+<section class="support-inbox-section" id="payments">
 
     <div class="support-inbox-header">
 
@@ -639,7 +684,7 @@
 </section>
 <!-- PREMIUM REQUEST INBOX -->
 
-<section class="support-inbox-section">
+<section class="support-inbox-section" id="premium-requests">
 
     <div class="support-inbox-header">
 
@@ -673,7 +718,7 @@
 
 <!-- CUSTOMER REVIEWS INBOX -->
 
-<section class="support-inbox-section">
+<section class="support-inbox-section" id="reviews">
 
     <div class="support-inbox-header">
 
@@ -704,6 +749,7 @@
 
 </section>
 </main>
+</div>
 
 <!-- MAYNA ADMIN MODAL -->
 <div

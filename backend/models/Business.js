@@ -208,6 +208,37 @@ planExpiresAt: {
     type: Date,
     default: null
 },
+// PROPERTY AGENT / AGENCY PLAN
+
+propertyPlan: {
+    type: String,
+    enum: [
+        "free",
+        "agent",
+        "pro_agency"
+    ],
+    default: "free"
+},
+
+propertyPlanStatus: {
+    type: String,
+    enum: [
+        "active",
+        "pending",
+        "expired"
+    ],
+    default: "active"
+},
+
+propertyPlanStartedAt: {
+    type: Date,
+    default: null
+},
+
+propertyPlanExpiresAt: {
+    type: Date,
+    default: null
+},
 
         // PREMIUM SOCIAL LINKS
 

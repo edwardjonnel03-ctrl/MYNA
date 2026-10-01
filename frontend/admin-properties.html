@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Review — MAYNA Admin</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        body { background:#f5f7fb; }
+        .property-shell { min-height:100vh; }
+        .property-sidebar { position:fixed; inset:0 auto 0 0; width:254px; padding:27px 16px; background:linear-gradient(180deg,#1650c7 0%,#0d3a9e 100%); color:#fff; z-index:100; box-shadow:12px 0 34px rgba(16,61,153,.18); }
+        .property-brand { display:flex; align-items:center; gap:10px; padding:0 12px 29px; color:#fff; font-weight:800; font-size:22px; letter-spacing:-.8px; }.property-brand-mark { width:31px; height:31px; border-radius:10px; display:grid; place-items:center; background:#ff6a3d; color:#fff; font-size:15px; box-shadow:0 8px 18px rgba(255,106,61,.35); }.property-brand small { display:block; margin-top:1px; color:#bcd0ff; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }.property-menu { display:grid; gap:7px; }.property-menu a { display:flex; align-items:center; gap:11px; padding:12px 13px; border-radius:10px; color:#dce8ff; font-size:14px; font-weight:700; }.property-menu a:hover,.property-menu a.active { color:#fff; background:rgba(255,255,255,.16); }.property-menu .menu-icon { width:20px; text-align:center; font-size:16px; }
+        .admin-properties {
+            max-width: none;
+            margin-left: 254px;
+            padding: 31px 38px 80px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 34px;
+        }
+
+        .top-row h1 {
+            margin-bottom: 6px;
+            color:#182233;
+            font-size:30px;
+            letter-spacing:-1.1px;
+        }
+
+        .top-row p {
+            color: var(--muted);
+        }
+
+        .back-button {
+            border: 1px solid #dbe2ee;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-weight: 700;
+            background: white;
+        }
+
+        .property-admin-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .property-admin-card {
+            background: white;
+            border: 1px solid #e5eaf2;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 5px 18px rgba(19,43,84,.06);
+        }
+
+        .property-admin-card h2 {
+            font-size: 19px;
+            line-height: 1.3;
+            margin: 10px 0 8px;
+        }
+
+        .property-admin-card p {
+            margin: 5px 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .property-admin-card strong {
+            color: var(--black);
+        }
+
+        .status {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            color: #9a5b00;
+            background: #fff1c9;
+        }
+
+        .status-active {
+            color: #087443;
+            background: #dff7ea;
+        }
+
+        .status-inactive {
+            color: #5b6470;
+            background: #edf0f2;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-actions button {
+            border: 0;
+            border-radius: 9px;
+            padding: 11px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .approve-button {
+            background: #1650c7;
+            color: white;
+        }
+
+        .inactive-button {
+            background: #e9edf0;
+            color: #303841;
+        }
+
+        .delete-button {
+            grid-column: 1 / -1;
+            background: #fff0ef;
+            color: #b42318;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            background: white;
+            border: 1px solid #e5eaf2;
+            border-radius: 16px;
+            padding: 34px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 800px) {
+            .top-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .property-admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width:900px) { .property-sidebar { width:72px; padding:23px 10px; } .property-brand{justify-content:center;padding:0 0 28px}.property-brand>span:last-child,.property-menu a span:not(.menu-icon){display:none}.property-menu a{justify-content:center;padding:12px}.admin-properties{margin-left:72px;padding:26px 24px 60px} }
+        @media (max-width:700px) { .property-sidebar { position:static;width:auto;height:auto;padding:13px 14px;display:flex;align-items:center;gap:10px }.property-brand{padding:0}.property-brand>span:last-child{display:block}.property-menu{display:flex;overflow-x:auto;gap:5px;flex:1}.property-menu a{min-width:44px;padding:9px}.admin-properties{margin-left:0;padding:23px 16px 50px} }
+        .property-confirm-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    padding: 20px;
+    background: rgba(17, 17, 17, 0.55);
+    z-index: 5000;
+}
+
+.property-confirm-modal.show {
+    display: grid;
+}
+
+.property-confirm-card {
+    width: min(100%, 420px);
+    background: white;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+}
+
+.property-confirm-card h2 {
+    margin-bottom: 9px;
+}
+
+.property-confirm-card p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.property-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.property-confirm-actions button {
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 16px;
+    cursor: pointer;
+    font-weight: 700;
+}
+    </style>
+</head>
+
+<body>
+    <div class="property-shell">
+    <aside class="property-sidebar" aria-label="Admin navigation">
+        <a class="property-brand" href="admin.html"><span class="property-brand-mark">M</span><span>MAYNA<small>Admin portal</small></span></a>
+        <nav class="property-menu">
+            <a href="admin.html"><span class="menu-icon">⌂</span><span>Overview</span></a>
+            <a class="active" href="admin-properties.html"><span class="menu-icon">⌂</span><span>Property review</span></a>
+        </nav>
+    </aside>
+    <main class="admin-properties">
+        <div class="top-row">
+            <div>
+                <h1>Property review</h1>
+                <p>Approve, unpublish or remove MAYNA property listings.</p>
+            </div>
+
+            <a href="admin.html" class="back-button">
+                ← Back to admin
+            </a>
+        </div>
+
+        <section
+            id="propertyAdminGrid"
+            class="property-admin-grid"
+            aria-live="polite"
+        >
+            <p class="empty-state">Loading properties...</p>
+        </section>
+    </main>
+    <div
+    id="propertyConfirmModal"
+    class="property-confirm-modal"
+    aria-hidden="true"
+>
+    <div class="property-confirm-card">
+        <h2 id="propertyConfirmTitle">
+            Confirm action
+        </h2>
+
+        <p id="propertyConfirmMessage"></p>
+
+        <div class="property-confirm-actions">
+            <button
+                type="button"
+                id="propertyConfirmCancel"
+                class="inactive-button"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="propertyConfirmAccept"
+                class="approve-button"
+            >
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script>
+        const grid = document.getElementById("propertyAdminGrid");
+
+        const propertyConfirmModal =
+    document.getElementById("propertyConfirmModal");
+
+const propertyConfirmTitle =
+    document.getElementById("propertyConfirmTitle");
+
+const propertyConfirmMessage =
+    document.getElementById("propertyConfirmMessage");
+
+const propertyConfirmCancel =
+    document.getElementById("propertyConfirmCancel");
+
+const propertyConfirmAccept =
+    document.getElementById("propertyConfirmAccept");
+
+let resolvePropertyConfirmation = null;
+
+function showPropertyConfirmation(
+    title,
+    message,
+    confirmText
+) {
+    propertyConfirmTitle.textContent = title;
+    propertyConfirmMessage.textContent = message;
+    propertyConfirmAccept.textContent = confirmText;
+
+    propertyConfirmModal.classList.add("show");
+    propertyConfirmModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    return new Promise(function (resolve) {
+        resolvePropertyConfirmation = resolve;
+    });
+}
+
+function closePropertyConfirmation(answer) {
+    propertyConfirmModal.classList.remove("show");
+    propertyConfirmModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    if (resolvePropertyConfirmation) {
+        resolvePropertyConfirmation(answer);
+        resolvePropertyConfirmation = null;
+    }
+}
+
+propertyConfirmCancel.addEventListener(
+    "click",
+    function () {
+        closePropertyConfirmation(false);
+    }
+);
+
+propertyConfirmAccept.addEventListener(
+    "click",
+    function () {
+        closePropertyConfirmation(true);
+    }
+);
+        function escapeHtml(value) {
+            const div = document.createElement("div");
+            div.textContent = value || "";
+            return div.innerHTML;
+        }
+
+        function formatPrice(price) {
+            return `N$${new Intl.NumberFormat("en-NA").format(price)}`;
+        }
+
+        async function updateStatus(id, status) {
+            const response = await fetch(
+                `/api/properties/admin/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ status })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Could not update property.");
+                return;
+            }
+
+            loadProperties();
+        }
+
+async function deleteProperty(id) {
+    const confirmed = await showPropertyConfirmation(
+        "Delete property permanently?",
+        "This permanently removes the property from MAYNA. This action cannot be undone.",
+        "Delete permanently"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+            const response = await fetch(
+                `/api/properties/admin/${encodeURIComponent(id)}`,
+                {
+                    method: "DELETE",
+                    credentials: "include"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Could not delete property.");
+                return;
+            }
+
+            loadProperties();
+        }
+        function propertyCard(property) {
+            const status = escapeHtml(property.status);
+
+            return `
+                <article class="property-admin-card">
+                    <span class="status status-${status}">
+                        ${status}
+                    </span>
+
+                    <h2>${escapeHtml(property.title)}</h2>
+
+                    <p>
+                        <strong>${formatPrice(property.price)}</strong>
+                        · ${escapeHtml(property.listingType)}
+                    </p>
+
+                    <p>
+                        ${escapeHtml(property.propertyType)}
+                        · ${escapeHtml(property.town)}
+                    </p>
+
+                    <p>
+                        Agent: ${escapeHtml(property.agentName)}
+                    </p>
+
+                    <p>
+                        ${escapeHtml(property.phone)}
+                    </p>
+
+                    <label class="property-photo-upload">
+    Add property photos
+    <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        data-property-photo-input
+        data-property-id="${property._id}"
+    >
+</label>
+                    <div class="admin-actions">
+<button
+    type="button"
+    class="approve-button"
+    data-property-action="status"
+    data-property-id="${property._id}"
+    data-property-status="active"
+>
+    Approve & publish
+</button>
+
+<button
+    type="button"
+    class="inactive-button"
+    data-property-action="status"
+    data-property-id="${property._id}"
+    data-property-status="inactive"
+>
+    Unpublish
+</button>
+
+<button
+    type="button"
+    class="delete-button"
+    data-property-action="delete"
+    data-property-id="${property._id}"
+>
+    Delete permanently
+</button>
+                    </div>
+                </article>
+            `;
+        }
+
+        async function loadProperties() {
+            try {
+                const accessCheck = await fetch(
+                    "/api/admin/check",
+                    {
+                        credentials: "include"
+                    }
+                );
+
+                if (!accessCheck.ok) {
+                    window.location.href = "admin-login.html";
+                    return;
+                }
+
+                const response = await fetch(
+                    "/api/properties/admin/all",
+                    {
+                        credentials: "include"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+
+                grid.innerHTML = data.properties.length
+                    ? data.properties.map(propertyCard).join("")
+                    : `
+                        <p class="empty-state">
+                            No property submissions yet.
+                        </p>
+                    `;
+            } catch (error) {
+                grid.innerHTML = `
+                    <p class="empty-state">
+                        Could not load properties. Please refresh and try again.
+                    </p>
+                `;
+            }
+        }
+
+        grid.addEventListener("click", async function (event) {
+    const button = event.target.closest(
+        "[data-property-action]"
+    );
+
+    if (!button) {
+        return;
+    }
+
+    const action = button.dataset.propertyAction;
+    const propertyId = button.dataset.propertyId;
+
+if (action === "status") {
+    const newStatus = button.dataset.propertyStatus;
+
+const confirmed = await showPropertyConfirmation(
+    newStatus === "active"
+        ? "Approve and publish?"
+        : "Unpublish property?",
+    newStatus === "active"
+        ? "This property will become visible publicly on MAYNA."
+        : "This property will be removed from the public Property page.",
+    newStatus === "active"
+        ? "Approve & publish"
+        : "Unpublish"
+);
+
+    if (!confirmed) {
+        return;
+    }
+
+    await updateStatus(
+        propertyId,
+        newStatus
+    );
+}
+
+    if (action === "delete") {
+        await deleteProperty(propertyId);
+    }
+});
+        loadProperties();
+    </script>
+
+    </div>
+</div>
+</body>
+</html>

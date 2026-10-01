@@ -355,6 +355,26 @@
 .mayna-dashboard-modal-button:hover {
     opacity: 0.9;
 }
+.dashboard-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.property-dashboard-button {
+    display: inline-block;
+    padding: 11px 16px;
+    border-radius: 7px;
+    background: #ff5a36;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.property-dashboard-button:hover {
+    background: #e84825;
+}
     </style>
 
 </head>
@@ -377,9 +397,18 @@
 
         </div>
 
-        <button id="logoutButton">
-            Logout
-        </button>
+<div class="dashboard-top-actions">
+    <a
+        href="property-dashboard.html"
+        class="property-dashboard-button"
+    >
+        Property Dashboard
+    </a>
+
+    <button id="logoutButton">
+        Logout
+    </button>
+</div>
 
     </div>
 

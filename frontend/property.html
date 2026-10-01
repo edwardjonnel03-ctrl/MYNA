@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Property in Namibia | MAYNA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/property.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="navbar"><div class="nav-container">
+    <a href="index.html" class="logo">MAYNA</a>
+    <nav class="nav-links">
+        <a href="businesses.html">Explore Businesses</a>
+        <a href="property.html" class="active">Property</a>
+        <a href="register.html">List your business</a>
+        <a href="owner-login.html">Business Login</a>
+        <a href="contact.html">Contact &amp; Support</a>
+    </nav>
+    <a href="list-property.html" class="nav-button">List property</a>
+</div></header>
+<main>
+    <section class="property-hero"><div class="property-wrap">
+        <p class="eyebrow">MAYNA PROPERTY</p>
+        <h1>Find a place that fits your life.</h1>
+        <p>Explore homes, rentals, land and commercial property across Namibia.</p>
+        <form id="propertySearch" class="property-search">
+            <input id="search" maxlength="100" placeholder="Search town, area, property type..." aria-label="Search property">
+            <select id="listing" aria-label="Listing type"><option value="">Buy or rent</option><option>For sale</option><option>For rent</option></select>
+            <button type="submit">Search property</button>
+        </form>
+    </div></section>
+    <section class="property-wrap property-content">
+        <div class="property-toolbar"><div><h2>Property listings</h2><p id="propertyCount">Loading listings...</p></div><a class="outline-button" href="list-property.html">+ List a property</a></div>
+        <div id="propertyGrid" class="property-grid" aria-live="polite"></div>
+    </section>
+</main>
+<script src="js/property.js"></script>
+</body>
+</html>

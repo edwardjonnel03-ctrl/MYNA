@@ -10,8 +10,8 @@ if (
     );
 }
 
-const cloudinary =
-    require("./config/cloudinary");
+const supabase =
+    require("./config/supabase");
 
 const mongoose = require("mongoose");
 const express = require("express");
@@ -77,7 +77,9 @@ app.use(
                 imgSrc: [
                     "'self'",
                     "data:",
+                    "blob:",
                     "https://res.cloudinary.com",
+                    "https://*.supabase.co",
                     "https://images.unsplash.com"
                 ],
 
@@ -287,7 +289,7 @@ const allowedImageTypes = [
     "image/webp"
 ];
 
-const imageMatch =
+const supabaseDataUriMatch =
     typeof image === "string"
         ? image.match(
             /^data:(image\/[a-zA-Z0-9.+-]+);base64,/
@@ -295,9 +297,9 @@ const imageMatch =
         : null;
 
 if (
-    !imageMatch ||
+    !supabaseDataUriMatch ||
     !allowedImageTypes.includes(
-        imageMatch[1].toLowerCase()
+        supabaseDataUriMatch[1].toLowerCase()
     )
 ) {
     return res.status(400).json({
@@ -320,7 +322,7 @@ const imageSizeBytes =
     imageBuffer.length;
 
 const declaredImageType =
-    imageMatch[1].toLowerCase();
+    supabaseDataUriMatch[1].toLowerCase();
 
 const isJPEG =
     imageBuffer.length >= 3 &&
@@ -382,24 +384,48 @@ if (
     });
 }
 
-            const result =
-                await cloudinary.uploader.upload(
-                    image,
-                    {
-                        folder: "myna/businesses",
-                        resource_type: "image"
-                    }
-                );
+const supabaseMimeType = declaredImageType;
 
-            return res.json({
-                success: true,
-                url: result.secure_url
-            });
+const extensionByType = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+};
+
+const supabaseFileExtension =
+    extensionByType[supabaseMimeType];
+
+const supabaseFileName =
+    `myna-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 10)}.${supabaseFileExtension}`;
+
+const { data: uploadedFile, error: uploadError } =
+    await supabase.storage
+        .from("mayna-images")
+.upload(`uploads/${supabaseFileName}`, imageBuffer, {
+    contentType: supabaseMimeType,
+    upsert: false
+});
+
+if (uploadError) {
+    throw uploadError;
+}
+
+const { data: publicUrlData } =
+    supabase.storage
+        .from("mayna-images")
+        .getPublicUrl(uploadedFile.path);
+
+return res.json({
+    success: true,
+    url: publicUrlData.publicUrl
+});
 
         } catch (error) {
 
             console.error(
-                "Cloudinary upload error:",
+                "Supabase upload error:",
                 error
             );
 
@@ -1680,6 +1706,22 @@ const businessRoutes =
 app.use(
     "/api/businesses",
     businessRoutes
+);
+
+// Property is a separate MAYNA section. It does not alter business records.
+const propertyRoutes =
+    require("./routes/properties");
+
+app.use(
+    "/api/properties",
+    propertyRoutes
+);
+const propertyPlanRequestRoutes =
+    require("./routes/property-plan-requests");
+
+app.use(
+    "/api/property-plan-requests",
+    propertyPlanRequestRoutes
 );
 
 

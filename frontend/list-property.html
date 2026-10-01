@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow">
+<title>List a Property | MAYNA</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/property.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head><body>
+<header class="navbar"><div class="nav-container"><a href="index.html" class="logo">MAYNA</a><nav class="nav-links"><a href="businesses.html">Explore Businesses</a><a href="property.html" class="active">Property</a><a href="register.html">List your business</a></nav><a href="property.html" class="nav-button">View property</a></div></header>
+<main class="property-wrap form-page"><p class="eyebrow">MAYNA PROPERTY</p><h1>List a property</h1><p class="form-intro">Send the listing for review. It will appear publicly only after approval.</p>
+<form id="propertyForm" class="property-form">
+<label>Listing title<input name="title" required maxlength="140" placeholder="Modern 2-bedroom apartment in Rundu"></label>
+<div class="form-grid"><label>Property type<select name="propertyType" required><option value="">Choose one</option><option>House</option><option>Apartment</option><option>Townhouse</option><option>Land / Plot</option><option>Commercial</option><option>Development</option><option>Other</option></select></label><label>Listing type<select name="listingType" required><option value="">Choose one</option><option>For sale</option><option>For rent</option></select></label></div>
+<div class="form-grid"><label>Price (N$)<input name="price" type="number" min="0" required></label><label>Town<input name="town" required maxlength="100"></label></div>
+<div class="form-grid"><label>Area / suburb<input name="area" maxlength="120"></label><label>Size (m²)<input name="size" type="number" min="0"></label></div>
+<div class="form-grid">
+    <label>
+        Land size (m²)
+        <input
+            name="landSize"
+            type="number"
+            min="0"
+        >
+    </label>
+
+    <label>
+        Garages
+        <input
+            name="garages"
+            type="number"
+            min="0"
+            max="20"
+        >
+    </label>
+</div>
+
+<label>
+    Property features
+    <textarea
+        name="features"
+        rows="3"
+        maxlength="2400"
+        placeholder="Separate features with commas, e.g. Sea view, Garden, Alarm system, Built-in braai"
+    ></textarea>
+</label>
+<div class="form-grid"><label>Bedrooms<input name="bedrooms" type="number" min="0" max="50"></label><label>Bathrooms<input name="bathrooms" type="number" min="0" max="50" step="0.5"></label></div>
+<label>Description<textarea name="description" required maxlength="3000" rows="6" placeholder="Tell people what makes this property useful and special."></textarea></label>
+<label>
+    Property photos
+    <input
+        type="file"
+        id="propertyImages"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+    >
+</label>
+
+<p class="form-note">
+    Upload up to 20 JPEG, PNG or WebP photos. Each image must be under 5 MB.
+</p>
+
+<div
+    id="propertyImagePreview"
+    class="property-image-preview"
+></div>
+<h2>Agent contact</h2><div class="form-grid"><label>Your name<input name="agentName" required maxlength="120"></label><label>Agency name<input name="agencyName" maxlength="120"></label></div><div class="form-grid"><label>Phone number<input name="phone" required maxlength="30"></label><label>WhatsApp number<input name="whatsapp" maxlength="30"></label></div><label>Email address<input name="email" type="email" required maxlength="254"></label>
+<p class="form-note">Photo uploads will be added with the agent dashboard. This first safe version collects the complete listing and contact details for review.</p><button type="submit" class="nav-button">Submit property for review</button><p id="formMessage" role="status"></p>
+</form></main><script src="js/list-property.js"></script>
+</body></html>

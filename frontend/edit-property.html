@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Property — MAYNA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .edit-property-page {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+
+        .edit-property-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+
+        .edit-property-header h1 {
+            margin: 0 0 8px;
+        }
+
+        .edit-property-header p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .edit-property-form {
+            padding: 26px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .edit-note {
+            margin: 0 0 18px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #fff2dc;
+            color: #7a4800;
+        }
+
+        .form-message {
+            margin-top: 16px;
+            font-weight: 700;
+        }
+
+        .form-message.error {
+            color: #b42318;
+        }
+
+        .form-message.success {
+            color: #087443;
+        }
+
+        @media (max-width: 700px) {
+            .edit-property-header,
+            .form-grid {
+                display: block;
+            }
+
+            .edit-property-header > * {
+                margin-bottom: 16px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="edit-property-page">
+        <div class="edit-property-header">
+            <div>
+                <h1>Edit property listing</h1>
+
+                <p>
+                    Update the details, then send the listing back to MAYNA for review.
+                </p>
+            </div>
+
+            <a
+                href="property-dashboard.html"
+                class="secondary-button"
+            >
+                Back to Property Dashboard
+            </a>
+        </div>
+
+        <form
+            id="editPropertyForm"
+            class="edit-property-form"
+        >
+            <p class="edit-note">
+                Saving changes sends this property to Pending review before it is shown publicly again.
+            </p>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="title">Property title</label>
+                    <input
+                        id="title"
+                        name="title"
+                        maxlength="140"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="propertyType">Property type</label>
+                    <select
+                        id="propertyType"
+                        name="propertyType"
+                        required
+                    >
+                        <option value="House">House</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Land / Plot">Land / Plot</option>
+                        <option value="Commercial">Commercial</option>
+                        <option value="Development">Development</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="listingType">Listing type</label>
+                    <select
+                        id="listingType"
+                        name="listingType"
+                        required
+                    >
+                        <option value="For sale">For sale</option>
+                        <option value="For rent">For rent</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price (N$)</label>
+                    <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="town">Town</label>
+                    <input
+                        id="town"
+                        name="town"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="area">Area / suburb</label>
+                    <input
+                        id="area"
+                        name="area"
+                        maxlength="120"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="size">Size (m²)</label>
+                    <div class="form-group">
+    <label for="landSize">Land size (m²)</label>
+    <input
+        id="landSize"
+        name="landSize"
+        type="number"
+        min="0"
+    >
+</div>
+
+<div class="form-group">
+    <label for="garages">Garages</label>
+    <input
+        id="garages"
+        name="garages"
+        type="number"
+        min="0"
+        max="20"
+    >
+</div>
+                    <input
+                        id="size"
+                        name="size"
+                        type="number"
+                        min="0"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="bedrooms">Bedrooms</label>
+                    <input
+                        id="bedrooms"
+                        name="bedrooms"
+                        type="number"
+                        min="0"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="bathrooms">Bathrooms</label>
+                    <input
+                        id="bathrooms"
+                        name="bathrooms"
+                        type="number"
+                        min="0"
+                    >
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        maxlength="3000"
+                        required
+                    ></textarea>
+                </div>
+                <div class="form-group full-width">
+    <label for="features">
+        Property features
+    </label>
+
+    <textarea
+        id="features"
+        name="features"
+        rows="4"
+        maxlength="2400"
+        placeholder="Separate features with commas, e.g. Sea view, Garden, Alarm system, Built-in braai"
+    ></textarea>
+</div>
+
+                <div class="form-group">
+                    <label for="agentName">Agent name</label>
+                    <input
+                        id="agentName"
+                        name="agentName"
+                        maxlength="120"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="agencyName">Agency name</label>
+                    <input
+                        id="agencyName"
+                        name="agencyName"
+                        maxlength="120"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input
+                        id="phone"
+                        name="phone"
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp</label>
+                    <input
+                        id="whatsapp"
+                        name="whatsapp"
+                        maxlength="30"
+                    >
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="email">Email</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        maxlength="254"
+                        required
+                    >
+                </div>
+            </div>
+
+            <button
+                id="saveButton"
+                type="submit"
+                class="nav-button"
+            >
+                Save changes for review
+            </button>
+
+            <p
+                id="formMessage"
+                class="form-message"
+                aria-live="polite"
+            ></p>
+        </form>
+    </main>
+
+    <script>
+        const form =
+            document.getElementById(
+                "editPropertyForm"
+            );
+
+        const message =
+            document.getElementById(
+                "formMessage"
+            );
+
+        const saveButton =
+            document.getElementById(
+                "saveButton"
+            );
+
+        const propertyId =
+            new URLSearchParams(
+                window.location.search
+            ).get("id");
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className =
+                `form-message ${type}`;
+        }
+
+        function setFieldValue(name, value) {
+            const field =
+                form.elements[name];
+
+            if (field) {
+                field.value =
+                    value === null ||
+                    value === undefined
+                        ? ""
+                        : value;
+            }
+        }
+
+        async function loadProperty() {
+            if (!propertyId) {
+                showMessage(
+                    "No property was selected.",
+                    "error"
+                );
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/api/properties/owner/${encodeURIComponent(propertyId)}`,
+                    {
+                        credentials: "include"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.status === 401) {
+                    window.location.href =
+                        "owner-login.html";
+
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+
+                const property = data.property;
+
+                [
+                    "title",
+                    "propertyType",
+                    "listingType",
+                    "price",
+                    "town",
+                    "area",
+                    "size",
+                    "landSize",
+                    "garages",
+                    "bedrooms",
+                    "bathrooms",
+                    "description",
+                    "features",
+                    "agentName",
+                    "agencyName",
+                    "phone",
+                    "whatsapp",
+                    "email"
+                ].forEach(function (field) {
+                    setFieldValue(
+                        field,
+                        property[field]
+                    );
+                });
+            } catch (error) {
+                showMessage(
+                    error.message ||
+                    "Could not load this property.",
+                    "error"
+                );
+            }
+        }
+
+        form.addEventListener(
+            "submit",
+            async function (event) {
+                event.preventDefault();
+
+                const body = Object.fromEntries(
+                    new FormData(form).entries()
+                );
+
+                saveButton.disabled = true;
+                saveButton.textContent =
+                    "Saving changes...";
+
+                try {
+                    const response = await fetch(
+                        `/api/properties/owner/${encodeURIComponent(propertyId)}`,
+                        {
+                            method: "PATCH",
+                            credentials: "include",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify(body)
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message);
+                    }
+
+                    showMessage(
+                        data.message,
+                        "success"
+                    );
+
+                    saveButton.textContent =
+                        "Saved for review";
+                } catch (error) {
+                    showMessage(
+                        error.message ||
+                        "Could not save changes.",
+                        "error"
+                    );
+
+                    saveButton.disabled = false;
+                    saveButton.textContent =
+                        "Save changes for review";
+                }
+            }
+        );
+
+        loadProperty();
+    </script>
+</body>
+</html>
