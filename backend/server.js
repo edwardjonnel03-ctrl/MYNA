@@ -2122,4 +2122,12 @@ async function startServer() {
     }
 }
 
-startServer();
+// =========================================
+// VERCEL + LOCAL SERVER SUPPORT
+// =========================================
+
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;
