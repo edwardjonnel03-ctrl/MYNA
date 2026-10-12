@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://myna-backend2.vercel.app/api/:path*"
+    }
+  ]
+}

@@ -84,10 +84,12 @@ app.use(
                 ],
 
                 connectSrc: [
-                    "'self'",
-                    "http://localhost:5000",
-                    "https://myna-web-i92o.onrender.com"
-                ],
+    "'self'",
+    "http://localhost:5000",
+    "https://myna-web-i92o.onrender.com",
+    "https://myna-frontend-pi.vercel.app",
+    "https://myna-backend2.vercel.app"
+],
 
                 objectSrc: [
                     "'none'"
@@ -106,6 +108,8 @@ app.use(
 );
 
 const allowedOrigins = [
+    "https://myna-frontend-pi.vercel.app",
+    "https://myna-backend2.vercel.app",
     "https://myna-web-i92o.onrender.com",
     "http://localhost:5000"
 ];
